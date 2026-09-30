@@ -1,0 +1,12 @@
+{
+  "name": "ticket-triage",
+  "image": "python:3.12-slim",
+  "setup": "python3 --version",
+  "files": ["pipeline.py"],
+  "command": "python3 pipeline.py input.json",
+  "record": "ticket.json",
+  "expects": {
+    "relevant": ["subject", "body", "customer_tier"],
+    "irrelevant": ["ticket_id", "submitted_at"]
+  }
+}
