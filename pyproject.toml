@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "loadbearing"
+version = "0.1.0"
+description = "Find which inputs a pipeline is actually load-bearing on, by checkpoint-and-fork over mutated inputs."
+readme = "README.md"
+license = { text = "Apache-2.0" }
+requires-python = ">=3.10"
+authors = [{ name = "Varunika Rai" }]
+# The core (mutations, local backend, verdicts, Nemotron and Tavily clients)
+# is stdlib only, so the local slice runs with nothing installed.
+dependencies = []
+
+[project.optional-dependencies]
+sandbox = ["contree-sdk", "contree-client"]
+
+[project.scripts]
+loadbearing = "loadbearing.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
