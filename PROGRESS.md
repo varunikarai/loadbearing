@@ -74,6 +74,7 @@ Each one missing kills the entry.
 
 Proposed by Aeshvarya on 2026-10-06, not yet agreed:
 
+- **Track fit is a Stage One gate.** The rules screen out a project that is not a "genuine attempt at the track's stated goal", and the Coding track asks for agents that write, run and test code in Sandboxes. Today we run and test but write nothing. Close the loop: Ultra writes the smallest fix, the fix is applied in a fresh fork of the same checkpoint, and the probe is re-run to show the defect gone. Find, explain, fix, prove: the same checkpoint primitive at every step.
 - **Demo target:** an LLM pipeline rather than a hand-written one. For example, a retrieval or tool-calling step on Nemotron that silently ignores a retrieved field. It fits the agentic track, and it is the case where Nano's noise-or-meaningful call actually earns its place.
 - **Noise floor:** an LLM target will fail the two-run determinism check. Run the baseline k times and mark the output keys that vary on their own as unstable, rather than voiding every verdict.
 - **Tavily's job:** infer `expects` for undeclared fields from upstream docs, so an undeclared field can carry a defect claim. That is a runtime call doing work that nothing else in the system does.
