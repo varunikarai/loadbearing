@@ -17,7 +17,8 @@ _Updated 2026-10-06_
 
 - **State:** the vertical slice runs end to end on the local backend: toy target, 15 forks from one checkpoint, both planted bugs caught, 18/18 tests pass. The Sandboxes backend and Nemotron Nano classification are written but have never run against a live account.
 - **Next action:** Sat 2026-10-10, Varunika. Claim credits, `pip install -e '.[sandbox]'`, `contree auth`, `loadbearing models` and put the Nemotron IDs in `.env`, then `loadbearing probe examples/ticket_triage/target.json --backend sandbox --nano`. Pass = the same two defects, found on Nebius.
-- **Waiting on:** Aeshvarya accepting the repo invite (expires 2026-10-13).
+- **Also built (2026-10-06, Aeshvarya, branch `aeshvarya/report-and-demo`):** timing, versioned JSON report, HTML report with the fork tree, demo server with cached runs and read-only mode, Dockerfile, CI with a probe gate. 34/34 tests. Not deployed yet.
+- **Waiting on:** Varunika reviewing and merging that branch.
 - **Deadline:** 2026-10-30 10:00 PT (22:30 IST). **Target submission: 2026-10-25.**
 
 ## Plan
@@ -47,7 +48,7 @@ Each one missing kills the entry.
 | Runs on Token Factory or AI Cloud, uses an NVIDIA open model | stage 1 pass/fail | Code written, not yet run live |
 | Public repo, OSS licence visible at the top | 2026-10-18 | Apache 2.0 committed. Repo private until the flip: `gh repo edit varunikarai/loadbearing --visibility public --accept-visibility-change-consequences` |
 | README with setup and Nebius / Nemotron usage | 2026-10-18 | Technical sections drafted. Pitch and team section not written |
-| Hosted demo URL | 2026-10-18 | Not started |
+| Hosted demo URL | 2026-10-18 | Server and Docker image built and checked locally. Host not chosen, not deployed |
 | Public YouTube video, 3 min or less, **with audio**, covering Token Factory and the NVIDIA model used | 2026-10-18 | Not started |
 | Written Nebius / NVIDIA tooling feedback | 2026-10-25 | Not started |
 
@@ -69,6 +70,14 @@ Each one missing kills the entry.
 - **Demo target pipeline:** not chosen. Due Sat 2026-10-10.
 - **Hosted demo shape:** not decided. Minimum is a web page that runs a probe on a fixed target and renders the report.
 - **Credits:** do they cover Sandboxes runs or only inference? Check the console balance after the first Sandboxes run.
+- **Demo host:** Render, Fly or Railway; all take the Dockerfile as is. Aeshvarya to pick by 2026-10-11.
+
+Proposed by Aeshvarya on 2026-10-06, not yet agreed:
+
+- **Demo target:** an LLM pipeline rather than a hand-written one. For example, a retrieval or tool-calling step on Nemotron that silently ignores a retrieved field. It fits the agentic track, and it is the case where Nano's noise-or-meaningful call actually earns its place.
+- **Noise floor:** an LLM target will fail the two-run determinism check. Run the baseline k times and mark the output keys that vary on their own as unstable, rather than voiding every verdict.
+- **Tavily's job:** infer `expects` for undeclared fields from upstream docs, so an undeclared field can carry a defect claim. That is a runtime call doing work that nothing else in the system does.
+- **Prior art to name in the README:** metamorphic testing and input ablation or sensitivity analysis. Mutation testing is different: it mutates the code, not the inputs.
 
 ## Quick reference
 
@@ -82,6 +91,11 @@ Problem statement: [SPEC.md](SPEC.md). Setup, target format, layout: [README.md]
 ## Log
 
 Newest first.
+
+### 2026-10-06 (b)
+- Invite accepted (Aeshvarya). Read the repo end to end; the slice runs and 18/18 tests pass as written.
+- Built on `aeshvarya/report-and-demo`: per-run timing; versioned JSON report; self-contained HTML report around the fork tree; `loadbearing serve` with cache and `--readonly`; `$PORT`; Dockerfile (checked in a container); CI running tests and the probe gate. 34/34 tests.
+- Next: Varunika merges, Aeshvarya picks a host and deploys by 2026-10-11.
 
 ### 2026-10-06
 - Aeshvarya invited to the repo with write access (Varunika). Invite expires 2026-10-13.
