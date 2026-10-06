@@ -36,5 +36,9 @@ class Backend(Protocol):
     def run(self, checkpoint: Any, target: Target, record: dict) -> RunResult:
         """Fork the checkpoint, drop `record` in as INPUT_NAME, run the pipeline."""
 
+    def apply(self, checkpoint: Any, files: dict[str, str]) -> Any:
+        """A new checkpoint derived from `checkpoint`, with `files` (path -> full content) written.
+        The original checkpoint is never changed. Contract C2; a fix is proven on the result."""
+
     def close(self) -> None:
         """Release whatever the backend holds."""
