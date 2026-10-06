@@ -5,9 +5,9 @@ from __future__ import annotations
 import argparse
 import json
 import sys
-from dataclasses import asdict
 from typing import Optional
 
+from loadbearing import report as report_json
 from loadbearing.backends import make_backend
 from loadbearing.config import load_dotenv
 from loadbearing.mutations import KINDS
@@ -29,6 +29,7 @@ def main(argv: Optional[list[str]] = None) -> int:
     p.add_argument("--nano", action="store_true", help="have Nemotron Nano judge each moved diff")
     p.add_argument("--workers", type=int, default=8, help="forks run in parallel")
     p.add_argument("--json", action="store_true", help="print the full report as JSON")
+    p.add_argument("--out", metavar="FILE", help="also save the full report as JSON")
 
     m = sub.add_parser("models", help="list the Nemotron model IDs your Token Factory key can call")
     m.add_argument("--all", action="store_true", help="list every model, not only Nemotron")
@@ -56,10 +57,10 @@ def _probe(args: argparse.Namespace) -> int:
     finally:
         backend.close()
 
+    if args.out:
+        report_json.save(report, args.out)
     if args.json:
-        out = asdict(report)
-        out["defects"] = [v.field for v in report.defects]
-        print(json.dumps(out, indent=2))
+        print(json.dumps(report_json.to_dict(report), indent=2))
     else:
         print(render(report))
     # Non-zero on any defect, so this can gate CI.
