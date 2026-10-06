@@ -89,6 +89,11 @@ Problem statement: [SPEC.md](SPEC.md). Setup, target format, layout: [README.md]
 
 Newest first.
 
+### 2026-10-06 (f)
+- `Fix` contract (C3) on `main` (Varunika, `460c787`), four days early: `src/loadbearing/fix.py` plus tests built on the toy target's real `bdoy` to `body` fix, so A4 can prove against a known-good fix now.
+- Pulled Aeshvarya's Sandboxes backend rebuilt on contree-sdk 0.3.6 and his A1 contracts; the full suite passes with all of it on `main`.
+- Next for Varunika: Sat 2026-10-10, V1 (no `contree auth` step any more: key and project ID go in `.env`), then V3.
+
 ### 2026-10-06 (e)
 - WORKPLAN.md written (Varunika): 24 tasks, 12 each, every one with why, owned files, prerequisites, steps and a done test; seven contracts so neither side waits; an ownership map; a day-by-day timeline to submission on 10-25; the judging criteria mapped to tasks; risks and a cut order.
 - Balance: Varunika 24 tech and 16.5 non-tech, Aeshvarya 26 tech and 13.5 non-tech.
