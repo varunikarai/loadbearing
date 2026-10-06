@@ -16,7 +16,7 @@ from loadbearing.verdict import PHANTOM_SENSITIVITY, SILENT_PASSTHROUGH
 
 _CLIP = 160
 
-_CSS = """
+CSS = """
 :root{--bg:#0b0b0c;--panel:#141416;--line:#26262a;--text:#f3f3f1;--dim:#8d8d93;
 --moved:#c8ff3d;--same:#3a3a40;--silent:#ff4d4d;--phantom:#ffb020;--ok:#c8ff3d}
 @media (prefers-color-scheme:light){:root{--bg:#fafaf7;--panel:#fff;--line:#e4e4df;--text:#111;
@@ -82,7 +82,7 @@ def render_html(data: dict[str, Any]) -> str:
     parts = [
         "<!doctype html><html lang=en><head><meta charset=utf-8>",
         '<meta name=viewport content="width=device-width,initial-scale=1">',
-        f"<title>{escape(data['target'])} · Loadbearing</title><style>{_CSS}</style></head><body><main>",
+        f"<title>{escape(data['target'])} · Loadbearing</title><style>{CSS}</style></head><body><main>",
         '<div class="brand"><b>Loadbearing</b> · checkpoint once, fork per mutation</div>',
         f"<h1>{escape(data['target'])}</h1>",
         f'<p class="lede">{lede}</p>',
