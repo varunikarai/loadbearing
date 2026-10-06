@@ -18,7 +18,11 @@ The problem statement is in [SPEC.md](SPEC.md).
 - [ ] Sandboxes backend run against a live account (written against the documented SDK, not yet exercised)
 - [ ] Nemotron Nano diff classification verified with real model IDs
 - [ ] Super reconciliation and Ultra explanation in the report
-- [ ] Tavily call establishing intended behaviour from upstream docs
+- [ ] Tavily inferring which fields should matter, from upstream docs
+- [ ] Noise floor: a k-run baseline marks keys that vary on their own as unstable
+- [ ] Close the loop: Ultra writes the fix, a fresh fork of the same checkpoint proves the defect gone
+- [ ] An LLM pipeline on Nemotron as the demo target
+- [ ] Prior art: metamorphic testing and input ablation
 - [x] Timing: checkpoint, parallel wall time, and the same runs summed one after another
 - [x] Versioned JSON report, and a self-contained HTML report built around the fork tree
 - [x] Demo server with cached runs and a read-only mode; Dockerfile; CI with a probe gate
