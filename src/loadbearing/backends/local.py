@@ -57,5 +57,17 @@ class LocalBackend:
         )
         return RunResult(proc.stdout, proc.stderr, proc.returncode)
 
+    def apply(self, checkpoint: Path, files: dict[str, str]) -> Path:
+        """A copy of the checkpoint with `files` written into it. The original is untouched."""
+        derived = Path(tempfile.mkdtemp(prefix="checkpoint-", dir=self._tmp.name))
+        shutil.copytree(checkpoint, derived, dirs_exist_ok=True)
+        for rel, content in files.items():
+            dest = (derived / rel).resolve()
+            if not dest.is_relative_to(derived.resolve()):
+                raise ValueError(f"{rel!r} is outside the checkpoint")
+            dest.parent.mkdir(parents=True, exist_ok=True)
+            dest.write_text(content)
+        return derived
+
     def close(self) -> None:
         self._tmp.cleanup()

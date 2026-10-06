@@ -21,6 +21,18 @@ class LocalBackendTests(unittest.TestCase):
         b = self.backend.checkpoint(self.target)
         self.assertNotEqual(a, b)
 
+    def test_apply_derives_a_new_checkpoint_and_leaves_the_original_alone(self):
+        original = self.backend.checkpoint(self.target)
+        before = (original / "pipeline.py").read_text()
+        derived = self.backend.apply(original, {"pipeline.py": "print('patched')\n"})
+        self.assertEqual((derived / "pipeline.py").read_text(), "print('patched')\n")
+        self.assertEqual((original / "pipeline.py").read_text(), before)
+
+    def test_apply_refuses_a_path_outside_the_checkpoint(self):
+        original = self.backend.checkpoint(self.target)
+        with self.assertRaises(ValueError):
+            self.backend.apply(original, {"../escape.py": "x"})
+
 
 if __name__ == "__main__":
     unittest.main()
