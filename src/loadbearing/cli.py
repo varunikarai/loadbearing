@@ -1,4 +1,4 @@
-"""Command line: `loadbearing probe <target.json>`, `loadbearing report` and `loadbearing models`."""
+"""Command line: `loadbearing probe`, `report`, `serve` and `models`."""
 
 from __future__ import annotations
 
@@ -37,6 +37,15 @@ def main(argv: Optional[list[str]] = None) -> int:
     r.add_argument("report", help="a report saved with `probe --out`")
     r.add_argument("-o", "--output", metavar="FILE", help="where to write it (default: next to the report)")
 
+    s = sub.add_parser("serve", help="the demo: list targets, run probes, serve the reports")
+    s.add_argument("--targets", default="examples", help="directory of <name>/target.json")
+    s.add_argument("--cache", default="runs", help="where finished runs are kept")
+    s.add_argument("--backend", choices=("local", "sandbox"), default="local")
+    s.add_argument("--nano", action="store_true", help="have Nemotron Nano judge each moved diff")
+    s.add_argument("--readonly", action="store_true", help="serve recorded runs only, never run")
+    s.add_argument("--host", default="127.0.0.1")
+    s.add_argument("--port", type=int, default=8000)
+
     m = sub.add_parser("models", help="list the Nemotron model IDs your Token Factory key can call")
     m.add_argument("--all", action="store_true", help="list every model, not only Nemotron")
 
@@ -46,6 +55,8 @@ def main(argv: Optional[list[str]] = None) -> int:
             return _models(args.all)
         if args.command == "report":
             return _report(args.report, args.output)
+        if args.command == "serve":
+            return _serve(args)
         return _probe(args)
     except RuntimeError as exc:
         print(f"loadbearing: {exc}", file=sys.stderr)
@@ -89,6 +100,27 @@ def _write_html(data: dict, path: str) -> None:
     from loadbearing.html_report import render_html
 
     Path(path).write_text(render_html(data))
+
+
+def _serve(args: argparse.Namespace) -> int:
+    from loadbearing.serve import Demo, serve
+
+    classify_factory = None
+    if args.nano:
+        from loadbearing.nemotron import NemotronRouter
+
+        classify_factory = lambda: NemotronRouter.from_env(tiers=("nano",)).classify_diff  # noqa: E731
+    demo = Demo(args.targets, args.cache, args.backend, args.readonly, classify_factory)
+    server = serve(demo, args.host, args.port)
+    mode = "read only" if args.readonly else f"runs on {args.backend}"
+    print(f"loadbearing: {len(demo.targets)} target(s), {mode}, http://{args.host}:{server.server_address[1]}", flush=True)
+    try:
+        server.serve_forever()
+    except KeyboardInterrupt:
+        pass
+    finally:
+        server.server_close()
+    return 0
 
 
 def _models(show_all: bool) -> int:
