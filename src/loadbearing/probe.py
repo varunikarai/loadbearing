@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import time
 from concurrent.futures import ThreadPoolExecutor
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Callable, Optional
 
 from loadbearing.backends.base import Backend, RunResult
@@ -44,6 +44,7 @@ class Report:
     fork_wall_seconds: float = 0.0
     # The sum of every run in that phase: what it would cost one after another.
     fork_total_seconds: float = 0.0
+    record: dict = field(default_factory=dict)  # the baseline input every fork mutated
 
     @property
     def defects(self) -> list[FieldVerdict]:
@@ -95,4 +96,5 @@ def probe(
         checkpoint_seconds=checkpointed - started,
         fork_wall_seconds=forked - checkpointed,
         fork_total_seconds=sum(r.seconds for r in results),
+        record=target.record,
     )
