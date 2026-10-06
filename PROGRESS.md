@@ -15,10 +15,9 @@ Where Loadbearing is, what happens next, and what has already happened. **Now**,
 
 _Updated 2026-10-06_
 
-- **State:** the vertical slice runs end to end on the local backend: toy target, 15 forks from one checkpoint, both planted bugs caught, 18/18 tests pass. The Sandboxes backend and Nemotron Nano classification are written but have never run against a live account.
+- **State:** the vertical slice runs end to end on the local backend: toy target, 15 forks from one checkpoint, both planted bugs caught. Report (JSON and HTML), demo server, Dockerfile and CI are on `main`, 34/34 tests pass. The Sandboxes backend and Nemotron Nano classification are written but have never run against a live account.
 - **Next action:** Sat 2026-10-10, Varunika. Claim credits, `pip install -e '.[sandbox]'`, `contree auth`, `loadbearing models` and put the Nemotron IDs in `.env`, then `loadbearing probe examples/ticket_triage/target.json --backend sandbox --nano`. Pass = the same two defects, found on Nebius.
-- **Also built (2026-10-06, Aeshvarya, branch `aeshvarya/report-and-demo`):** timing, versioned JSON report, HTML report with the fork tree, demo server with cached runs and read-only mode, Dockerfile, CI with a probe gate. 34/34 tests. Not deployed yet.
-- **Waiting on:** Varunika reviewing and merging that branch.
+- **Waiting on:** Aeshvarya picking a demo host and deploying by 2026-10-11. Varunika deciding on the proposals in Open questions, the closing-the-loop one first.
 - **Deadline:** 2026-10-30 10:00 PT (22:30 IST). **Target submission: 2026-10-25.**
 
 ## Plan
@@ -92,6 +91,11 @@ Problem statement: [SPEC.md](SPEC.md). Setup, target format, layout: [README.md]
 ## Log
 
 Newest first.
+
+### 2026-10-06 (c)
+- Reviewed and merged `aeshvarya/report-and-demo` into `main` (Varunika, `47514fc`). 34/34 tests and the probe gate pass on the branch and on `main`. The server only runs targets listed at startup.
+- Stage One wording checked against the rules: the track asks for "coding agents and developer tools: agents that write, run, and test code in Token Factory". Loadbearing qualifies as a developer tool today; closing the loop would make the fit stronger, not rescue it.
+- Prior art: mutation testing mutates the code, not the inputs, so it is not the right citation. The README's prior-art section, not yet written, should name metamorphic testing and input ablation or sensitivity analysis.
 
 ### 2026-10-06 (b)
 - Invite accepted (Aeshvarya). Read the repo end to end; the slice runs and 18/18 tests pass as written.
