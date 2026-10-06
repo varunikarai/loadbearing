@@ -33,6 +33,12 @@ def main(argv: Optional[list[str]] = None) -> int:
     p.add_argument("--json", action="store_true", help="print the full report as JSON")
     p.add_argument("--out", metavar="FILE", help="also save the full report as JSON")
     p.add_argument("--html", metavar="FILE", help="also save the report as a self-contained web page")
+    # Contract C6: reserved now, wired as each function lands on main.
+    p.add_argument("--baseline-runs", type=int, metavar="N", help="override the target's baseline_runs")
+    p.add_argument("--explain", action="store_true", help="Super reconciliation and Ultra explanation per field")
+    p.add_argument("--intent", action="store_true", help="Tavily intent inference for undeclared fields")
+    p.add_argument("--fix", action="store_true", help="write a fix per defect (implies --explain)")
+    p.add_argument("--prove", action="store_true", help="apply each fix in a fresh fork and re-probe (implies --fix)")
 
     r = sub.add_parser("report", help="render a saved JSON report as a web page")
     r.add_argument("report", help="a report saved with `probe --out`")
@@ -65,7 +71,20 @@ def main(argv: Optional[list[str]] = None) -> int:
         return 2
 
 
+# Flag -> the task that builds it. A flag leaves this map when its function is on main.
+NOT_BUILT = {
+    "baseline_runs": "V3",
+    "explain": "V2",
+    "intent": "V4",
+    "fix": "V5",
+    "prove": "A4",
+}
+
+
 def _probe(args: argparse.Namespace) -> int:
+    for flag, task in NOT_BUILT.items():
+        if getattr(args, flag) not in (None, False):
+            raise RuntimeError(f"--{flag.replace('_', '-')} is not built yet ({task})")
     target = load_target(args.target)
     classify = None
     if args.nano:
