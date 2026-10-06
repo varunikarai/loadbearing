@@ -78,6 +78,7 @@ def _models(show_all: bool) -> int:
 
 def render(report: Report) -> str:
     lines = [f"{report.target}: {len(report.forks)} forks from one checkpoint ({report.backend})"]
+    lines.append(timing_line(report))
     if not report.deterministic:
         lines.append("WARNING: the baseline disagrees with itself, so no verdict below is sound.")
 
@@ -96,3 +97,13 @@ def render(report: Report) -> str:
     else:
         lines.append("No defects found.")
     return "\n".join(lines)
+
+
+def timing_line(report: Report) -> str:
+    """Checkpoint once, then every run in parallel: the line that shows what that buys."""
+    wall, total = report.fork_wall_seconds, report.fork_total_seconds
+    speedup = f", {total / wall:.1f}x parallel" if wall > 0 else ""
+    return (
+        f"checkpoint {report.checkpoint_seconds:.2f}s, then {len(report.forks) + 2} runs "
+        f"in {wall:.2f}s wall ({total:.2f}s one after another{speedup})"
+    )

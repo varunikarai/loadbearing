@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import time
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from typing import Callable, Optional
@@ -38,6 +39,11 @@ class Report:
     baseline: RunResult
     forks: list[Fork]
     verdicts: list[FieldVerdict]
+    checkpoint_seconds: float = 0.0
+    # Wall time of the parallel phase: both baselines and every fork.
+    fork_wall_seconds: float = 0.0
+    # The sum of every run in that phase: what it would cost one after another.
+    fork_total_seconds: float = 0.0
 
     @property
     def defects(self) -> list[FieldVerdict]:
@@ -51,12 +57,21 @@ def probe(
     workers: int = 8,
 ) -> Report:
     mutations = plan(target.record)
+    started = time.perf_counter()
     checkpoint = backend.checkpoint(target)
+    checkpointed = time.perf_counter()
+
+    def run(record: dict) -> RunResult:
+        start = time.perf_counter()
+        result = backend.run(checkpoint, target, record)
+        result.seconds = time.perf_counter() - start
+        return result
 
     # The baseline runs twice. If it disagrees with itself, no comparison below means anything.
     records = [target.record, target.record] + [m.apply(target.record) for m in mutations]
     with ThreadPoolExecutor(max_workers=workers) as pool:
-        results = list(pool.map(lambda rec: backend.run(checkpoint, target, rec), records))
+        results = list(pool.map(run, records))
+    forked = time.perf_counter()
     first, second, *rest = results
 
     forks = [Fork(m, r, compare(first, r)) for m, r in zip(mutations, rest)]
@@ -77,4 +92,7 @@ def probe(
         baseline=first,
         forks=forks,
         verdicts=verdicts,
+        checkpoint_seconds=checkpointed - started,
+        fork_wall_seconds=forked - checkpointed,
+        fork_total_seconds=sum(r.seconds for r in results),
     )
