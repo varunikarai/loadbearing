@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
 from pathlib import Path
 from typing import Optional
@@ -44,7 +45,8 @@ def main(argv: Optional[list[str]] = None) -> int:
     s.add_argument("--nano", action="store_true", help="have Nemotron Nano judge each moved diff")
     s.add_argument("--readonly", action="store_true", help="serve recorded runs only, never run")
     s.add_argument("--host", default="127.0.0.1")
-    s.add_argument("--port", type=int, default=8000)
+    # Hosting platforms say which port to bind through $PORT.
+    s.add_argument("--port", type=int, default=int(os.environ.get("PORT", 8000)))
 
     m = sub.add_parser("models", help="list the Nemotron model IDs your Token Factory key can call")
     m.add_argument("--all", action="store_true", help="list every model, not only Nemotron")
