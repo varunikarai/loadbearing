@@ -1,0 +1,42 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: ["3.10", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - run: PYTHONPATH=src python -m unittest discover -s tests -v
+
+  # The probe exits 1 on any defect, so it can gate a pipeline's CI.
+  # The example has two planted defects; this job proves the gate trips.
+  probe-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Probe the example and expect the gate to trip
+        run: |
+          set +e
+          PYTHONPATH=src python -m loadbearing probe examples/ticket_triage/target.json \
+            --out report.json --html report.html
+          code=$?
+          set -e
+          test "$code" -eq 1 || { echo "expected exit 1 (defects found), got $code"; exit 1; }
+      - uses: actions/upload-artifact@v4
+        with:
+          name: probe-report
+          path: |
+            report.json
+            report.html
