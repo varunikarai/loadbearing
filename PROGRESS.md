@@ -16,7 +16,7 @@ Where Loadbearing is, what happens next, and what has already happened. **Now**,
 _Updated 2026-10-06_
 
 - **State:** the vertical slice runs end to end on the local backend: toy target, 15 forks from one checkpoint, both planted bugs caught. Report (JSON and HTML), demo server, Dockerfile and CI are on `main`, 34/34 tests pass. The Sandboxes backend and Nemotron Nano classification are written but have never run against a live account.
-- **Next action:** Fri 2026-10-09. Varunika: V1 prep (credits, `pip install -e '.[sandbox]'`, `contree auth`, model IDs into `.env`) and the `Fix` contract (V5). Aeshvarya: A1 contracts and the A3 shortlist. Then Sat 2026-10-10: V1 live, `loadbearing probe examples/ticket_triage/target.json --backend sandbox --nano`, pass = the same two defects, found on Nebius.
+- **Next action:** Fri 2026-10-09, Aeshvarya: A1 contracts and the A3 shortlist. Sat 2026-10-10, Varunika: before 11:00, V1 prep (credits, `pip install -e '.[sandbox]'`, `contree auth`, model IDs into `.env`) and the `Fix` contract (V5); from 12:00, V1 live, `loadbearing probe examples/ticket_triage/target.json --backend sandbox --nano`, pass = the same two defects, found on Nebius.
 - **Waiting on:** Aeshvarya confirming the split in WORKPLAN.md by 2026-10-09.
 - **Deadline:** 2026-10-30 10:00 PT (22:30 IST). **Target submission: 2026-10-25.**
 
@@ -26,8 +26,8 @@ Every task, owner, contract and date is in **[WORKPLAN.md](WORKPLAN.md)**. Start
 
 | Date | Milestone |
 |---|---|
-| Fri 2026-10-09 | Contracts on `main` (A1, and V5's `Fix`). LLM target shortlist posted (A3) |
-| Sat 2026-10-10 | Sandboxes runs live (V1). LLM target picked. Noise floor done (V3) |
+| Fri 2026-10-09 | Contracts on `main` (A1). LLM target shortlist posted (A3) |
+| Sat 2026-10-10 | `Fix` contract (V5). Sandboxes runs live (V1). LLM target picked. Noise floor done (V3) |
 | Sun 2026-10-11 | Nemotron layer verified (V2). Hosted demo live (A6). **Contracts frozen** |
 | Sat 2026-10-17 | **Loop closed on the LLM target, on Sandboxes** (V4, V5, A3, A4, A5) |
 | Sun 2026-10-18 | **Repo public** after the audit (V6). README narrative (V8) |
