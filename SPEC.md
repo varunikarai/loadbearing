@@ -19,6 +19,8 @@ Empirically. Checkpoint the pipeline once, fork that checkpoint per mutation, ru
 | **Silent passthrough** | The output did not move when an input was destroyed. The pipeline claims to use a field it never reads. |
 | **Phantom sensitivity** | The output moved when an irrelevant input was nudged. The pipeline reacts to something that should not matter. |
 
+Then close the loop. Ultra writes the smallest fix for each defect, the fix is applied in a fresh fork of the same checkpoint, and the probe re-runs on that fork to show the defect gone. **Find, explain, fix, prove**, with the same checkpoint primitive at every step.
+
 ## The claim we defend
 
 For any pipeline, we tell you which inputs actually change its behaviour, and we prove it by running it, not by reading it.
@@ -27,10 +29,10 @@ For any pipeline, we tell you which inputs actually change its behaviour, and we
 
 | Piece | Job | Why it is load-bearing, not decoration |
 |---|---|---|
-| Nebius Token Factory Sandboxes | Checkpoint once, fork per mutation | The comparison is only sound if every fork starts from a byte-identical environment. Checkpoint-and-fork makes "hold everything constant except one input" a primitive instead of N rebuilds. |
+| Nebius Token Factory Sandboxes | Checkpoint once, fork per mutation, fork again to prove a fix | The comparison is only sound if every fork starts from a byte-identical environment. Checkpoint-and-fork makes "hold everything constant except one input" a primitive instead of N rebuilds, and the same primitive makes "this fix removed the defect, and nothing else changed" provable. |
 | Nemotron Nano | Classify each fork's diff | One cheap call per fork: is this change meaningful or noise? |
 | Nemotron Super | Reconcile across forks | Turns many per-fork diffs into one defect class per input. |
-| Nemotron Ultra | Explain the defect | Long-horizon reasoning over the pipeline source: why does this path not read the field? |
+| Nemotron Ultra | Explain the defect and write the fix | Long-horizon reasoning over the pipeline source: why does this path not read the field, and what is the smallest change that makes it? |
 | Tavily | Fetch intended behaviour | Pulls the upstream spec or docs, which is what makes phantom sensitivity a finding rather than a guess. |
 
 ## Scope for the vertical slice
