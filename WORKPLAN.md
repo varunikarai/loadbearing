@@ -466,3 +466,87 @@ Every function behind a flag must also be callable without the CLI, so it can be
 3. Sun 10-25: submit. Varunika checks every link logged out the same day.
 
 **Done when.** Submitted on 10-25, and verified.
+
+## Balance
+
+| | Tech | Non-tech | Total |
+|---|---|---|---|
+| Varunika | 24 (V1 to V6) | 16.5 (V7 to V12) | 40.5 |
+| Aeshvarya | 26 (A1 to A7) | 13.5 (A8 to A12) | 39.5 |
+
+Every kind of work has one owner on each side:
+
+| Kind of work | Varunika | Aeshvarya |
+|---|---|---|
+| Live platform | V1 Sandboxes live run | A6 hosted demo |
+| Models | V2 Nemotron layer, V4 Tavily intent | A3 LLM target on Nemotron |
+| Engine | V3 noise floor | A1 contracts, A2 secrets into forks |
+| Closing the loop | V5 fix writer | A4 fix and prove |
+| Quality and safety | V6 pre-public audit | A7 CI and clean clone |
+| What judges look at | V9 visual identity | A5 report and UI |
+| Judged writing | V8 README narrative | A10 Devpost page |
+| Video | V10 script and voice | A9 production |
+| Research | V7 prior art | A8 field scan |
+| Feedback prize | V11 | A11 |
+| Final checks | V12 self-review | A12 compliance and submission |
+
+## Timeline
+
+Varunika's build days are weekends, Friday evenings, Mon 10-19 evening and Tue 10-20. Aeshvarya's due dates are hand-off dates; he chooses his own hours.
+
+| Date | Varunika | Aeshvarya | Together |
+|---|---|---|---|
+| Wed 10-07 | | A1 contracts | |
+| Thu 10-08 | | A1 contracts | |
+| Fri 10-09 | V1 prep: credits, install, `contree auth`, model IDs. V5 `Fix` contract | A1 merged. A3 shortlist posted. Own credits and `contree auth` | |
+| Sat 10-10 | V1 live run (morning). V3 noise floor (afternoon). V9 palette (evening) | A2 secrets into forks. A3 build starts | Morning: Varunika picks the LLM target |
+| Sun 10-11 | V2 Nemotron layer. V10 outline | A6 demo live with the toy target. Devpost team confirmed | **Contracts frozen** |
+| Mon 10-12 | | A9 storyboard. A4 on the toy target | |
+| Tue 10-13 | | A3 runs locally. A4 on the toy target done. A8 field scan | |
+| Wed 10-14 to Thu 10-15 | | A5 report v2 against fixtures | |
+| Fri 10-16 | V4 part 1. V5 on the toy target | A4 on Sandboxes. A5 | |
+| Sat 10-17 | V4 part 2. V5 on the LLM target | A3 on Sandboxes. A5 palette and logo. A6 recorded runs. A9 screen recordings | **Loop closed on the LLM target, on Sandboxes** |
+| Sun 10-18 | V6 audit, then the public flip. V8 README narrative. V10 narration | A7 CI and clean clone, before the audit | **Repo public** |
+| Mon 10-19 | V9 logo and diagram (evening). V10 caption check | A9 edit | |
+| Tue 10-20 | V9 finished. V7 prior art. V11 draft. V12 review 1 | A9 edit. A10 draft. A12 checklist | Review 1 gaps assigned |
+| Wed 10-21 | | A9 video uploaded | |
+| Thu 10-22 | | Fixes from review 1 | |
+| Fri 10-23 | V11 final. V12 review 2 | A10 final. A11 final | **Feature freeze** |
+| Sat 10-24 | Not available | Buffer | |
+| Sun 10-25 | Every link checked logged out | A12 submits | **Submitted** |
+| Mon 10-26 to Thu 10-29 | Buffer | Demo uptime | Fixes only |
+| Fri 10-30 | | | Deadline 10:00 PT, 22:30 IST |
+
+Two dates differ from the original deliverables list, on purpose: the video moves to Wed 10-21 because it has to show the loop closed on 10-17, and the feedback is final on Fri 10-23, two days earlier than needed.
+
+## What each judging criterion sees
+
+| Criterion | What a judge sees | Tasks |
+|---|---|---|
+| Technological Implementation (25%) | Live Sandboxes numbers, the Nemotron routing working, tests and CI, a fix proven from the same checkpoint | V1, V2, V3, V5, A2, A4, A7 |
+| Design (25%) | The report and the demo, the hand-drawn identity, the video | V9, A5, A6, A9 |
+| Potential Impact (25%) | A realistic LLM pipeline failing silently, real cases with sources | A3, V7, V8, A10 |
+| Quality of the Idea (25%) | Find, explain, fix, prove on one checkpoint primitive; intent drawn from sources; the prior art and how this differs | V4, V5, A4, V7, SPEC.md |
+| Stage One (pass or fail) | Every requirement met | A12 |
+| Best Use of Tavily ($3,000) | A runtime call that decides intent, with quotes and links | V4, shown in A5 and A9 |
+| Most Valuable Feedback | Two specific, reproducible feedback files | V11, A11 |
+
+## Risks
+
+| Risk | Early signal | Response |
+|---|---|---|
+| Sandboxes fails live | V1 not done by Sat 10-10 noon | Fix in `contree.py`; Builders Program office hours. Stage One still passes on Token Factory inference with Nemotron, and the local backend keeps the demo alive while it is fixed |
+| The LLM target is too noisy | V3 marks most of its keys unstable | Temperature 0, structured JSON output, fewer free-text fields, `baseline_runs` up to 8 |
+| Credits run out | Balances logged in V1 | Read-only demo on recorded runs, cached Tavily results, a per-run budget |
+| Sat 10-17 slips | Loop not closed by Saturday night | The cut order below |
+| One builder unavailable | No Log entry on their tasks for two days | The other takes the next open task on the Board; every task is written to be picked up cold |
+| Merge conflicts | A branch touching the other's paths | The ownership map, and rebase before merging |
+
+## Cut order, if behind
+
+Hard deliverables are never cut. If time runs short, drop these in this order:
+
+1. V4 refinements beyond the first version. Keep the live Tavily call and the cached evidence.
+2. A5 polish beyond the core panels.
+3. Closing the loop on the LLM target. Keep it on the toy target, still on Sandboxes.
+4. Phantom sensitivity on the LLM target. Silent passthrough alone carries the demo.
