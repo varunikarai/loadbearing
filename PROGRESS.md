@@ -62,22 +62,21 @@ Each one missing kills the entry.
 - **2026-09-30** Nemotron model IDs live in `.env`, never in code. They are not published in the docs; `loadbearing models` lists them.
 - **2026-09-30** Repo private until 2026-10-18, so the idea cannot be scouted before it is built.
 - **2026-09-30** Commits: one concern each, the message says why, each person commits as themselves.
+- **2026-10-06** Close the loop: find, explain, fix, prove. Ultra writes the smallest fix, the fix is applied in a fresh fork of the same checkpoint, and the probe re-runs to show the defect gone. Makes "agents that write, run, and test code" explicit. (Proposed by Aeshvarya, accepted by Varunika.)
+- **2026-10-06** The demo target is an LLM pipeline on Nemotron, such as a retrieval or tool-calling step that silently ignores a retrieved field. Which one is still open. (Aeshvarya, accepted.)
+- **2026-10-06** Noise floor: the baseline runs k times, and output keys that vary on their own are marked unstable and left out of verdicts, instead of voiding the whole report. (Aeshvarya, accepted.)
+- **2026-10-06** Tavily infers `expects` for undeclared fields from upstream docs, so an undeclared field can carry a defect claim. (Aeshvarya, accepted.)
+- **2026-10-06** Prior art in the README: metamorphic testing and input ablation or sensitivity analysis. Not mutation testing, which mutates the code, not the inputs. (Aeshvarya, accepted.)
 
 ## Open questions
 
 - **Work split**, proposed 2026-09-20, not yet confirmed: Varunika owns the mutation engine and defect classification; Aeshvarya owns orchestration and deploy, including the hosted demo.
-- **Demo target pipeline:** not chosen. Due Sat 2026-10-10.
+- **Demo target pipeline:** an LLM pipeline on Nemotron (decided 2026-10-06), but which one is not chosen. Due Sat 2026-10-10.
 - **Hosted demo shape:** not decided. Minimum is a web page that runs a probe on a fixed target and renders the report.
 - **Credits:** do they cover Sandboxes runs or only inference? Check the console balance after the first Sandboxes run.
 - **Demo host:** Render, Fly or Railway; all take the Dockerfile as is. Aeshvarya to pick by 2026-10-11.
 
-Proposed by Aeshvarya on 2026-10-06, not yet agreed:
-
-- **Track fit is a Stage One gate.** The rules screen out a project that is not a "genuine attempt at the track's stated goal", and the Coding track asks for agents that write, run and test code in Sandboxes. Today we run and test but write nothing. Close the loop: Ultra writes the smallest fix, the fix is applied in a fresh fork of the same checkpoint, and the probe is re-run to show the defect gone. Find, explain, fix, prove: the same checkpoint primitive at every step.
-- **Demo target:** an LLM pipeline rather than a hand-written one. For example, a retrieval or tool-calling step on Nemotron that silently ignores a retrieved field. It fits the agentic track, and it is the case where Nano's noise-or-meaningful call actually earns its place.
-- **Noise floor:** an LLM target will fail the two-run determinism check. Run the baseline k times and mark the output keys that vary on their own as unstable, rather than voiding every verdict.
-- **Tavily's job:** infer `expects` for undeclared fields from upstream docs, so an undeclared field can carry a defect claim. That is a runtime call doing work that nothing else in the system does.
-- **Prior art to name in the README:** metamorphic testing and input ablation or sensitivity analysis. Mutation testing is different: it mutates the code, not the inputs.
+Aeshvarya's five proposals from 2026-10-06 were all accepted the same day; they are now in Decisions.
 
 ## Quick reference
 
