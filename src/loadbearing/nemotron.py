@@ -2,8 +2,8 @@
 
 Nano judges each fork (one cheap call per moved diff), Super reconciles across
 forks into a defect class, Ultra explains why a code path does or does not read
-a field. Token Factory is OpenAI-compatible, so this uses the standard library
-rather than an SDK.
+a field. Token Factory speaks the standard chat-completions HTTP API, so this
+uses the standard library rather than an SDK.
 """
 
 from __future__ import annotations
