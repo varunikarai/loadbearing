@@ -16,7 +16,7 @@ Where Loadbearing is, what happens next, and what has already happened. **Now**,
 _Updated 2026-10-06_
 
 - **State:** the vertical slice runs end to end on the local backend: toy target, 15 forks from one checkpoint, both planted bugs caught. Report (JSON and HTML), demo server, Dockerfile and CI are on `main`, 34/34 tests pass. The Sandboxes backend and Nemotron Nano classification are written but have never run against a live account.
-- **Next action:** Fri 2026-10-09, Aeshvarya: A1 contracts and the A3 shortlist. Sat 2026-10-10, Varunika: before 11:00, V1 prep (credits, `pip install -e '.[sandbox]'`, `contree auth`, model IDs into `.env`) and the `Fix` contract (V5); from 12:00, V1 live, `loadbearing probe examples/ticket_triage/target.json --backend sandbox --nano`, pass = the same two defects, found on Nebius.
+- **Next action:** Fri 2026-10-09, Aeshvarya: A1 contracts and the A3 shortlist. Sat 2026-10-10, Varunika: before 11:00, V1 prep (credits, `pip install -e '.[sandbox]'`, `NEBIUS_API_KEY` and `NEBIUS_PROJECT_ID` into `.env`, model IDs into `.env`) and the `Fix` contract (V5); from 12:00, V1 live, `loadbearing probe examples/ticket_triage/target.json --backend sandbox --nano`, pass = the same two defects, found on Nebius.
 - **Waiting on:** Aeshvarya confirming the split in WORKPLAN.md by 2026-10-09.
 - **Deadline:** 2026-10-30 10:00 PT (22:30 IST). **Target submission: 2026-10-25.**
 
