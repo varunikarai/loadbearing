@@ -54,6 +54,15 @@ EXPLAIN_SYSTEM = (
     "Quote the line. Propose the smallest fix."
 )
 
+FIX_SYSTEM = (
+    "You fix one defect in a pipeline. You are given its source files and a defect found by "
+    "running it: a field it should read but never does (silent passthrough), or a field it "
+    "should ignore but reacts to (phantom sensitivity). Make the smallest change that removes "
+    "that defect and nothing else. Reply with one JSON object and nothing around it: "
+    '{"rationale": "<one paragraph>", "files": {"<path>": "<complete new file content>"}}. '
+    "Include only the files you change, each with its complete new content."
+)
+
 
 class TokenFactory:
     def __init__(self, api_key: str | None = None, base_url: str | None = None) -> None:
@@ -125,6 +134,37 @@ class NemotronRouter:
         prompt = f"Defect: {verdict.verdict} on field '{verdict.field}'.\n\nSource:\n{source}"
         return self._ask("ultra", EXPLAIN_SYSTEM, prompt, max_tokens=2048)
 
+    def write_fix(self, verdict: FieldVerdict, sources: dict[str, str]) -> tuple[dict[str, str], str]:
+        """Ultra. The smallest change that removes one defect: (path -> new content, rationale)."""
+        lines = [
+            f"Defect: {verdict.verdict} on input field '{verdict.field}', "
+            f"which is supposed to be {verdict.intent}.",
+            f"Output moved, per mutation: {json.dumps(verdict.moved)}",
+        ]
+        if verdict.explanation:
+            lines.append(f"Why, from reading the code: {verdict.explanation}")
+        if verdict.evidence:
+            lines.append(f'Intended behaviour, from {verdict.evidence.url}: "{verdict.evidence.quote}"')
+        for path, content in sources.items():
+            lines.append(f"\n--- {path}\n{content}")
+        reply = _json_object(self._ask("ultra", FIX_SYSTEM, "\n".join(lines), max_tokens=4096))
+        files, rationale = reply.get("files"), reply.get("rationale")
+        if not isinstance(files, dict) or not all(
+            isinstance(k, str) and isinstance(v, str) for k, v in files.items()
+        ):
+            raise ValueError("the fix reply has no files mapping path to content")
+        if not isinstance(rationale, str):
+            raise ValueError("the fix reply has no rationale")
+        return files, rationale
+
     def _ask(self, tier: str, system: str, prompt: str, max_tokens: int = 1024) -> str:
         messages = [{"role": "system", "content": system}, {"role": "user", "content": prompt}]
         return self.client.chat(self.models[tier], messages, max_tokens=max_tokens)
+
+
+def _json_object(text: str) -> dict:
+    """The JSON object in a reply, tolerating a code fence or a sentence around it."""
+    start, end = text.find("{"), text.rfind("}")
+    if start < 0 or end < start:
+        raise ValueError("the reply holds no JSON object")
+    return json.loads(text[start : end + 1])
