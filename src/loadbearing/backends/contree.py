@@ -4,19 +4,25 @@ Checkpoint: the image left behind by the setup run with disposable=False, which
 snapshots the whole filesystem. Fork: a disposable run from that image with one
 mutated input file dropped in. Every fork starts from the same snapshot.
 
-Credentials come from the profile that `contree auth` saves.
-Written against the documented SDK API; not yet run against a live account.
+Credentials: contree-sdk reads NEBIUS_API_KEY and NEBIUS_PROJECT_ID from the
+environment (which `loadbearing` fills from .env), and talks to the Token
+Factory Sandboxes endpoint by default.
+
+Checked against contree-sdk 0.3.6 by reading its source; not yet run against a
+live account.
 """
 
 from __future__ import annotations
 
 import json
-import os
-import tempfile
 from typing import Any
 
 from loadbearing.backends.base import INPUT_NAME, RunResult
 from loadbearing.target import Target
+
+# Everything the pipeline needs lives here inside the sandbox. Paths handed to
+# the SDK are absolute, so nothing depends on the image's default directory.
+WORKDIR = "/work"
 
 
 class ContreeBackend:
@@ -24,40 +30,37 @@ class ContreeBackend:
 
     def __init__(self) -> None:
         try:
-            from contree_client.httpx import ContreeSyncClient
             from contree_sdk import ContreeSync
         except ImportError as exc:
             raise RuntimeError(
                 "the sandbox backend needs the sandbox extra: pip install -e '.[sandbox]'"
             ) from exc
-        self._client = ContreeSyncClient.from_profile()
-        self._sdk = ContreeSync(self._client)
+        self._sdk = ContreeSync()
 
     def checkpoint(self, target: Target) -> Any:
         image = self._sdk.images.use(target.image)
         if target.files:
-            image = image.apply_files({rel: str(target.root / rel) for rel in target.files})
-        result = image.run(shell=f"cd / && {target.setup or 'true'}", disposable=False).wait()
+            image = image.apply_files(
+                {f"{WORKDIR}/{rel}": (target.root / rel).read_bytes() for rel in target.files}
+            )
+        result = image.run(
+            shell=target.setup or "true", cwd=WORKDIR, disposable=False
+        ).wait()
         if result.exit_code != 0:
             raise RuntimeError(f"setup failed in the sandbox:\n{_text(result.stderr)}")
         return result
 
     def run(self, checkpoint: Any, target: Target, record: dict) -> RunResult:
-        fd, path = tempfile.mkstemp(suffix=".json")
-        try:
-            with os.fdopen(fd, "w") as fh:
-                json.dump(record, fh)
-            result = checkpoint.run(
-                shell=f"cd / && {target.command}", files={INPUT_NAME: path}
-            ).wait()
-        finally:
-            os.unlink(path)
+        result = checkpoint.run(
+            shell=target.command,
+            cwd=WORKDIR,
+            files={f"{WORKDIR}/{INPUT_NAME}": json.dumps(record).encode()},
+            timeout=target.timeout,
+        ).wait()
         return RunResult(_text(result.stdout), _text(result.stderr), result.exit_code)
 
     def close(self) -> None:
-        close = getattr(self._client, "close", None)
-        if callable(close):
-            close()
+        pass  # the SDK holds no session open between operations
 
 
 def _text(value: Any) -> str:

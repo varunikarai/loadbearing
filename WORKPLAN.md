@@ -159,7 +159,7 @@ Every function behind a flag must also be callable without the CLI, so it can be
 **Needs.** Nothing.
 **Steps.**
 1. Claim the hackathon credit (the promo form, activation code `NEBIUS-DEVPOST-GLOBAL26`) and the Builders Program credit. Note both balances.
-2. `pip install -e '.[sandbox]'`, then `contree auth` with your token and project ID.
+2. `pip install -e '.[sandbox]'`, then put `NEBIUS_API_KEY` and `NEBIUS_PROJECT_ID` in `.env`. There is no `contree auth` step: the SDK reads both from the environment.
 3. Create a Token Factory key, put `NEBIUS_API_KEY` in `.env`, run `loadbearing models`, and paste the Nano, Super and Ultra IDs into `.env`.
 4. `loadbearing probe examples/ticket_triage/target.json --backend sandbox`, then again with `--nano`.
 5. If it breaks, make the smallest fix in `contree.py`, one commit per fix, and keep the exact error text for V11.
@@ -348,7 +348,7 @@ Every function behind a flag must also be callable without the CLI, so it can be
 
 **Why.** The demo target carries Design and Potential Impact. Decided 2026-10-06: an LLM pipeline on Nemotron.
 **Owns.** `examples/<target>/`.
-**Needs.** A2, V3. V1 for the Sandboxes run. Your own Token Factory key, credits and `contree auth`, claimed the same way as V1 steps 1 to 3, so your runs bill to your account.
+**Needs.** A2, V3. V1 for the Sandboxes run. Your own Token Factory key, credits and project ID in `.env`, claimed the same way as V1 steps 1 to 3, so your runs bill to your account.
 **Steps.**
 1. Fri 10-09: post three candidates under Open questions in PROGRESS.md, each with its planted defect and why a judge would recognise it. Shapes worth considering:
    - a retrieval answerer whose prompt template reads the retrieved passage under the wrong key, so it answers fluently from the model's priors
@@ -498,7 +498,7 @@ Varunika's build days are weekends, Friday evenings from 10-16, Mon 10-19 evenin
 |---|---|---|---|
 | Wed 10-07 | | A1 contracts | |
 | Thu 10-08 | | A1 contracts | |
-| Fri 10-09 | | A1 merged. A3 shortlist posted. Own credits and `contree auth` | |
+| Fri 10-09 | | A1 merged. A3 shortlist posted. Own credits, key and project ID in `.env` | |
 | Sat 10-10 | V1 prep and the V5 `Fix` contract (before 11:00). V1 live run (from 12:00). V3 noise floor (afternoon). V9 palette (evening) | A2 secrets into forks. A3 build starts | By 13:00: Varunika picks the LLM target |
 | Sun 10-11 | V2 Nemotron layer. V10 outline | A6 demo live with the toy target. Devpost team confirmed | **Contracts frozen** |
 | Mon 10-12 | | A9 storyboard. A4 on the toy target | |
