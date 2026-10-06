@@ -3,8 +3,9 @@
 from __future__ import annotations
 
 import json
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
+from typing import Any, Optional
 
 
 @dataclass
@@ -18,6 +19,13 @@ class Target:
     record: dict  # the baseline input
     expects: dict[str, list[str]]  # "relevant" / "irrelevant" -> field paths
     timeout: float = 60.0
+    # Version 2 keys (contract C1). All optional; their defaults keep v1 targets unchanged.
+    baseline_runs: int = 2  # how often the unmutated record runs, for the noise floor
+    # Variable names read from the host at run time and passed to baseline and
+    # fork runs only, never to setup, so a secret is never baked into a checkpoint.
+    env: list[str] = field(default_factory=list)
+    docs: Optional[dict[str, Any]] = None  # {"query": str, "urls": [str]} for Tavily intent
+    sources: list[str] = field(default_factory=list)  # files a fix may read and rewrite
 
 
 def load_target(path: str | Path) -> Target:
@@ -25,12 +33,13 @@ def load_target(path: str | Path) -> Target:
     spec = json.loads(path.read_text())
     root = path.parent
     expects = spec.get("expects", {})
-    return Target(
+    files = list(spec.get("files", []))
+    target = Target(
         name=spec.get("name", root.name),
         root=root,
         image=spec.get("image", "python:3.12-slim"),
         setup=spec.get("setup", ""),
-        files=list(spec.get("files", [])),
+        files=files,
         command=spec["command"],
         record=json.loads((root / spec["record"]).read_text()),
         expects={
@@ -38,4 +47,28 @@ def load_target(path: str | Path) -> Target:
             "irrelevant": list(expects.get("irrelevant", [])),
         },
         timeout=float(spec.get("timeout", 60)),
+        baseline_runs=spec.get("baseline_runs", 2),
+        env=list(spec.get("env", [])),
+        docs=spec.get("docs"),
+        sources=list(spec.get("sources", files)),
     )
+    _check(target, path)
+    return target
+
+
+def _check(target: Target, path: Path) -> None:
+    """Fail at load time with the key's name, not mid-probe with a stack trace."""
+    runs = target.baseline_runs
+    if isinstance(runs, bool) or not isinstance(runs, int) or runs < 2:
+        raise RuntimeError(f"{path}: baseline_runs must be an integer, 2 or more")
+    if not all(isinstance(name, str) and name for name in target.env):
+        raise RuntimeError(f"{path}: env must be a list of variable names")
+    if target.docs is not None:
+        if not isinstance(target.docs, dict) or not isinstance(target.docs.get("query", ""), str):
+            raise RuntimeError(f'{path}: docs must look like {{"query": "...", "urls": ["..."]}}')
+        if not all(isinstance(u, str) for u in target.docs.get("urls", [])):
+            raise RuntimeError(f"{path}: docs.urls must be a list of URLs")
+    for rel in target.sources:
+        resolved = (target.root / rel).resolve()
+        if not resolved.is_relative_to(target.root) or not resolved.is_file():
+            raise RuntimeError(f"{path}: source {rel!r} is not a file inside the target directory")
