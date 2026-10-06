@@ -33,7 +33,11 @@ For any pipeline, we tell you which inputs actually change its behaviour, and we
 | Nemotron Nano | Classify each fork's diff | One cheap call per fork: is this change meaningful or noise? |
 | Nemotron Super | Reconcile across forks | Turns many per-fork diffs into one defect class per input. |
 | Nemotron Ultra | Explain the defect and write the fix | Long-horizon reasoning over the pipeline source: why does this path not read the field, and what is the smallest change that makes it? |
-| Tavily | Fetch intended behaviour | Pulls the upstream spec or docs, which is what makes phantom sensitivity a finding rather than a guess. |
+| Tavily | Infer which fields should matter | Pulls the upstream spec or docs and fills in `expects` for fields nobody declared, so an undeclared field can carry a defect claim. That is what makes phantom sensitivity a finding rather than a guess. |
+
+## LLM pipelines
+
+The demo target is an LLM pipeline, because that is where silent passthrough does the most damage: a retrieval or tool-calling step that answers fluently while ignoring what it retrieved. An LLM's output varies on its own, so a two-run determinism check would void every verdict. Instead the baseline runs k times, and output keys that vary with no mutation at all are marked **unstable** and left out of verdicts. Everything else is still judged.
 
 ## Scope for the vertical slice
 
