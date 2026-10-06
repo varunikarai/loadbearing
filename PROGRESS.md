@@ -95,6 +95,12 @@ Problem statement: [SPEC.md](SPEC.md). Setup, target format, layout: [README.md]
 
 Newest first.
 
+### 2026-10-06 (g)
+- Sandboxes backend rebuilt on contree-sdk 0.3.6 after reading its source (Aeshvarya): the old client import did not exist, the project variable is `NEBIUS_PROJECT_ID`, and there is no `contree auth`. Networking is on by default, so a fork can call Nemotron.
+- A1 contracts (C1, C2, C5, C6) and A2 secrets into forks merged, three and four days early. A setup run can no longer write a key into a checkpoint.
+- A4 on the toy target: `apply` on both backends and `prove()`. The real `body` fix is proven clean (the outage ticket becomes P1); a fix that leaks `ticket_id` is caught as a new defect. 60/60 tests.
+- A3 shortlist posted under Open questions; recommendation is the RAG answerer. Next for Aeshvarya: own credits and `.env`, then A3 once the target is picked on Sat 2026-10-10.
+
 ### 2026-10-06 (f)
 - `Fix` contract (C3) on `main` (Varunika, `460c787`), four days early: `src/loadbearing/fix.py` plus tests built on the toy target's real `bdoy` to `body` fix, so A4 can prove against a known-good fix now.
 - Pulled Aeshvarya's Sandboxes backend rebuilt on contree-sdk 0.3.6 and his A1 contracts; the full suite passes with all of it on `main`.
