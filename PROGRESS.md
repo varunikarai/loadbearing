@@ -89,6 +89,11 @@ Problem statement: [SPEC.md](SPEC.md). Setup, target format, layout: [README.md]
 
 Newest first.
 
+### 2026-10-06 (e)
+- WORKPLAN.md written (Varunika): 24 tasks, 12 each, every one with why, owned files, prerequisites, steps and a done test; seven contracts so neither side waits; an ownership map; a day-by-day timeline to submission on 10-25; the judging criteria mapped to tasks; risks and a cut order.
+- Balance: Varunika 24 tech and 16.5 non-tech, Aeshvarya 26 tech and 13.5 non-tech.
+- Next: Aeshvarya confirms or counters by Fri 2026-10-09.
+
 ### 2026-10-06 (d)
 - Varunika accepted all five of Aeshvarya's proposals. Recorded in Decisions, scheduled in Plan, written into SPEC.md (find, explain, fix, prove; LLM targets with a noise floor; Tavily inferring `expects`), and listed as open in the README status.
 - Next: Sat 2026-10-10, the live Sandboxes run and picking the LLM demo target. Everything accepted today depends on both.
