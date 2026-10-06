@@ -97,6 +97,14 @@ class ContreeBackendTests(unittest.TestCase):
         self.assertIsNone(setup.request["env"])
         self.assertEqual(fork.request["env"], {"LB_TEST_SECRET": "s3cret"})
 
+    def test_apply_derives_a_new_image_and_leaves_the_checkpoint_alone(self):
+        ckpt = self.backend.checkpoint(self.target)
+        derived = self.backend.apply(ckpt, {"pipeline.py": "print('patched')"})
+        self.assertEqual(derived.files["/work/pipeline.py"], b"print('patched')")
+        self.assertNotEqual(ckpt.files["/work/pipeline.py"], b"print('patched')")
+        with self.assertRaises(ValueError):
+            self.backend.apply(ckpt, {"../etc/passwd": "x"})
+
     def test_a_failed_setup_is_reported(self):
         original = FakeImage.wait
 

@@ -15,6 +15,7 @@ live account.
 from __future__ import annotations
 
 import json
+from pathlib import Path
 from typing import Any
 
 from loadbearing.backends.base import INPUT_NAME, RunResult, forwarded_env
@@ -62,6 +63,15 @@ class ContreeBackend:
             timeout=target.timeout,
         ).wait()
         return RunResult(_text(result.stdout), _text(result.stderr), result.exit_code)
+
+    def apply(self, checkpoint: Any, files: dict[str, str]) -> Any:
+        """A new image derived from the checkpoint with `files` written. The original is untouched."""
+        for rel in files:
+            if rel.startswith("/") or ".." in Path(rel).parts:
+                raise ValueError(f"{rel!r} is outside the checkpoint")
+        return checkpoint.apply_files(
+            {f"{WORKDIR}/{rel}": content.encode() for rel, content in files.items()}
+        )
 
     def close(self) -> None:
         pass  # the SDK holds no session open between operations
