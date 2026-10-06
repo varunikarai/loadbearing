@@ -17,7 +17,7 @@ from __future__ import annotations
 import json
 from typing import Any
 
-from loadbearing.backends.base import INPUT_NAME, RunResult
+from loadbearing.backends.base import INPUT_NAME, RunResult, forwarded_env
 from loadbearing.target import Target
 
 # Everything the pipeline needs lives here inside the sandbox. Paths handed to
@@ -38,6 +38,7 @@ class ContreeBackend:
         self._sdk = ContreeSync()
 
     def checkpoint(self, target: Target) -> Any:
+        forwarded_env(target)  # a missing variable fails here, before any paid run
         image = self._sdk.images.use(target.image)
         if target.files:
             image = image.apply_files(
@@ -54,6 +55,9 @@ class ContreeBackend:
         result = checkpoint.run(
             shell=target.command,
             cwd=WORKDIR,
+            # Only the variables the target names, and only on this disposable
+            # fork. The setup run that made the checkpoint never had them.
+            env=forwarded_env(target),
             files={f"{WORKDIR}/{INPUT_NAME}": json.dumps(record).encode()},
             timeout=target.timeout,
         ).wait()
