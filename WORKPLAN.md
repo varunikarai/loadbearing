@@ -348,7 +348,7 @@ Every function behind a flag must also be callable without the CLI, so it can be
 
 **Why.** The demo target carries Design and Potential Impact. Decided 2026-10-06: an LLM pipeline on Nemotron.
 **Owns.** `examples/<target>/`.
-**Needs.** A2, V3. V1 for the Sandboxes run.
+**Needs.** A2, V3. V1 for the Sandboxes run. Your own Token Factory key, credits and `contree auth`, claimed the same way as V1 steps 1 to 3, so your runs bill to your account.
 **Steps.**
 1. Fri 10-09: post three candidates under Open questions in PROGRESS.md, each with its planted defect and why a judge would recognise it. Shapes worth considering:
    - a retrieval answerer whose prompt template reads the retrieved passage under the wrong key, so it answers fluently from the model's priors
