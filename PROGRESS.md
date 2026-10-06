@@ -22,22 +22,19 @@ _Updated 2026-10-06_
 
 ## Plan
 
-The Who column follows the proposed split in Open questions.
+Every task, owner, contract and date is in **[WORKPLAN.md](WORKPLAN.md)**. Start with its Board. The milestones:
 
-| When | Who | Goal | Done when |
-|---|---|---|---|
-| Sat 2026-10-10 | Varunika | Slice on Sandboxes with Nano | `--backend sandbox --nano` reports the same two defects |
-| Sat 2026-10-10 | both | Pick the LLM demo target | A recognisable Nemotron retrieval or tool-calling step with a real silent-failure bug, recorded in Decisions |
-| Sun 2026-10-11 | Varunika | Noise floor, then Super reconciliation, Ultra explanation and Tavily inferring `expects` in the report | A k-run baseline marks unstable keys, and `probe` on the toy target prints all three with one real Tavily call |
-| Sun 2026-10-11 | Aeshvarya | Hosted demo deployed | A public URL that runs a probe and shows the report |
-| Sat 2026-10-17 | both | LLM demo target probed end to end on Sandboxes | Report shows at least one real defect |
-| Sat 2026-10-17 | both | Close the loop on the demo target | Ultra's fix applied in a fresh fork of the same checkpoint, and the re-probe shows the defect gone |
-| Sun 2026-10-18 | both | README final with the prior-art section, video recorded, repo public | Every hard deliverable due 10-18 ticked below |
-| Tue 2026-10-20 | both | Buffer: fixes from 10-17 and 10-18 | Nothing open from the weekend |
-| Sun 2026-10-25 | both | Tooling feedback written, Devpost submission filed | Submitted |
-| 2026-10-26 to 10-30 | | Buffer only, no new build | |
-
-Not available: Sat 2026-10-24 (Varunika).
+| Date | Milestone |
+|---|---|
+| Fri 2026-10-09 | Contracts on `main` (A1, and V5's `Fix`). LLM target shortlist posted (A3) |
+| Sat 2026-10-10 | Sandboxes runs live (V1). LLM target picked. Noise floor done (V3) |
+| Sun 2026-10-11 | Nemotron layer verified (V2). Hosted demo live (A6). **Contracts frozen** |
+| Sat 2026-10-17 | **Loop closed on the LLM target, on Sandboxes** (V4, V5, A3, A4, A5) |
+| Sun 2026-10-18 | **Repo public** after the audit (V6). README narrative (V8) |
+| Wed 2026-10-21 | Video public on YouTube (A9) |
+| Fri 2026-10-23 | **Feature freeze.** Devpost page and both feedback files final |
+| Sun 2026-10-25 | **Submitted** (A12) |
+| Fri 2026-10-30 | Deadline, 10:00 PT, 22:30 IST |
 
 ### Hard deliverables
 
