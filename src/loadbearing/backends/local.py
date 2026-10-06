@@ -26,8 +26,7 @@ class LocalBackend:
 
     def checkpoint(self, target: Target) -> Path:
         forwarded_env(target)  # a missing variable fails here, before any run
-        ckpt = Path(self._tmp.name) / "checkpoint"
-        ckpt.mkdir()
+        ckpt = Path(tempfile.mkdtemp(prefix="checkpoint-", dir=self._tmp.name))
         for rel in target.files:
             dest = ckpt / rel
             dest.parent.mkdir(parents=True, exist_ok=True)
