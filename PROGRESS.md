@@ -43,11 +43,11 @@ Each one missing kills the entry.
 | Deliverable | Due | Status |
 |---|---|---|
 | Runs on Token Factory or AI Cloud, uses an NVIDIA open model | stage 1 pass/fail | Code written, not yet run live |
-| Public repo, OSS licence visible at the top | 2026-10-18 | Apache 2.0 committed. Repo private until the flip: `gh repo edit varunikarai/loadbearing --visibility public --accept-visibility-change-consequences` |
-| README with setup and Nebius / Nemotron usage | 2026-10-18 | Technical sections drafted. Pitch and team section not written |
-| Hosted demo URL | 2026-10-18 | Server and Docker image built and checked locally. Host not chosen, not deployed |
-| Public YouTube video, 3 min or less, **with audio**, covering Token Factory and the NVIDIA model used | 2026-10-18 | Not started |
-| Written Nebius / NVIDIA tooling feedback | 2026-10-25 | Not started |
+| Public repo, OSS licence visible at the top | 2026-10-18 (V6) | Apache 2.0 committed. Repo private until Varunika flips it after the audit: `gh repo edit varunikarai/loadbearing --visibility public --accept-visibility-change-consequences` |
+| README with setup and Nebius / Nemotron usage | 2026-10-18 (V8, A7), prior art 2026-10-20 (V7) | Technical sections drafted. Pitch and team section not written |
+| Hosted demo URL | live 2026-10-11, final 2026-10-17 (A6) | Server and Docker image built and checked locally. Host not chosen, not deployed |
+| Public YouTube video, 3 min or less, **with audio**, covering Token Factory and the NVIDIA model used | 2026-10-21 (A9, V10). Moved from 10-18 so it can show the loop closed on 10-17 | Not started |
+| Written Nebius / NVIDIA tooling feedback | 2026-10-23 (V11, A11) | Not started |
 
 **Aiming at:** Coding and Agentic Engineering track, Best Use of Tavily ($3,000, needs a functional runtime Tavily call), the overall prizes, Most Valuable Feedback ($100).
 
