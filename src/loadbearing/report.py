@@ -3,6 +3,20 @@
 The schema is versioned so a cached report from an older run is never
 silently misread. Everything a viewer needs to check a verdict is in it:
 the baseline input, what each fork changed it to, and what came out.
+
+Schema 2 (contract C5, built in A5) adds, each null or empty when the step
+did not run, so a schema-2 reader handles a plain probe unchanged:
+
+    verdicts[].reconciliation  str or null   Super's statement for the field (V2)
+    verdicts[].explanation     str or null   Ultra's account of the code path (V2)
+    verdicts[].intent_source   "declared" | "inferred" | "undeclared"     (V4)
+    verdicts[].evidence        {"intent", "quote", "url"} or null           (V4)
+    baseline_runs              int, how often the baseline ran              (V3)
+    unstable_keys              [str], output keys that vary on their own    (V3)
+    fixes                      [{"field", "defect", "files", "rationale", "diff"}]   (V5, A4)
+    proofs                     [{"field", "fixed", "new_defects", "after"}]  (A4)
+
+Schema-1 caches are refused on load and re-run, never upgraded in place.
 """
 
 from __future__ import annotations
