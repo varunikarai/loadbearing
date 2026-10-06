@@ -19,7 +19,7 @@ Every task below is written so either builder can pick it up cold: why it exists
 | V2 | Nemotron layer verified | tech | 6 | Sun 10-11 | todo |
 | V3 | Noise floor | tech | 3 | Sat 10-10 | todo |
 | V4 | Tavily intent inference | tech | 5 | Sat 10-17 | todo |
-| V5 | Fix writer | tech | 4 | contract Fri 10-09, done Sat 10-17 | todo |
+| V5 | Fix writer | tech | 4 | contract Sat 10-10, done Sat 10-17 | todo |
 | V6 | Pre-public audit and the public flip | tech | 2 | Sun 10-18 | todo |
 | V7 | Prior art and evidence | non-tech | 3 | Tue 10-20 | todo |
 | V8 | README narrative ✍ | non-tech | 3 | Sun 10-18 | todo |
@@ -96,7 +96,7 @@ def apply(self, checkpoint, files: dict[str, str]):
     The original checkpoint is never changed."""
 ```
 
-### C3 · `Fix` (V5, Fri 10-09) in `src/loadbearing/fix.py`
+### C3 · `Fix` (V5, Sat 10-10) in `src/loadbearing/fix.py`
 
 ```python
 @dataclass
@@ -152,7 +152,7 @@ Every function behind a flag must also be callable without the CLI, so it can be
 
 ## Varunika's tasks
 
-### V1 · Sandboxes live run · tech · 4 pts · prep Fri 10-09, done Sat 10-10 morning
+### V1 · Sandboxes live run · tech · 4 pts · Sat 10-10: prep before 11:00, live run from 12:00
 
 **Why.** Everything accepted on 2026-10-06 depends on the Sandboxes path, and it has never run once. It is also the core evidence for Technological Implementation.
 **Owns.** Your local `.env` (never committed). May fix `backends/contree.py` on the spot.
@@ -212,13 +212,13 @@ Every function behind a flag must also be callable without the CLI, so it can be
 **Done when.** On the LLM target, at least one undeclared field gets an inferred intent with a real quote and URL; one live Tavily call is logged; tests pass offline with a fake search.
 **Hands to.** A5 (evidence links), A9 and A10 (the Tavily part of the story).
 
-### V5 · Fix writer · tech · 4 pts · contract Fri 10-09, toy Fri 10-16, LLM target Sat 10-17
+### V5 · Fix writer · tech · 4 pts · contract Sat 10-10, toy Fri 10-16, LLM target Sat 10-17
 
 **Why.** The first half of closing the loop: Ultra writes the smallest fix for a defect.
 **Owns.** `fix.py` (`Fix`, `write_fix`), `Router.write_fix`, `tests/test_fix.py`.
 **Needs.** V2.
 **Steps.**
-1. Fri 10-09: commit the `Fix` dataclass from contract C3 on its own, so A4 can start against it.
+1. Sat 10-10 morning: commit the `Fix` dataclass from contract C3 on its own, so A4 can start against it.
 2. `write_fix(verdict, target, router) -> Fix`: Ultra receives the files in `target.sources`, the verdict and its evidence, and returns the full new content of each changed file plus a rationale.
 3. Validate before returning: only `sources` files changed; Python files compile; the change is small (reject anything that rewrites most of a file); `Fix.diff()` renders a unified diff.
 4. Test with the fake router returning the `bdoy` to `body` fix for the toy target.
@@ -354,7 +354,7 @@ Every function behind a flag must also be callable without the CLI, so it can be
    - a retrieval answerer whose prompt template reads the retrieved passage under the wrong key, so it answers fluently from the model's priors
    - a tool-calling step whose tool result field was renamed, so the model fills the value in itself
    - a summariser whose instructions field never reaches the prompt
-2. Varunika picks one on Sat 10-10 morning.
+2. Varunika picks one on Sat 10-10, by 13:00.
 3. Build it with the standard library only: Nemotron through Token Factory, temperature 0, reading `input.json` and printing JSON.
 4. Plant one real silent passthrough. Note any irrelevant field the model reacts to beyond the noise floor: that is a phantom sensitivity for free.
 5. Set `docs` to public pages that state what the pipeline is supposed to read (for V4), `baseline_runs: 5`, `env: ["NEBIUS_API_KEY"]`, and `sources`.
@@ -366,7 +366,7 @@ Every function behind a flag must also be callable without the CLI, so it can be
 
 **Why.** The second half of closing the loop: show that the fix removed the defect and changed nothing else, starting from the same checkpoint.
 **Owns.** `prove.py`, `Backend.apply` in both backends, the `--fix` and `--prove` wiring, and their tests.
-**Needs.** C3 from V5 (Fri 10-09); V5's writer for the live run.
+**Needs.** C3 from V5 (Sat 10-10); V5's writer for the live run.
 **Steps.**
 1. `apply`: local copies the checkpoint directory and writes the files; Sandboxes calls `apply_files` on the checkpoint image. The original is never changed.
 2. `prove(target, backend, fix, before) -> Proof`: probe again on the patched checkpoint and compare verdicts field by field.
@@ -492,14 +492,14 @@ Every kind of work has one owner on each side:
 
 ## Timeline
 
-Varunika's build days are weekends, Friday evenings, Mon 10-19 evening and Tue 10-20. Aeshvarya's due dates are hand-off dates; he chooses his own hours.
+Varunika's build days are weekends, Friday evenings from 10-16, Mon 10-19 evening and Tue 10-20. Sat 10-10 has a fixed commitment from 11:00 to 12:00. Aeshvarya's due dates are hand-off dates; he chooses his own hours.
 
 | Date | Varunika | Aeshvarya | Together |
 |---|---|---|---|
 | Wed 10-07 | | A1 contracts | |
 | Thu 10-08 | | A1 contracts | |
-| Fri 10-09 | V1 prep: credits, install, `contree auth`, model IDs. V5 `Fix` contract | A1 merged. A3 shortlist posted. Own credits and `contree auth` | |
-| Sat 10-10 | V1 live run (morning). V3 noise floor (afternoon). V9 palette (evening) | A2 secrets into forks. A3 build starts | Morning: Varunika picks the LLM target |
+| Fri 10-09 | | A1 merged. A3 shortlist posted. Own credits and `contree auth` | |
+| Sat 10-10 | V1 prep and the V5 `Fix` contract (before 11:00). V1 live run (from 12:00). V3 noise floor (afternoon). V9 palette (evening) | A2 secrets into forks. A3 build starts | By 13:00: Varunika picks the LLM target |
 | Sun 10-11 | V2 Nemotron layer. V10 outline | A6 demo live with the toy target. Devpost team confirmed | **Contracts frozen** |
 | Mon 10-12 | | A9 storyboard. A4 on the toy target | |
 | Tue 10-13 | | A3 runs locally. A4 on the toy target done. A8 field scan | |
@@ -535,7 +535,7 @@ Two dates differ from the original deliverables list, on purpose: the video move
 
 | Risk | Early signal | Response |
 |---|---|---|
-| Sandboxes fails live | V1 not done by Sat 10-10 noon | Fix in `contree.py`; Builders Program office hours. Stage One still passes on Token Factory inference with Nemotron, and the local backend keeps the demo alive while it is fixed |
+| Sandboxes fails live | V1 not done by Sat 10-10 evening | Fix in `contree.py`; Builders Program office hours. Stage One still passes on Token Factory inference with Nemotron, and the local backend keeps the demo alive while it is fixed |
 | The LLM target is too noisy | V3 marks most of its keys unstable | Temperature 0, structured JSON output, fewer free-text fields, `baseline_runs` up to 8 |
 | Credits run out | Balances logged in V1 | Read-only demo on recorded runs, cached Tavily results, a per-run budget |
 | Sat 10-17 slips | Loop not closed by Saturday night | The cut order below |
