@@ -17,7 +17,7 @@ _Updated 2026-10-06_
 
 - **State:** the vertical slice runs end to end on the local backend: toy target, 15 forks from one checkpoint, both planted bugs caught. Report (JSON and HTML), demo server, Dockerfile and CI are on `main`, 34/34 tests pass. The Sandboxes backend and Nemotron Nano classification are written but have never run against a live account.
 - **Next action:** Sat 2026-10-10, Varunika. Claim credits, `pip install -e '.[sandbox]'`, `contree auth`, `loadbearing models` and put the Nemotron IDs in `.env`, then `loadbearing probe examples/ticket_triage/target.json --backend sandbox --nano`. Pass = the same two defects, found on Nebius.
-- **Waiting on:** Aeshvarya picking a demo host and deploying by 2026-10-11. Varunika deciding on the proposals in Open questions, the closing-the-loop one first.
+- **Waiting on:** Aeshvarya picking a demo host and deploying by 2026-10-11.
 - **Deadline:** 2026-10-30 10:00 PT (22:30 IST). **Target submission: 2026-10-25.**
 
 ## Plan
@@ -91,6 +91,10 @@ Problem statement: [SPEC.md](SPEC.md). Setup, target format, layout: [README.md]
 ## Log
 
 Newest first.
+
+### 2026-10-06 (d)
+- Varunika accepted all five of Aeshvarya's proposals. Recorded in Decisions, scheduled in Plan, written into SPEC.md (find, explain, fix, prove; LLM targets with a noise floor; Tavily inferring `expects`), and listed as open in the README status.
+- Next: Sat 2026-10-10, the live Sandboxes run and picking the LLM demo target. Everything accepted today depends on both.
 
 ### 2026-10-06 (c)
 - Reviewed and merged `aeshvarya/report-and-demo` into `main` (Varunika, `47514fc`). 34/34 tests and the probe gate pass on the branch and on `main`. The server only runs targets listed at startup.
