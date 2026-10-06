@@ -314,3 +314,155 @@ Every function behind a flag must also be callable without the CLI, so it can be
 **Owns.** Two review entries in the Log.
 **Steps.** Score each of the four criteria from 1 to 10 against the evidence a judge would actually see, cross-check A12's Stage One checklist, and list the top three gaps with an owner for each.
 **Done when.** Both reviews are logged and every gap has an owner.
+
+## Aeshvarya's tasks
+
+### A1 · Contracts · tech · 2 pts · Fri 10-09
+
+**Why.** Everything in this plan builds on these seams. Landing them first lets both builders work without waiting on each other.
+**Owns.** `target.py`, `backends/base.py`, the `report.py` docstring, CLI flag names.
+**Needs.** Nothing.
+**Steps.**
+1. C1: the four `target.json` keys with their defaults. Today's targets must keep working unchanged.
+2. C2: `apply(checkpoint, files)` on the Backend protocol. The implementations come in A4.
+3. C5: list the schema-2 fields in the `report.py` docstring.
+4. C6: reserve the CLI flags. Each prints "not built yet" until its function is on `main`.
+
+**Done when.** Merged, tests pass, and Varunika has acknowledged it in PROGRESS.md.
+**Hands to.** V3, V4, V5, A2, A4, A5.
+
+### A2 · Secrets into forks · tech · 2 pts · Sat 10-10
+
+**Why.** The LLM target calls Nemotron from inside every fork, so the key has to get in, and it must never be baked into a checkpoint: Sandboxes keeps checkpoints for 180 days.
+**Owns.** Run-time `env` handling in `backends/local.py` and `backends/contree.py`, and its tests.
+**Needs.** A1 (`env`).
+**Steps.**
+1. Variables named in `target.env` are read from the host at run time and passed only to baseline and fork runs, never to the setup run.
+2. Local: the subprocess `env`. Sandbox: the run's `env` parameter.
+3. Test: after a probe, no file in the local checkpoint contains the key's value; a target without `env` behaves exactly as before.
+
+**Done when.** Tests pass, and once live, a Sandboxes fork can read the key while the checkpoint image does not contain it.
+**Hands to.** A3.
+
+### A3 · LLM demo target · tech · 6 pts · shortlist Fri 10-09, local Tue 10-13, on Sandboxes Sat 10-17
+
+**Why.** The demo target carries Design and Potential Impact. Decided 2026-10-06: an LLM pipeline on Nemotron.
+**Owns.** `examples/<target>/`.
+**Needs.** A2, V3. V1 for the Sandboxes run.
+**Steps.**
+1. Fri 10-09: post three candidates under Open questions in PROGRESS.md, each with its planted defect and why a judge would recognise it. Shapes worth considering:
+   - a retrieval answerer whose prompt template reads the retrieved passage under the wrong key, so it answers fluently from the model's priors
+   - a tool-calling step whose tool result field was renamed, so the model fills the value in itself
+   - a summariser whose instructions field never reaches the prompt
+2. Varunika picks one on Sat 10-10 morning.
+3. Build it with the standard library only: Nemotron through Token Factory, temperature 0, reading `input.json` and printing JSON.
+4. Plant one real silent passthrough. Note any irrelevant field the model reacts to beyond the noise floor: that is a phantom sensitivity for free.
+5. Set `docs` to public pages that state what the pipeline is supposed to read (for V4), `baseline_runs: 5`, `env: ["NEBIUS_API_KEY"]`, and `sources`.
+
+**Done when.** A probe on Sandboxes, with the noise floor on, finds the planted defect, and that run is saved for the demo.
+**Hands to.** V4, V5, A4, A6, A9.
+
+### A4 · Fix and prove · tech · 5 pts · toy Tue 10-13, Sandboxes Fri 10-16, LLM target Sat 10-17
+
+**Why.** The second half of closing the loop: show that the fix removed the defect and changed nothing else, starting from the same checkpoint.
+**Owns.** `prove.py`, `Backend.apply` in both backends, the `--fix` and `--prove` wiring, and their tests.
+**Needs.** C3 from V5 (Fri 10-09); V5's writer for the live run.
+**Steps.**
+1. `apply`: local copies the checkpoint directory and writes the files; Sandboxes calls `apply_files` on the checkpoint image. The original is never changed.
+2. `prove(target, backend, fix, before) -> Proof`: probe again on the patched checkpoint and compare verdicts field by field.
+3. `fixed` means the fix's field no longer has the defect. `new_defects` lists defects that appear only after the fix.
+4. Tue 10-13: on the toy target, with a hand-written `Fix` for `body`, `body` becomes load-bearing, `submitted_at` stays a phantom sensitivity, and there are no new defects.
+
+**Done when.** `--prove` closes the loop on the LLM target on Sandboxes on 10-17.
+**Hands to.** A5, A9.
+
+### A5 · Report and UI v2 · tech · 5 pts · Sat 10-17
+
+**Why.** Design is 25% of the score, and the report is what judges look at in the demo and the video.
+**Owns.** `report.py` (schema 2), `html_report.py`, the `serve.py` pages.
+**Needs.** C5. V9's palette (Sat 10-10) and logo.
+**Steps.**
+1. Schema 2 with every C5 field. Build against a fixture JSON that has all of them, so live runs never block you.
+2. HTML: unstable keys, the Super line and the Ultra explanation per field, Tavily evidence with its quote and link, the fix diff, and a before and after proof panel next to the fork tree.
+3. Adopt V9's palette and logo. Check contrast, and check a phone-width view.
+4. Still one self-contained file that loads nothing from outside.
+
+**Done when.** The LLM target's full report (probe, evidence, fix, proof) reads clearly on a laptop and on a phone.
+**Hands to.** A6, A9, V8.
+
+### A6 · Hosted demo · tech · 4 pts · live Sun 10-11, final Sat 10-17, up through judging
+
+**Why.** A hard deliverable. It has to work for a judge who clicks through from Devpost.
+**Owns.** Hosting, deploys, uptime.
+**Needs.** A3 and A5 for the final version.
+**Steps.**
+1. Pick the host (Render, Fly or Railway) and deploy the Dockerfile with the toy target on the local backend. Live by 10-11, URL in PROGRESS.md. If connecting the host to the repo needs owner approval, ask Varunika.
+2. 10-17: add the recorded Sandboxes runs of the LLM target and serve with `--readonly`, so visits never spend credits.
+3. A health check. Make sure a free tier does not sleep through a judge's visit.
+4. Check it logged out on 10-18, 10-23 and 10-25.
+
+**Done when.** The URL works logged out and shows the LLM target's full report.
+**Hands to.** A10, A12, V8.
+
+### A7 · CI and clean-clone check · tech · 2 pts · Sun 10-18
+
+**Why.** The README commands have to work for a stranger on a fresh machine.
+**Owns.** `.github/workflows/`, the README setup and usage sections.
+**Steps.**
+1. CI runs every new module's tests, offline.
+2. A job that clones fresh, runs `pip install .`, and executes the README quickstart exactly as written.
+3. README setup, Sandboxes, target format and demo sections brought up to date with every new flag and key.
+
+**Done when.** CI is green on `main`, and the clean-clone job passes.
+**Hands to.** V6 (the audit runs after this), A12.
+
+### A8 · Field scan · non-tech · 2 pts · Tue 10-13
+
+**Why.** It confirms nobody else is building Loadbearing, and sharpens how we describe the difference. Read only: nothing is copied, because the rules require original work.
+**Owns.** Private notes, kept outside this repo since it goes public, plus one Decisions line with the conclusion.
+**Steps.** Look through public GitHub repos and any visible Devpost entries for this hackathon. For each relevant one, note what it does, its track, its overlap with us, and whether it uses Tavily.
+**Done when.** The Decisions line is in, and anything that changes our framing is flagged to V8 and A10.
+
+### A9 · Video production · non-tech · 5 pts · storyboard Mon 10-12, recordings Sat 10-17, uploaded Wed 10-21
+
+**Why.** A hard deliverable, and historically the one most often dropped.
+**Owns.** Storyboard, screen recordings, edit, captions, upload.
+**Needs.** V10's outline (10-11) and narration (10-18), the closed loop (10-17), V9's diagram and logo (10-20).
+**Steps.**
+1. Storyboard: one shot per script section, saying what is on screen.
+2. 10-17: record the terminal and the report at 1080p with a large font, and no personal tabs or notifications.
+3. Edit to V10's narration, add V9's diagram and logo, and add captions.
+4. Upload publicly to YouTube by Wed 10-21. Confirm it runs 3:00 or less, has audio, and plays logged out.
+
+**Done when.** The public link is in PROGRESS.md.
+**Hands to.** A10, A12.
+
+### A10 · Devpost page ✍ · non-tech · 3 pts · draft Tue 10-20, final Fri 10-23
+
+**Why.** It is what judges read alongside the video.
+**Owns.** The Devpost project page.
+**Steps.**
+1. By Sun 10-11: confirm both builders are on the Devpost project team.
+2. Sections: Inspiration; What it does; How we built it, naming Token Factory Sandboxes, Nemotron Nano, Super and Ultra, and Tavily, each with its job; Challenges; Accomplishments; What we learned; What's next.
+3. Track: Coding and Agentic Engineering. Built-with tags. Links to the repo, the demo and the video. Gallery: V9's cover, the report, the fork tree, the fix proof, the diagram.
+
+**Done when.** The final version is saved on 10-23 and Varunika has read it.
+**Hands to.** A12.
+
+### A11 · Feedback: Token Factory and Nemotron ✍ · non-tech · 1.5 pts · Fri 10-23
+
+**Why.** The second half of the Most Valuable Feedback entry.
+**Owns.** `docs/feedback/token-factory-nemotron.md`.
+**Steps.** Keep notes while building A2 to A4. In the final version, give every point steps to reproduce and a concrete suggestion: the inference API, model behaviour, the docs, and model IDs not being published.
+**Done when.** Merged.
+
+### A12 · Compliance and submission · non-tech · 2 pts · checklist Tue 10-20, submit Sun 10-25
+
+**Why.** Stage One is pass or fail, and one missing item kills the entry.
+**Owns.** The checklist (in PROGRESS.md) and the final Devpost submit.
+**Steps.**
+1. A checklist from the official rules: Token Factory or AI Cloud used; an NVIDIA open model used; the repo public with an OSS licence; the demo URL works; the video is public, 3:00 or less, with audio covering Token Factory and the model; the track chosen; the team listed.
+2. By 10-20: find out how Most Valuable Feedback is submitted.
+3. Sun 10-25: submit. Varunika checks every link logged out the same day.
+
+**Done when.** Submitted on 10-25, and verified.
