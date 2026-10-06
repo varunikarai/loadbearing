@@ -19,7 +19,7 @@ Every task below is written so either builder can pick it up cold: why it exists
 | V2 | Nemotron layer verified | tech | 6 | Sun 10-11 | todo |
 | V3 | Noise floor | tech | 3 | Sat 10-10 | todo |
 | V4 | Tavily intent inference | tech | 5 | Sat 10-17 | todo |
-| V5 | Fix writer | tech | 4 | contract Sat 10-10, done Sat 10-17 | todo |
+| V5 | Fix writer | tech | 4 | contract Sat 10-10, done Sat 10-17 | contract done 10-06, writer todo |
 | V6 | Pre-public audit and the public flip | tech | 2 | Sun 10-18 | todo |
 | V7 | Prior art and evidence | non-tech | 3 | Tue 10-20 | todo |
 | V8 | README narrative ✍ | non-tech | 3 | Sun 10-18 | todo |
