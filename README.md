@@ -19,7 +19,10 @@ The problem statement is in [SPEC.md](SPEC.md).
 - [ ] Nemotron Nano diff classification verified with real model IDs
 - [ ] Super reconciliation and Ultra explanation in the report
 - [ ] Tavily call establishing intended behaviour from upstream docs
-- [ ] Hosted demo
+- [x] Timing: checkpoint, parallel wall time, and the same runs summed one after another
+- [x] Versioned JSON report, and a self-contained HTML report built around the fork tree
+- [x] Demo server with cached runs and a read-only mode; Dockerfile; CI with a probe gate
+- [ ] Hosted demo deployed at a public URL
 - [ ] Demo video
 
 ## Quickstart
@@ -34,6 +37,7 @@ PYTHONPATH=src python3 -m loadbearing probe examples/ticket_triage/target.json
 
 ```
 ticket-triage: 15 forks from one checkpoint (local)
+checkpoint 0.01s, then 17 runs in 0.07s wall (0.46s one after another, 6.5x parallel)
 
 field          intent      destroy  drop   nudge  verdict
 ticket_id      irrelevant  same     same   same   inert
@@ -62,6 +66,30 @@ cp .env.example .env        # set NEBIUS_API_KEY
 loadbearing models          # prints the Nemotron IDs your key can call; paste them into .env
 loadbearing probe examples/ticket_triage/target.json --nano
 ```
+
+## The report
+
+```bash
+loadbearing probe examples/ticket_triage/target.json --out report.json --html report.html
+loadbearing report report.json            # re-render a saved run without re-running it
+```
+
+`report.html` is one self-contained page: the checkpoint fanning out to every fork, the
+field-by-mutation matrix, and, for each defect, the baseline and fork outputs side by side
+with the changed keys marked. It fetches nothing, so a saved copy always opens.
+
+## The demo server
+
+```bash
+loadbearing serve                          # http://127.0.0.1:8000
+loadbearing serve --backend sandbox --nano # runs on Nebius, Nano judging each diff
+loadbearing serve --readonly               # serve recorded runs only, never run
+```
+
+It lists every `examples/<name>/target.json`, runs a probe on one when asked, and caches the
+result in `runs/`, so a page view never costs a run. `--readonly` refuses new runs, which is
+how a public deployment keeps Sandboxes credits intact. The Dockerfile runs it on any
+container host that sets `$PORT`.
 
 ## Writing a target
 
@@ -103,7 +131,10 @@ src/loadbearing/
   backends/contree.py  Nebius Token Factory Sandboxes
   nemotron.py        Token Factory client, Nano / Super / Ultra routing
   tavily.py          Tavily search client
-  cli.py             loadbearing probe | models
+  report.py          the versioned JSON report
+  html_report.py     the self-contained HTML report and fork tree
+  serve.py           the demo server
+  cli.py             loadbearing probe | report | serve | models
 examples/ticket_triage/  toy pipeline with two planted bugs
 ```
 

@@ -23,6 +23,14 @@ class TicketTriageSlice(unittest.TestCase):
     def test_baseline_is_deterministic(self):
         self.assertTrue(self.report.deterministic)
 
+    def test_every_run_is_timed(self):
+        runs = [self.report.baseline] + [f.result for f in self.report.forks]
+        self.assertTrue(all(r.seconds > 0 for r in runs))
+        self.assertGreater(self.report.checkpoint_seconds, 0)
+        # Parallel wall time can never be shorter than the slowest single run.
+        self.assertGreaterEqual(self.report.fork_wall_seconds, max(r.seconds for r in runs))
+        self.assertGreaterEqual(self.report.fork_total_seconds, sum(r.seconds for r in runs))
+
     def test_the_pipeline_really_is_wrong(self):
         # The body reports a full outage and the pipeline still says P3.
         self.assertEqual(self.report.baseline.output()["priority"], "P3")

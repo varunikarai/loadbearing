@@ -17,6 +17,7 @@ class RunResult:
     stdout: str
     stderr: str
     exit_code: int
+    seconds: float = 0.0  # wall time of this run, filled in by the engine
 
     def output(self) -> Any:
         """Parsed JSON when the pipeline prints JSON, raw text otherwise."""

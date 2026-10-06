@@ -1,13 +1,15 @@
-"""Command line: `loadbearing probe <target.json>` and `loadbearing models`."""
+"""Command line: `loadbearing probe`, `report`, `serve` and `models`."""
 
 from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
-from dataclasses import asdict
+from pathlib import Path
 from typing import Optional
 
+from loadbearing import report as report_json
 from loadbearing.backends import make_backend
 from loadbearing.config import load_dotenv
 from loadbearing.mutations import KINDS
@@ -29,6 +31,22 @@ def main(argv: Optional[list[str]] = None) -> int:
     p.add_argument("--nano", action="store_true", help="have Nemotron Nano judge each moved diff")
     p.add_argument("--workers", type=int, default=8, help="forks run in parallel")
     p.add_argument("--json", action="store_true", help="print the full report as JSON")
+    p.add_argument("--out", metavar="FILE", help="also save the full report as JSON")
+    p.add_argument("--html", metavar="FILE", help="also save the report as a self-contained web page")
+
+    r = sub.add_parser("report", help="render a saved JSON report as a web page")
+    r.add_argument("report", help="a report saved with `probe --out`")
+    r.add_argument("-o", "--output", metavar="FILE", help="where to write it (default: next to the report)")
+
+    s = sub.add_parser("serve", help="the demo: list targets, run probes, serve the reports")
+    s.add_argument("--targets", default="examples", help="directory of <name>/target.json")
+    s.add_argument("--cache", default="runs", help="where finished runs are kept")
+    s.add_argument("--backend", choices=("local", "sandbox"), default="local")
+    s.add_argument("--nano", action="store_true", help="have Nemotron Nano judge each moved diff")
+    s.add_argument("--readonly", action="store_true", help="serve recorded runs only, never run")
+    s.add_argument("--host", default="127.0.0.1")
+    # Hosting platforms say which port to bind through $PORT.
+    s.add_argument("--port", type=int, default=int(os.environ.get("PORT", 8000)))
 
     m = sub.add_parser("models", help="list the Nemotron model IDs your Token Factory key can call")
     m.add_argument("--all", action="store_true", help="list every model, not only Nemotron")
@@ -37,6 +55,10 @@ def main(argv: Optional[list[str]] = None) -> int:
     try:
         if args.command == "models":
             return _models(args.all)
+        if args.command == "report":
+            return _report(args.report, args.output)
+        if args.command == "serve":
+            return _serve(args)
         return _probe(args)
     except RuntimeError as exc:
         print(f"loadbearing: {exc}", file=sys.stderr)
@@ -56,14 +78,51 @@ def _probe(args: argparse.Namespace) -> int:
     finally:
         backend.close()
 
+    data = report_json.to_dict(report)
+    if args.out:
+        report_json.save(report, args.out)
+    if args.html:
+        _write_html(data, args.html)
     if args.json:
-        out = asdict(report)
-        out["defects"] = [v.field for v in report.defects]
-        print(json.dumps(out, indent=2))
+        print(json.dumps(data, indent=2))
     else:
         print(render(report))
     # Non-zero on any defect, so this can gate CI.
     return 1 if report.defects else 0
+
+
+def _report(path: str, output: Optional[str]) -> int:
+    out = output or str(Path(path).with_suffix(".html"))
+    _write_html(report_json.load(path), out)
+    print(out)
+    return 0
+
+
+def _write_html(data: dict, path: str) -> None:
+    from loadbearing.html_report import render_html
+
+    Path(path).write_text(render_html(data))
+
+
+def _serve(args: argparse.Namespace) -> int:
+    from loadbearing.serve import Demo, serve
+
+    classify_factory = None
+    if args.nano:
+        from loadbearing.nemotron import NemotronRouter
+
+        classify_factory = lambda: NemotronRouter.from_env(tiers=("nano",)).classify_diff  # noqa: E731
+    demo = Demo(args.targets, args.cache, args.backend, args.readonly, classify_factory)
+    server = serve(demo, args.host, args.port)
+    mode = "read only" if args.readonly else f"runs on {args.backend}"
+    print(f"loadbearing: {len(demo.targets)} target(s), {mode}, http://{args.host}:{server.server_address[1]}", flush=True)
+    try:
+        server.serve_forever()
+    except KeyboardInterrupt:
+        pass
+    finally:
+        server.server_close()
+    return 0
 
 
 def _models(show_all: bool) -> int:
@@ -78,6 +137,7 @@ def _models(show_all: bool) -> int:
 
 def render(report: Report) -> str:
     lines = [f"{report.target}: {len(report.forks)} forks from one checkpoint ({report.backend})"]
+    lines.append(timing_line(report))
     if not report.deterministic:
         lines.append("WARNING: the baseline disagrees with itself, so no verdict below is sound.")
 
@@ -96,3 +156,13 @@ def render(report: Report) -> str:
     else:
         lines.append("No defects found.")
     return "\n".join(lines)
+
+
+def timing_line(report: Report) -> str:
+    """Checkpoint once, then every run in parallel: the line that shows what that buys."""
+    wall, total = report.fork_wall_seconds, report.fork_total_seconds
+    speedup = f", {total / wall:.1f}x parallel" if wall > 0 else ""
+    return (
+        f"checkpoint {report.checkpoint_seconds:.2f}s, then {len(report.forks) + 2} runs "
+        f"in {wall:.2f}s wall ({total:.2f}s one after another{speedup})"
+    )
