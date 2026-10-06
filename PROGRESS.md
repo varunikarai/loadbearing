@@ -1,0 +1,103 @@
+# Progress
+
+Where Loadbearing is, what happens next, and what has already happened. **Now**, **Plan** and **Decisions** are enough to pick up the work. The **Log** is history; read it only when you need it.
+
+## How to use this file
+
+1. **Start of a session:** read Now, Plan, Decisions and Open questions.
+2. **End of any session that touched the repo:** add an entry at the top of the Log and update Now if it changed. Commit it with the work, or straight after.
+3. **Log output, not effort.** What shipped, what broke, what is next, who did it. Five lines at most per day.
+4. **Decisions are not reopened** without new evidence. If one changes, add a new dated line below it; never edit the old one.
+5. **Dates are absolute:** 2026-10-10, never "next week".
+6. **Never in this file:** keys, tokens, or material from any employer or other project. This repo goes public by 2026-10-18, and so does everything written here.
+
+## Now
+
+_Updated 2026-10-06_
+
+- **State:** the vertical slice runs end to end on the local backend: toy target, 15 forks from one checkpoint, both planted bugs caught, 18/18 tests pass. The Sandboxes backend and Nemotron Nano classification are written but have never run against a live account.
+- **Next action:** Sat 2026-10-10, Varunika. Claim credits, `pip install -e '.[sandbox]'`, `contree auth`, `loadbearing models` and put the Nemotron IDs in `.env`, then `loadbearing probe examples/ticket_triage/target.json --backend sandbox --nano`. Pass = the same two defects, found on Nebius.
+- **Waiting on:** Aeshvarya accepting the repo invite (expires 2026-10-13).
+- **Deadline:** 2026-10-30 10:00 PT (22:30 IST). **Target submission: 2026-10-25.**
+
+## Plan
+
+The Who column follows the proposed split in Open questions.
+
+| When | Who | Goal | Done when |
+|---|---|---|---|
+| Sat 2026-10-10 | Varunika | Slice on Sandboxes with Nano | `--backend sandbox --nano` reports the same two defects |
+| Sat 2026-10-10 | both | Lock the real demo target | A public, recognisable pipeline with a real silent-failure bug, recorded in Decisions |
+| Sun 2026-10-11 | Varunika | Super reconciliation, Ultra explanation, Tavily intent call in the report | `probe` on the toy target prints all three, with one real Tavily call |
+| Sat 2026-10-17 | both | Real demo target probed end to end on Sandboxes | Report shows at least one real defect |
+| Sat 2026-10-17 | Aeshvarya | Hosted demo | A public URL that runs a probe and shows the report |
+| Sun 2026-10-18 | both | README final, video recorded, repo public | Every hard deliverable due 10-18 ticked below |
+| Tue 2026-10-20 | both | Buffer: fixes from 10-17 and 10-18 | Nothing open from the weekend |
+| Sun 2026-10-25 | both | Tooling feedback written, Devpost submission filed | Submitted |
+| 2026-10-26 to 10-30 | | Buffer only, no new build | |
+
+Not available: Sat 2026-10-24 (Varunika).
+
+### Hard deliverables
+
+Each one missing kills the entry.
+
+| Deliverable | Due | Status |
+|---|---|---|
+| Runs on Token Factory or AI Cloud, uses an NVIDIA open model | stage 1 pass/fail | Code written, not yet run live |
+| Public repo, OSS licence visible at the top | 2026-10-18 | Apache 2.0 committed. Repo private until the flip: `gh repo edit varunikarai/loadbearing --visibility public --accept-visibility-change-consequences` |
+| README with setup and Nebius / Nemotron usage | 2026-10-18 | Technical sections drafted. Pitch and team section not written |
+| Hosted demo URL | 2026-10-18 | Not started |
+| Public YouTube video, 3 min or less, **with audio**, covering Token Factory and the NVIDIA model used | 2026-10-18 | Not started |
+| Written Nebius / NVIDIA tooling feedback | 2026-10-25 | Not started |
+
+**Aiming at:** Coding and Agentic Engineering track, Best Use of Tavily ($3,000, needs a functional runtime Tavily call), the overall prizes, Most Valuable Feedback ($100).
+
+## Decisions
+
+- **2026-09-20** Build Loadbearing, not an autonomous PR agent: one already exists in this hackathon. Idea locked, no pivots.
+- **2026-09-20** Track: Coding and Agentic Engineering. Tavily is a runtime dependency on purpose.
+- **2026-09-20** Models routed by job: Nano per fork, Super across forks, Ultra for the explanation.
+- **2026-09-30** The core is stdlib only and the Sandboxes SDK is an optional extra. The local backend is for development; the submission runs on Sandboxes.
+- **2026-09-30** Nemotron model IDs live in `.env`, never in code. They are not published in the docs; `loadbearing models` lists them.
+- **2026-09-30** Repo private until 2026-10-18, so the idea cannot be scouted before it is built.
+- **2026-09-30** Commits: one concern each, the message says why, each person commits as themselves.
+
+## Open questions
+
+- **Work split**, proposed 2026-09-20, not yet confirmed: Varunika owns the mutation engine and defect classification; Aeshvarya owns orchestration and deploy, including the hosted demo.
+- **Demo target pipeline:** not chosen. Due Sat 2026-10-10.
+- **Hosted demo shape:** not decided. Minimum is a web page that runs a probe on a fixed target and renders the report.
+- **Credits:** do they cover Sandboxes runs or only inference? Check the console balance after the first Sandboxes run.
+
+## Quick reference
+
+```bash
+PYTHONPATH=src python3 -m loadbearing probe examples/ticket_triage/target.json   # local slice
+PYTHONPATH=src python3 -m unittest discover -s tests                              # tests
+```
+
+Problem statement: [SPEC.md](SPEC.md). Setup, target format, layout: [README.md](README.md).
+
+## Log
+
+Newest first.
+
+### 2026-10-06
+- Aeshvarya invited to the repo with write access (Varunika). Invite expires 2026-10-13.
+- Credits: Nebius Builders Program form in progress (Varunika). Hackathon code form (`NEBIUS-DEVPOST-GLOBAL26`) not yet confirmed done.
+- No commits 2026-10-01 to 10-06. The planned 2026-10-02 to 10-04 build block did not happen; its next action moves to 2026-10-10.
+- This file added.
+
+### 2026-10-01
+- Aeshvarya confirmed on the team.
+
+### 2026-09-30
+- Repo created (Varunika): mutation engine, checkpoint-and-fork engine, verdicts, local and Sandboxes backends, Nemotron router, Tavily client, CLI, toy target.
+- Slice runs locally: 15 forks from one checkpoint, both planted bugs caught, 18/18 tests.
+
+### 2026-09-20
+- Direction set to Loadbearing. Problem statement written, now [SPEC.md](SPEC.md).
+
+### 2026-09-07
+- Registered: Varunika and Aeshvarya.
