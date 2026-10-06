@@ -1,10 +1,11 @@
-"""Command line: `loadbearing probe <target.json>` and `loadbearing models`."""
+"""Command line: `loadbearing probe <target.json>`, `loadbearing report` and `loadbearing models`."""
 
 from __future__ import annotations
 
 import argparse
 import json
 import sys
+from pathlib import Path
 from typing import Optional
 
 from loadbearing import report as report_json
@@ -30,6 +31,11 @@ def main(argv: Optional[list[str]] = None) -> int:
     p.add_argument("--workers", type=int, default=8, help="forks run in parallel")
     p.add_argument("--json", action="store_true", help="print the full report as JSON")
     p.add_argument("--out", metavar="FILE", help="also save the full report as JSON")
+    p.add_argument("--html", metavar="FILE", help="also save the report as a self-contained web page")
+
+    r = sub.add_parser("report", help="render a saved JSON report as a web page")
+    r.add_argument("report", help="a report saved with `probe --out`")
+    r.add_argument("-o", "--output", metavar="FILE", help="where to write it (default: next to the report)")
 
     m = sub.add_parser("models", help="list the Nemotron model IDs your Token Factory key can call")
     m.add_argument("--all", action="store_true", help="list every model, not only Nemotron")
@@ -38,6 +44,8 @@ def main(argv: Optional[list[str]] = None) -> int:
     try:
         if args.command == "models":
             return _models(args.all)
+        if args.command == "report":
+            return _report(args.report, args.output)
         return _probe(args)
     except RuntimeError as exc:
         print(f"loadbearing: {exc}", file=sys.stderr)
@@ -57,14 +65,30 @@ def _probe(args: argparse.Namespace) -> int:
     finally:
         backend.close()
 
+    data = report_json.to_dict(report)
     if args.out:
         report_json.save(report, args.out)
+    if args.html:
+        _write_html(data, args.html)
     if args.json:
-        print(json.dumps(report_json.to_dict(report), indent=2))
+        print(json.dumps(data, indent=2))
     else:
         print(render(report))
     # Non-zero on any defect, so this can gate CI.
     return 1 if report.defects else 0
+
+
+def _report(path: str, output: Optional[str]) -> int:
+    out = output or str(Path(path).with_suffix(".html"))
+    _write_html(report_json.load(path), out)
+    print(out)
+    return 0
+
+
+def _write_html(data: dict, path: str) -> None:
+    from loadbearing.html_report import render_html
+
+    Path(path).write_text(render_html(data))
 
 
 def _models(show_all: bool) -> int:
