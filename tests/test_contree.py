@@ -81,6 +81,22 @@ class ContreeBackendTests(unittest.TestCase):
         # The checkpoint itself is never written to by a fork.
         self.assertNotIn("/work/input.json", ckpt.files)
 
+    def test_secrets_go_to_forks_only(self):
+        import os
+
+        saved = dict(os.environ)
+        os.environ["LB_TEST_SECRET"] = "s3cret"
+        try:
+            self.target.env = ["LB_TEST_SECRET"]
+            ckpt = self.backend.checkpoint(self.target)
+            self.backend.run(ckpt, self.target, {})
+        finally:
+            os.environ.clear()
+            os.environ.update(saved)
+        setup, fork = self.backend._sdk.runs[0], self.backend._sdk.runs[-1]
+        self.assertIsNone(setup.request["env"])
+        self.assertEqual(fork.request["env"], {"LB_TEST_SECRET": "s3cret"})
+
     def test_a_failed_setup_is_reported(self):
         original = FakeImage.wait
 

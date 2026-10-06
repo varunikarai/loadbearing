@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import os
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, Protocol
 
@@ -10,6 +11,28 @@ if TYPE_CHECKING:
     from loadbearing.target import Target
 
 INPUT_NAME = "input.json"  # the file each fork reads its (mutated) record from
+
+# Keys this project itself reads. They never reach a pipeline unless its
+# target names them in `env`, and they never reach a setup run at all.
+SECRETS = ("NEBIUS_API_KEY", "NEBIUS_PROJECT_ID", "TAVILY_API_KEY")
+
+
+def forwarded_env(target: Target) -> dict[str, str]:
+    """The values of the variables a target names in `env`, read from the host now.
+
+    Passed to baseline and fork runs only. A missing one fails before any run,
+    rather than as a pipeline that quietly behaves differently without it.
+    """
+    missing = [name for name in target.env if not os.environ.get(name)]
+    if missing:
+        raise RuntimeError(f"{target.name} needs {', '.join(missing)} in the environment (see .env.example)")
+    return {name: os.environ[name] for name in target.env}
+
+
+def scrubbed_env(target: Target) -> dict[str, str]:
+    """The host environment with every secret removed: what a setup run sees."""
+    hidden = set(SECRETS) | set(target.env)
+    return {k: v for k, v in os.environ.items() if k not in hidden}
 
 
 @dataclass

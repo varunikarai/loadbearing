@@ -14,7 +14,7 @@ import subprocess
 import tempfile
 from pathlib import Path
 
-from loadbearing.backends.base import INPUT_NAME, RunResult
+from loadbearing.backends.base import INPUT_NAME, RunResult, forwarded_env, scrubbed_env
 from loadbearing.target import Target
 
 
@@ -25,6 +25,7 @@ class LocalBackend:
         self._tmp = tempfile.TemporaryDirectory(prefix="loadbearing-")
 
     def checkpoint(self, target: Target) -> Path:
+        forwarded_env(target)  # a missing variable fails here, before any run
         ckpt = Path(self._tmp.name) / "checkpoint"
         ckpt.mkdir()
         for rel in target.files:
@@ -32,7 +33,14 @@ class LocalBackend:
             dest.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(target.root / rel, dest)
         if target.setup:
-            subprocess.run(target.setup, shell=True, cwd=ckpt, check=True, capture_output=True)
+            subprocess.run(
+                target.setup,
+                shell=True,
+                cwd=ckpt,
+                check=True,
+                capture_output=True,
+                env=scrubbed_env(target),  # setup output is frozen into the checkpoint
+            )
         return ckpt
 
     def run(self, checkpoint: Path, target: Target, record: dict) -> RunResult:
@@ -41,6 +49,7 @@ class LocalBackend:
         (work / INPUT_NAME).write_text(json.dumps(record))
         proc = subprocess.run(
             target.command,
+            env={**scrubbed_env(target), **forwarded_env(target)},
             shell=True,
             cwd=work,
             capture_output=True,

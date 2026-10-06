@@ -38,7 +38,8 @@ class DemoServerTests(unittest.TestCase):
             with urllib.request.urlopen(url) as resp:
                 return resp.status, resp.read().decode()
         except urllib.error.HTTPError as err:
-            return err.code, err.read().decode()
+            with err:
+                return err.code, err.read().decode()
 
     def post(self, url):
         opener = urllib.request.build_opener(_NoRedirect)
@@ -46,7 +47,8 @@ class DemoServerTests(unittest.TestCase):
             with opener.open(urllib.request.Request(url, data=b"", method="POST")) as resp:
                 return resp.status, resp.headers
         except urllib.error.HTTPError as err:
-            return err.code, err.headers
+            with err:
+                return err.code, err.headers
 
     def test_index_lists_the_example_targets(self):
         base = self.start()
