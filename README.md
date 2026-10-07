@@ -148,6 +148,15 @@ examples/ticket_triage/  toy pipeline with two planted bugs
 PYTHONPATH=src python3 -m unittest discover -s tests
 ```
 
+## Prior art
+
+- **Metamorphic testing** (Chen, Cheung and Yiu, 1998) checks relations between runs on transformed inputs; Loadbearing's relations are per field and come from intent.
+- **Leave-one-feature-out** (Sculley et al., NeurIPS 2015) finds inputs a model barely uses; Loadbearing applies the idea to any running pipeline and also flags the input it should use but silently does not.
+- **Input erasure** and **sensitivity analysis** measure what an input changes; Loadbearing adds a defect claim per field, a noise floor for LLM output, and a fix proven from the same checkpoint.
+- **"Lost in the Middle"** (Liu et al., TACL 2024) shows why a retrieval pipeline can answer without using what it retrieved.
+
+Sources, differences in full, and documented real failures: [docs/prior-art.md](docs/prior-art.md).
+
 ## License
 
 [Apache 2.0](LICENSE)
