@@ -57,5 +57,42 @@ class ReasoningTests(unittest.TestCase):
         for raw, answer in cases.items():
             self.assertEqual(_strip_reasoning(raw), answer, raw)
 
+
+class Excerpt:
+    def __init__(self, url, content):
+        self.url, self.content, self.title = url, content, ""
+
+
+class InferIntentTests(unittest.TestCase):
+    EXCERPTS = [Excerpt("https://example.org/rag", "Answers must be grounded in the retrieved passages.")]
+
+    def reply(self, fields):
+        return json.dumps({"fields": fields})
+
+    def test_keeps_relevant_and_irrelevant_and_drops_unknown(self):
+        r, _ = router({"super": self.reply({
+            "passages": {"intent": "relevant", "quote": "Answers must be grounded in the retrieved passages.", "url": "https://example.org/rag"},
+            "user_id": {"intent": "irrelevant", "quote": "q", "url": "u"},
+            "request_ts": {"intent": "unknown", "quote": "", "url": ""},
+        })})
+        out = r.infer_intent(["passages", "user_id", "request_ts"], self.EXCERPTS)
+        self.assertEqual(sorted(out), ["passages", "user_id"])
+        self.assertEqual(out["passages"].intent, RELEVANT)
+        self.assertEqual(out["passages"].url, "https://example.org/rag")
+
+    def test_the_prompt_carries_fields_values_and_excerpts_and_goes_to_super(self):
+        r, client = router({"super": self.reply({})})
+        r.infer_intent(["user_id"], self.EXCERPTS, record={"user_id": "u-42"})
+        model, messages = client.calls[0]
+        self.assertEqual(model, MODELS["super"])
+        prompt = messages[1]["content"]
+        for expected in ("user_id", "u-42", "https://example.org/rag", "grounded in the retrieved"):
+            self.assertIn(expected, prompt)
+
+    def test_a_reply_without_fields_is_refused(self):
+        r, _ = router({"super": json.dumps({"answer": "both matter"})})
+        with self.assertRaises(ValueError):
+            r.infer_intent(["user_id"], self.EXCERPTS)
+
 if __name__ == "__main__":
     unittest.main()
