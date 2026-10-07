@@ -14,6 +14,7 @@ from loadbearing.backends import make_backend
 from loadbearing.config import load_dotenv
 from loadbearing.mutations import KINDS
 from loadbearing.probe import Report, probe
+from loadbearing.prove import Loop, Pinned, close_loop
 from loadbearing.target import load_target
 
 
@@ -75,8 +76,6 @@ def main(argv: Optional[list[str]] = None) -> int:
 NOT_BUILT = {
     "explain": "V2",
     "intent": "V4",
-    "fix": "V5",
-    "prove": "A4",
 }
 
 
@@ -90,24 +89,39 @@ def _probe(args: argparse.Namespace) -> int:
         from loadbearing.nemotron import NemotronRouter
 
         classify = NemotronRouter.from_env(tiers=("nano",)).classify_diff
+    router = None
+    if args.fix or args.prove:
+        from loadbearing.nemotron import NemotronRouter
+
+        router = NemotronRouter.from_env(tiers=("ultra",))  # before any run, so a missing ID costs nothing
     backend = make_backend(args.backend)
+    loop = None
     try:
+        # One checkpoint for the probe and every proof, so a fix is the only difference.
+        pinned = Pinned(backend)
         report = probe(
-            target, backend, classify=classify, workers=args.workers, baseline_runs=args.baseline_runs
+            target, pinned, classify=classify, workers=args.workers, baseline_runs=args.baseline_runs
         )
+        if router is not None and report.defects:
+            loop = close_loop(
+                target, backend, report, router, checkpoint=pinned.pinned, prove_fixes=args.prove,
+                classify=classify, workers=args.workers, baseline_runs=args.baseline_runs,
+            )
     finally:
         backend.close()
 
-    data = report_json.to_dict(report)
+    data = report_json.to_dict(report, loop, target)
     if args.out:
-        report_json.save(report, args.out)
+        Path(args.out).write_text(json.dumps(data, indent=2))
     if args.html:
         _write_html(data, args.html)
     if args.json:
         print(json.dumps(data, indent=2))
     else:
         print(render(report))
-    # Non-zero on any defect, so this can gate CI.
+        if loop is not None:
+            print(render_loop(loop, target))
+    # Non-zero on any defect in the pipeline as given, so this can gate CI.
     return 1 if report.defects else 0
 
 
@@ -181,6 +195,29 @@ def render(report: Report) -> str:
         lines.append(f"{len(report.defects)} defect(s): {found}")
     else:
         lines.append("No defects found.")
+    return "\n".join(lines)
+
+
+def render_loop(loop: Loop, target) -> str:
+    """The fix and its proof per defect, then whatever could not be fixed."""
+    lines = []
+    for fix in loop.fixes:
+        lines += ["", f"fix for {fix.field} ({fix.defect}): {fix.rationale}", fix.diff(target).rstrip()]
+        proof = next((p for p in loop.proofs if p.fix is fix), None)
+        if proof is None:
+            continue
+        after = next((v.verdict for v in proof.after.verdicts if v.field == fix.field), "gone")
+        if proof.clean:
+            lines.append(f"proof: {fix.field} is now {after}, and no other field gained a defect.")
+        elif not proof.fixed:
+            lines.append(f"proof: FAILED, {fix.field} is still {after}.")
+        else:
+            lines.append(
+                f"proof: {fix.field} is now {after}, but the fix adds defects on "
+                + ", ".join(proof.new_defects)
+            )
+    for field, reason in loop.rejected:
+        lines += ["", f"no fix for {field}: {reason}"]
     return "\n".join(lines)
 
 
