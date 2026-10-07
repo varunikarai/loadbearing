@@ -30,7 +30,7 @@ Every task below is written so either builder can pick it up cold: why it exists
 | V12 | Judging self-review | non-tech | 2 | Tue 10-20 and Fri 10-23 | todo |
 | A1 | Contracts | tech | 2 | Fri 10-09 | done 10-06 |
 | A2 | Secrets into forks | tech | 2 | Sat 10-10 | done 10-06 |
-| A3 | LLM demo target | tech | 6 | shortlist Fri 10-09, done Sat 10-17 | todo |
+| A3 | LLM demo target | tech | 6 | shortlist Fri 10-09, done Sat 10-17 | built and proven offline 10-07 (fake Token Factory); live run waits on V1 and my key |
 | A4 | Fix and prove | tech | 5 | toy Tue 10-13, done Sat 10-17 | toy and CLI done 10-07; LLM target on Sandboxes waits on V1 and A3 |
 | A5 | Report and UI v2 | tech | 5 | Sat 10-17 | todo |
 | A6 | Hosted demo | tech | 4 | live Sun 10-11, final Sat 10-17 | todo |
