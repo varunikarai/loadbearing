@@ -158,8 +158,14 @@ def _models(show_all: bool) -> int:
 def render(report: Report) -> str:
     lines = [f"{report.target}: {len(report.forks)} forks from one checkpoint ({report.backend})"]
     lines.append(timing_line(report))
-    if not report.deterministic:
-        lines.append("WARNING: the baseline disagrees with itself, so no verdict below is sound.")
+    if report.void:
+        lines.append("WARNING: every output key varies on its own, so no verdict below is sound.")
+    elif report.unstable_keys:
+        # An LLM target is expected to land here: the noise floor removed these, the rest is judged.
+        lines.append(
+            f"noise floor: {report.baseline_runs} baseline runs; varies on its own, not judged: "
+            + ", ".join(report.unstable_keys)
+        )
 
     rows = [("field", "intent", *KINDS, "verdict")]
     for v in report.verdicts:

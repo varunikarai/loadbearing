@@ -32,5 +32,29 @@ class ReservedFlagTests(unittest.TestCase):
             self.assertEqual(main(["probe", EXAMPLE]), 1)  # two defects
 
 
+
+class RenderTests(unittest.TestCase):
+    def report(self, unstable, output='{"a": 1, "id": "x"}'):
+        from loadbearing.backends.base import RunResult
+        from loadbearing.probe import Report
+
+        return Report(target="t", backend="local", deterministic=not unstable,
+                      baseline=RunResult(output, "", 0), forks=[], verdicts=[],
+                      baseline_runs=5, unstable_keys=unstable)
+
+    def test_a_noisy_key_is_named_and_the_report_still_stands(self):
+        from loadbearing.cli import render
+
+        text = render(self.report(["id"]))
+        self.assertIn("noise floor: 5 baseline runs; varies on its own, not judged: id", text)
+        self.assertNotIn("WARNING", text)
+
+    def test_only_a_void_report_is_called_unsound(self):
+        from loadbearing.cli import render
+
+        self.assertIn("WARNING", render(self.report(["a", "id"])))
+        self.assertNotIn("WARNING", render(self.report([])))
+
+
 if __name__ == "__main__":
     unittest.main()
