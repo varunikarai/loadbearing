@@ -65,11 +65,12 @@ Each one missing kills the entry.
 - **2026-10-06** Noise floor: the baseline runs k times, and output keys that vary on their own are marked unstable and left out of verdicts, instead of voiding the whole report. (Aeshvarya, accepted.)
 - **2026-10-06** Tavily infers `expects` for undeclared fields from upstream docs, so an undeclared field can carry a defect claim. (Aeshvarya, accepted.)
 - **2026-10-06** Prior art in the README: metamorphic testing and input ablation or sensitivity analysis. Not mutation testing, which mutates the code, not the inputs. (Aeshvarya, accepted.)
+- **2026-10-07** Demo target: **shortlist option 1, the support answerer over retrieved policy (RAG)**. Planted defect: the prompt reads `context`, the retriever writes `passages`, so a 14-day return policy comes out as 30 days. Option 2 (weather tool agent) is the fallback. (Picked by Varunika from Aeshvarya's shortlist.)
 
 ## Open questions
 
 - **Work split:** written in full in [WORKPLAN.md](WORKPLAN.md) by Varunika on 2026-10-06, 40.5 points hers and 39.5 his, tech and non-tech on both sides. Aeshvarya confirms it, or counters a specific task, here by Fri 2026-10-09, before A1 lands.
-- **Demo target pipeline:** an LLM pipeline on Nemotron (decided 2026-10-06), but which one is not chosen. Due Sat 2026-10-10.
+- **Demo target pipeline:** decided 2026-10-07, the RAG answerer (see Decisions). The shortlist below is kept for the record.
   A3 shortlist (Aeshvarya, 2026-10-06). All three use the standard library and Nemotron through Token Factory at temperature 0, read `input.json`, print JSON, and carry `env: ["NEBIUS_API_KEY"]`.
   1. **Support answerer over retrieved policy (RAG).** Record: `question`, `passages` (retrieved policy text), `user_id`, `request_ts`. Planted defect: the prompt is filled from `record.get("context", "")`, but the retriever writes `passages`, so the model answers from its priors. Asked "how long do I have to return this?" with a passage saying 14 days, it says 30, fluently. Silent passthrough on `passages`. Why a judge recognises it: everyone has shipped or used RAG, and "it answered without reading the docs" is the failure people fear most. Docs for V4: retrieval-augmented generation guides that say answers must be grounded in the retrieved context. Prior art fit: Lost in the Middle (V7).
   2. **Tool-calling agent after an API rename.** Record: `user_message`, `tool_result` (a weather API response with `temp_c`), `session_id`. Planted defect: the agent reads `tool_result.get("temperature")`, a field the API renamed to `temp_c`, gets `None`, and the model fills in a plausible temperature itself. Silent passthrough on `tool_result.temp_c`. Why a judge recognises it: schema drift breaking agents quietly is a well-known pain, and it is "agentic" on its face. Docs for V4: the weather API's public reference, which names `temp_c`. This gives Tavily the clearest job of the three: the current docs settle what the field is called.
@@ -104,7 +105,7 @@ Newest first.
   3. `cli.render`: the "baseline disagrees with itself, so no verdict below is sound" warning should key on `report.void`, not `not report.deterministic`, and list `report.unstable_keys` when there are any. Today it would wrongly void an LLM target's whole report.
   4. Run counts: `timing_line` and `report.py` count runs as `len(report.forks) + 2`; with the noise floor that is `+ report.baseline_runs`.
   5. Schema 2 (A5): `baseline_runs`, `unstable_keys` and the four new verdict fields are on the dataclasses now.
-- **Waiting on Varunika:** the A3 pick (RAG answerer, weather agent, or summariser).
+- **A3 pick made the same evening:** the RAG answerer, with the weather agent as fallback. Aeshvarya can build it now.
 
 ### 2026-10-06 (g)
 - Sandboxes backend rebuilt on contree-sdk 0.3.6 after reading its source (Aeshvarya): the old client import did not exist, the project variable is `NEBIUS_PROJECT_ID`, and there is no `contree auth`. Networking is on by default, so a fork can call Nemotron.
