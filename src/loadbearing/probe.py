@@ -5,11 +5,12 @@ from __future__ import annotations
 import time
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
-from typing import Callable, Optional
+from typing import Any, Callable, Optional
 
 from loadbearing.backends.base import Backend, RunResult
 from loadbearing import noise
 from loadbearing.compare import Diff, compare
+from loadbearing.fix import read_sources
 from loadbearing.mutations import Mutation, plan
 from loadbearing.target import Target
 from loadbearing.verdict import FieldVerdict, intent_of, judge
@@ -65,8 +66,11 @@ def probe(
     classify: Optional[Classifier] = None,
     workers: int = 8,
     baseline_runs: Optional[int] = None,
+    explain_with: Optional[Any] = None,
 ) -> Report:
-    """`baseline_runs` overrides the target's own setting (the --baseline-runs flag)."""
+    """`baseline_runs` overrides the target's own setting (the --baseline-runs flag).
+    `explain_with` is a Nemotron router: each defect gets Super's statement and
+    Ultra's account of the code path (the --explain flag)."""
     runs = baseline_runs if baseline_runs is not None else target.baseline_runs
     if runs < 2:
         raise ValueError("baseline_runs must be 2 or more: one run cannot show what varies")
@@ -101,6 +105,8 @@ def probe(
     for field in dict.fromkeys(m.field for m in mutations):
         moved = {f.mutation.kind: f.moved for f in forks if f.mutation.field == field}
         verdicts.append(judge(field, intent_of(field, target.expects), moved))
+    if explain_with is not None:
+        explain_defects(verdicts, target, explain_with)
 
     return Report(
         target=target.name,
@@ -116,3 +122,15 @@ def probe(
         baseline_runs=runs,
         unstable_keys=unstable,
     )
+
+
+def explain_defects(verdicts: list[FieldVerdict], target: Target, router: Any) -> None:
+    """Super's statement and Ultra's account of the code path, for defects only:
+    a field that behaves as intended needs no explaining, and every call costs."""
+    defects = [v for v in verdicts if v.defect]
+    if not defects:
+        return
+    source = "\n\n".join(f"--- {rel}\n{text}" for rel, text in read_sources(target).items())
+    for verdict in defects:
+        verdict.reconciliation = router.reconcile(verdict)
+        verdict.explanation = router.explain(verdict, source)
