@@ -42,11 +42,16 @@ class Fix:
         return "".join(chunks)
 
 
+
+def read_sources(target: Target) -> dict[str, str]:
+    """The files a fix may change, by path: what Ultra reads to explain a defect and to fix it."""
+    return {rel: (target.root / rel).read_text() for rel in target.sources}
+
 def write_fix(verdict: FieldVerdict, target: Target, router: Any) -> Fix:
     """Ask Ultra for the smallest fix for one defect, and refuse anything unsafe to apply."""
     if not verdict.defect:
         raise ValueError(f"{verdict.field} has no defect to fix")
-    sources = {rel: (target.root / rel).read_text() for rel in target.sources}
+    sources = read_sources(target)
     files, rationale = router.write_fix(verdict, sources)
     return validate(Fix(verdict.field, verdict.verdict, files, rationale), sources)
 

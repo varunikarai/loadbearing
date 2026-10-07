@@ -2,6 +2,7 @@ import json
 import unittest
 
 from fakes import MODELS, router
+from loadbearing.nemotron import _strip_reasoning
 from loadbearing.verdict import RELEVANT, SILENT_PASSTHROUGH, Evidence, FieldVerdict
 
 VERDICT = FieldVerdict(
@@ -43,6 +44,18 @@ class WriteFixTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             r.write_fix(VERDICT, SOURCES)
 
+
+
+class ReasoningTests(unittest.TestCase):
+    def test_reasoning_never_reaches_the_answer(self):
+        cases = {
+            "<think>weigh it</think>noise": "noise",
+            "the template opened it</think>\nmeaningful": "meaningful",
+            "noise<think>cut off before the end": "noise",
+            "  meaningful  ": "meaningful",
+        }
+        for raw, answer in cases.items():
+            self.assertEqual(_strip_reasoning(raw), answer, raw)
 
 if __name__ == "__main__":
     unittest.main()

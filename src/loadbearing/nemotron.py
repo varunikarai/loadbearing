@@ -80,8 +80,7 @@ class TokenFactory:
             "chat/completions",
             {"model": model, "messages": messages, "max_tokens": max_tokens, "temperature": 0},
         )
-        text = reply["choices"][0]["message"].get("content") or ""
-        return _THINK.sub("", text).strip()
+        return _strip_reasoning(reply["choices"][0]["message"].get("content") or "")
 
     def _request(self, path: str, body: dict | None = None) -> Any:
         req = urllib.request.Request(
@@ -168,3 +167,14 @@ def _json_object(text: str) -> dict:
     if start < 0 or end < start:
         raise ValueError("the reply holds no JSON object")
     return json.loads(text[start : end + 1])
+
+
+def _strip_reasoning(text: str) -> str:
+    """Drop reasoning traces: whole <think> blocks, a trace whose opening tag the
+    chat template supplied, and one cut off before its closing tag."""
+    text = _THINK.sub("", text)
+    if "</think>" in text:
+        text = text.rsplit("</think>", 1)[1]
+    if "<think>" in text:
+        text = text.split("<think>", 1)[0]
+    return text.strip()
