@@ -17,7 +17,7 @@ Every task below is written so either builder can pick it up cold: why it exists
 | ID | Task | Type | Pts | Due | Status |
 |---|---|---|---|---|---|
 | V1 | Sandboxes live run | tech | 4 | Sat 10-10 | todo |
-| V2 | Nemotron layer verified | tech | 6 | Sun 10-11 | todo |
+| V2 | Nemotron layer verified | tech | 6 | Sun 10-11 | offline done 10-07; Nano score and live run after V1 |
 | V3 | Noise floor | tech | 3 | Sat 10-10 | done 10-07 |
 | V4 | Tavily intent inference | tech | 5 | Sat 10-17 | todo |
 | V5 | Fix writer | tech | 4 | contract Sat 10-10, done Sat 10-17 | writer done offline 10-07; live Ultra check after V1 |
