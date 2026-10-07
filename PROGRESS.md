@@ -15,8 +15,8 @@ Where Loadbearing is, what happens next, and what has already happened. **Now**,
 
 _Updated 2026-10-07_
 
-- **State:** on the local backend the whole loop runs offline: probe with a noise floor, Super and Ultra on defects, Tavily-inferred intent with checked quotes, Ultra's fix validated and proven in a fresh fork. `--baseline-runs`, `--fix` and `--prove` are wired, and the JSON report is schema 2. 123 tests pass on `main`. Nothing has yet run against a live Nebius account: not the Sandboxes backend, not Token Factory, not Tavily.
-- **Next action:** Sat 2026-10-10, Varunika: before 11:00, V1 prep (credits, `pip install -e '.[sandbox]'`, `NEBIUS_API_KEY`, `NEBIUS_PROJECT_ID` and the three model IDs into `.env`); from 12:00, V1 live, `loadbearing probe examples/ticket_triage/target.json --backend sandbox --nano`, pass = the same two defects, found on Nebius; then `scripts/eval_nano.py` (pass = 18/20). Aeshvarya, any time: A3 (the RAG target, with a `docs` block) and follow-ups 6 to 8 (`--explain`, `--intent`, the RAG `docs` block) in the 2026-10-07 Log.
+- **State:** on the local backend the whole loop runs offline: probe with a noise floor, Super and Ultra on defects, Tavily-inferred intent with checked quotes, Ultra's fix validated and proven in a fresh fork. `--baseline-runs`, `--fix` and `--prove` are wired, and the JSON report is schema 2. The RAG demo target is built and proven offline. 127 tests pass on `main`. Nothing has yet run against a live Nebius account: not the Sandboxes backend, not Token Factory, not Tavily.
+- **Next action:** Sat 2026-10-10, Varunika: before 11:00, V1 prep (credits, `pip install -e '.[sandbox]'`, `NEBIUS_API_KEY`, `NEBIUS_PROJECT_ID` and the three model IDs into `.env`); from 12:00, V1 live, `loadbearing probe examples/ticket_triage/target.json --backend sandbox --nano`, pass = the same two defects, found on Nebius; then `scripts/eval_nano.py` (pass = 18/20). Aeshvarya, any time: follow-ups 6, 7 and 9 (`--explain`, `--intent`, and leaving `passages` undeclared so Tavily has work on the demo target) in the 2026-10-07 Log.
 - **Waiting on:** Aeshvarya confirming the split in WORKPLAN.md by 2026-10-09; V1's keys for every live check.
 - **Deadline:** 2026-10-30 10:00 PT (22:30 IST). **Target submission: 2026-10-25.**
 
@@ -95,6 +95,10 @@ Problem statement: [SPEC.md](SPEC.md). Setup, target format, layout: [README.md]
 ## Log
 
 Newest first.
+
+### 2026-10-07 (e)
+- **A4 loop and A5 schema 2 merged** (Aeshvarya, `c03d3cf`): `close_loop()`, `--fix` and `--prove` on one pinned checkpoint, report schema 2. **A3 built and proven offline** (Aeshvarya, `213554d`): `examples/support_answerer`, the RAG answerer with a `docs` block. 127 tests pass. Checked: every malformed Ultra reply in `write_fix` raises `ValueError`, which `close_loop` catches.
+- **Hand-off 9 to Aeshvarya, proposed:** the demo target declares all five fields, so `infer_expects` finds no undeclared field and Tavily never runs on it. Leave `passages` out of `expects` (keep `question` relevant and the three ids irrelevant). Then `--intent` has real work: the RAG docs say answers must be grounded in the retrieved passages, Super quotes that with its link, and the silent passthrough on `passages` becomes a defect only Tavily could have claimed. The $3,000 Tavily prize needs exactly that runtime job (WORKPLAN, V4 "Why").
 
 ### 2026-10-07 (d)
 - **Follow-ups 2 to 4 merged** (Aeshvarya, `052394e`): `--baseline-runs` reaches the probe, the CLI warns only on a void report and otherwise names the unstable keys, and run counts use `baseline_runs`. 114 tests pass on `main`.
