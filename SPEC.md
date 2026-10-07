@@ -31,7 +31,7 @@ For any pipeline, we tell you which inputs actually change its behaviour, and we
 |---|---|---|
 | Nebius Token Factory Sandboxes | Checkpoint once, fork per mutation, fork again to prove a fix | The comparison is only sound if every fork starts from a byte-identical environment. Checkpoint-and-fork makes "hold everything constant except one input" a primitive instead of N rebuilds, and the same primitive makes "this fix removed the defect, and nothing else changed" provable. |
 | Nemotron Nano | Classify each fork's diff | One cheap call per fork: is this change meaningful or noise? |
-| Nemotron Super | Reconcile across forks | Turns many per-fork diffs into one defect class per input. |
+| Nemotron Super | Reconcile across forks | States, for each defect, what its destroy, drop and nudge forks show together. The defect class itself comes from a fixed rule over the forks, never from a model, so no model can invent a defect. |
 | Nemotron Ultra | Explain the defect and write the fix | Long-horizon reasoning over the pipeline source: why does this path not read the field, and what is the smallest change that makes it? |
 | Tavily | Infer which fields should matter | Pulls the upstream spec or docs and fills in `expects` for fields nobody declared, so an undeclared field can carry a defect claim. That is what makes phantom sensitivity a finding rather than a guess. |
 
