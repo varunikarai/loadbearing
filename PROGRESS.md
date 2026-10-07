@@ -96,6 +96,10 @@ Problem statement: [SPEC.md](SPEC.md). Setup, target format, layout: [README.md]
 
 Newest first.
 
+### 2026-10-07 (c)
+- **V7 drafted** (Varunika, merge `f99f265`): `docs/prior-art.md` (metamorphic testing, leave-one-feature-out with Sculley et al.'s own sentence quoted, input erasure, global sensitivity analysis, Lost in the Middle; how Loadbearing differs from each, including that it does not measure interactions between inputs) and a five-line README section. Three documented failures for Potential Impact: Air Canada's chatbot (*Moffatt v. Air Canada*, 2024 BCCRT 149), New York City's MyCity chatbot (The Markup, 2024-03-29), and Public Health England's missed cases (October 2020). Every source was opened before citing; one figure was corrected to what its source says (nearly 16,000, not 15,841).
+- With V7, every task of Varunika's that can be done without her keys, voice or drawing is done. What remains needs her: V1 live run (unblocks the live halves of V2, V4 and V5), V9 palette, V10 outline, then V6, V8, V11, V12.
+
 ### 2026-10-07 (b)
 - **V2 offline half done** (Varunika, merge `5287f6c`): reasoning traces stripped in every form (a complete block, a trace whose opening tag the template supplied, one cut off); `tests/fixtures/diffs.json`, 20 labelled diffs (10 meaningful, 10 noise); `scripts/eval_nano.py` scores Nano against them and fails below 18/20; `probe(..., explain_with=router)` gives each defect, and only defects, Super's statement and Ultra's account of the code path. The Nano score itself waits on V1's keys.
 - **V4 done offline** (Varunika, merge `991e29b`): `tavily.extract` for `docs.urls` and whole pages from search; `NemotronRouter.infer_intent` (Super); `intent.infer_expects(target, router)`, which drops any answer whose quote is not really in the excerpt it cites and caches docs and intents under `runs/`; `probe(..., inferred=...)` judges undeclared fields by inferred intent, marked `inferred` with the evidence. On the toy target with `submitted_at` undeclared, the spec sentence turns it from an observation into a cited phantom sensitivity. 111 tests pass.
