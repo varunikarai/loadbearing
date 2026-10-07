@@ -1,0 +1,16 @@
+{
+  "request_id": "req_7Hq2Lw",
+  "user_id": "u_48213",
+  "received_at": "2026-10-07T14:03:11+00:00",
+  "question": "I bought wireless headphones 20 days ago and the left side stopped working. Can I still return them for a refund?",
+  "passages": [
+    {
+      "source": "help/returns-policy",
+      "text": "You can return most items within 14 days of delivery for a full refund. After 14 days, returns are not accepted, but faulty items may still be covered by the warranty."
+    },
+    {
+      "source": "help/warranty",
+      "text": "Electronics carry a 12-month limited warranty against manufacturing defects. A warranty claim gets you a repair or a replacement, not a refund."
+    }
+  ]
+}

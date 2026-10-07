@@ -1,0 +1,20 @@
+{
+  "name": "support-answerer",
+  "image": "python:3.12-slim",
+  "setup": "python3 --version",
+  "files": ["pipeline.py"],
+  "command": "python3 pipeline.py input.json",
+  "record": "request.json",
+  "timeout": 120,
+  "expects": {
+    "relevant": ["question", "passages"],
+    "irrelevant": ["request_id", "user_id", "received_at"]
+  },
+  "baseline_runs": 5,
+  "env": ["NEBIUS_API_KEY", "NEMOTRON_NANO_MODEL"],
+  "docs": {
+    "query": "retrieval-augmented generation: the answer must be grounded in the retrieved passages, not the model's prior knowledge",
+    "urls": []
+  },
+  "sources": ["pipeline.py"]
+}
