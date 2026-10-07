@@ -39,7 +39,7 @@ For any pipeline, we tell you which inputs actually change its behaviour, and we
 
 ## LLM pipelines
 
-The demo target is an LLM pipeline, because that is where silent passthrough does the most damage: a retrieval or tool-calling step that answers fluently while ignoring what it retrieved. An LLM's output varies on its own, so a two-run determinism check would void every verdict. Instead the baseline runs k times, and output keys that vary with no mutation at all are marked **unstable** and left out of verdicts. Everything else is still judged.
+The demo target is an LLM pipeline, because that is where silent passthrough does the most damage: a retrieval or tool-calling step that answers fluently while ignoring what it retrieved. An LLM's output varies on its own, so a two-run determinism check would void every verdict. Instead the baseline runs k times, and output keys that vary with no mutation at all are marked **unstable** and left out of verdicts. Everything else is still judged. Only when nothing stable is left (every key varies, the exit code varies, or the output is not JSON and varies) is the report void, and it says so instead of judging.
 
 ## Scope for the vertical slice
 
