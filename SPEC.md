@@ -21,6 +21,8 @@ Empirically. Checkpoint the pipeline once, fork that checkpoint per mutation, ru
 
 Then close the loop. Ultra writes the smallest fix for each defect, the fix is applied in a fresh fork of the same checkpoint, and the probe re-runs on that fork to show the defect gone. **Find, explain, fix, prove**, with the same checkpoint primitive at every step.
 
+A fix is checked before any fork runs it: it may change only the pipeline's own source files, a Python file must still compile, and it may not remove more than half of a file's lines. A fix that fails a check is rejected, not applied.
+
 ## The claim we defend
 
 For any pipeline, we tell you which inputs actually change its behaviour, and we prove it by running it, not by reading it.
