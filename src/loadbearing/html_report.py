@@ -65,6 +65,26 @@ pre{margin:0;white-space:pre-wrap;word-break:break-word;font:13px/1.6 ui-monospa
 details{margin-top:12px}summary{cursor:pointer;font-weight:800}
 .warn{background:var(--silent);color:#fff;font-weight:800;border-radius:12px;padding:12px 16px;margin:0 0 24px}
 footer{margin-top:56px;color:var(--dim);font-size:13px;font-weight:600}
+.note{border:1px solid var(--line);border-radius:12px;padding:12px 16px;margin:16px 0 0;font-weight:600;color:var(--dim)}
+.note b{color:var(--text)}
+.model{margin-top:14px;border-top:1px solid var(--line);padding-top:12px}
+.model .who{font-size:12px;font-weight:900;letter-spacing:.02em;color:var(--dim);margin-bottom:4px}
+.model p{margin:0 0 10px}
+blockquote{margin:0 0 6px;padding:8px 14px;border-left:4px solid var(--moved);font-weight:600}
+.src{font-size:13px;color:var(--dim);word-break:break-all}
+.src a{color:inherit}
+.card.proof{border-left-color:var(--ok)}
+.card.proof.bad{border-left-color:var(--silent)}
+.verdicts{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 14px;font-weight:800}
+.arrow{color:var(--dim);font-size:20px}
+.diff{font:13px/1.55 ui-monospace,"SF Mono",Menlo,Consolas,monospace;border:1px solid var(--line);
+border-radius:12px;padding:10px 0;margin:0 0 14px;overflow-x:auto;white-space:pre}
+.diff div{padding:0 14px}
+.diff .add{background:color-mix(in srgb,var(--ok) 22%,transparent)}
+.diff .del{background:color-mix(in srgb,var(--silent) 22%,transparent)}
+.diff .hunk{color:var(--dim)}
+.badge.ok{background:var(--ok);color:#0b0b0c}
+.rejected{color:var(--dim);font-weight:600;margin:6px 0}
 """
 
 
@@ -87,12 +107,14 @@ def render_html(data: dict[str, Any]) -> str:
         f"<h1>{escape(data['target'])}</h1>",
         f'<p class="lede">{lede}</p>',
     ]
-    if not data["deterministic"]:
+    if data.get("void"):
         parts.append(
-            '<div class="warn">The baseline disagreed with itself, so no verdict below is sound.</div>'
+            '<div class="warn">Every output key varied on its own across the baseline runs, '
+            "so no verdict below is sound.</div>"
         )
     parts += [
         _stats(data),
+        _noise_note(data),
         "<h2>One checkpoint, every fork</h2>",
         f'<div class="panel">{fork_tree_svg(data)}</div>',
         "<h2>Every field, every mutation</h2>",
@@ -101,14 +123,20 @@ def render_html(data: dict[str, Any]) -> str:
     if defects:
         parts.append("<h2>The evidence</h2>")
         parts += [_evidence(v, data) for v in defects]
+    if data.get("fixes") or data.get("rejected_fixes"):
+        parts.append("<h2>The fix, proven</h2>")
+        parts += [_fix_card(f, data) for f in data.get("fixes", [])]
+        parts += [
+            f'<p class="rejected">No fix applied for <b>{escape(r["field"])}</b>: {escape(r["reason"])}</p>'
+            for r in data.get("rejected_fixes", [])
+        ]
     parts += [
         "<h2>Baseline</h2>",
         '<div class="pair">',
         f'<div class="out"><div class="t">input</div>{_value_block(data["record"])}</div>',
         f'<div class="out"><div class="t">output</div>{_value_block(data["baseline"]["output"])}</div>',
         "</div>",
-        f"<footer>Backend: {escape(data['backend'])} · "
-        f"baseline {'deterministic' if data['deterministic'] else 'NOT deterministic'} · "
+        f"<footer>Backend: {escape(data['backend'])} · {_floor_summary(data)} · "
         f"report schema {data['schema']}</footer>",
         "</main></body></html>",
     ]
@@ -120,12 +148,15 @@ def _stats(data: dict[str, Any]) -> str:
     wall, total = t["fork_wall_seconds"], t["fork_total_seconds"]
     speed = f"{total / wall:.1f}x" if wall > 0 else "-"
     n = len(data["defects"])
+    proven = sum(1 for p in data.get("proofs", []) if p["clean"])
     tiles = [
         (str(len(data["forks"])), "forks from one checkpoint", ""),
         (f"{wall:.2f}s", f"all {t['runs']} runs, in parallel ({total:.2f}s one after another)", ""),
         (speed, "faster than running them in sequence", ""),
         (str(n), "defect" if n == 1 else "defects", "bad" if n else ""),
     ]
+    if data.get("proofs"):
+        tiles.append((f"{proven}/{n}", "defects fixed by Ultra and proven in a fresh fork", ""))
     cells = "".join(
         f'<div class="stat {cls}"><div class="v">{escape(v)}</div><div class="k">{escape(k)}</div></div>'
         for v, k, cls in tiles
@@ -203,6 +234,8 @@ def _matrix(data: dict[str, Any]) -> str:
                 cls = "moved" if moved else "same"
                 cells.append(f'<td><span class="cell {cls}">{cls}</span></td>')
         intent = {"relevant": "yes", "irrelevant": "no"}.get(v["intent"], "undeclared")
+        if v.get("intent_source") == "inferred":
+            intent += " · from docs"
         rows.append(
             f'<tr><td class="f">{escape(v["field"])}</td><td>{intent}</td>{"".join(cells)}'
             f"<td>{_badge(v)}</td></tr>"
@@ -241,8 +274,106 @@ def _evidence(verdict: dict[str, Any], data: dict[str, Any]) -> str:
         '<div class="pair">'
         f'<div class="out"><div class="t">baseline output</div>{_value_block(before, shown["changed"])}</div>'
         f'<div class="out"><div class="t">{escape(label)}</div>{_value_block(after, shown["changed"])}</div>'
-        "</div></div>"
+        f"</div>{_model_text(verdict)}</div>"
     )
+
+
+def _model_text(verdict: dict[str, Any]) -> str:
+    """What Super, Ultra and Tavily said about this field, when they ran."""
+    blocks = []
+    ev = verdict.get("evidence")
+    if ev:
+        link = escape(ev["url"])
+        blocks.append(
+            '<div class="who">INTENDED BEHAVIOUR · TAVILY</div>'
+            f'<blockquote>{escape(ev["quote"])}</blockquote>'
+            f'<div class="src"><a href="{link}" rel="noopener">{link}</a></div>'
+        )
+    if verdict.get("reconciliation"):
+        blocks.append(f'<div class="who">ACROSS ALL FORKS · NEMOTRON SUPER</div><p>{escape(verdict["reconciliation"])}</p>')
+    if verdict.get("explanation"):
+        blocks.append(f'<div class="who">WHY · NEMOTRON ULTRA</div><p>{escape(verdict["explanation"])}</p>')
+    return f'<div class="model">{"".join(blocks)}</div>' if blocks else ""
+
+
+def _floor_summary(data: dict[str, Any]) -> str:
+    runs = data.get("baseline_runs", 2)
+    if data.get("void"):
+        return f"baseline ran {runs} times and nothing was stable: report void"
+    if data.get("unstable_keys"):
+        return f"baseline ran {runs} times; {len(data['unstable_keys'])} key(s) varied and were set aside"
+    return f"baseline ran {runs} times, identical every time"
+
+
+def _noise_note(data: dict[str, Any]) -> str:
+    keys = data.get("unstable_keys") or []
+    if not keys or data.get("void"):
+        return ""
+    return (
+        f'<p class="note">Noise floor: the unmodified input ran <b>{data.get("baseline_runs", 2)}</b> times. '
+        f'<b>{escape(", ".join(keys))}</b> changed with no mutation at all, so '
+        f'{"it is" if len(keys) == 1 else "they are"} left out of every comparison. '
+        "Everything else is judged.</p>"
+    )
+
+
+def _fix_card(fix: dict[str, Any], data: dict[str, Any]) -> str:
+    field = fix["field"]
+    proof = next((p for p in data.get("proofs", []) if p["field"] == field), None)
+    before_v = next((v for v in data["verdicts"] if v["field"] == field), {})
+    parts = [f"<h3>{escape(field)} · fixed by Nemotron Ultra</h3>", f"<p>{escape(fix['rationale'])}</p>"]
+    if fix.get("diff"):
+        parts.append(_diff_block(fix["diff"]))
+    if proof is None:
+        parts.append('<p class="rejected">Written, not yet proven. Run with --prove.</p>')
+        return f'<div class="card proof">{"".join(parts)}</div>'
+    after = proof["after"]
+    after_v = next((v for v in after["verdicts"] if v["field"] == field), {})
+    parts.append(
+        '<div class="verdicts">'
+        f'{_badge(before_v)}<span class="arrow">→</span>{_badge(after_v, fixed=True) if after_v else "gone"}</div>'
+    )
+    if proof["clean"]:
+        verdict = (
+            "Applied in a fresh fork of the same checkpoint and probed again: the defect is gone, "
+            "and no other field gained one."
+        )
+    elif not proof["fixed"]:
+        verdict = "Applied in a fresh fork and probed again: the defect is still there."
+    else:
+        verdict = "The defect is gone, but the fix adds defects on " + ", ".join(proof["new_defects"]) + "."
+    parts.append(f"<p><b>{escape(verdict)}</b></p>")
+    changed = sorted(
+        k for k in set(data["baseline"]["output"] or {}) | set(after["baseline"]["output"] or {})
+        if isinstance(data["baseline"]["output"], dict) and isinstance(after["baseline"]["output"], dict)
+        and data["baseline"]["output"].get(k) != after["baseline"]["output"].get(k)
+        and k not in (data.get("unstable_keys") or [])
+    )
+    parts.append(
+        '<div class="pair">'
+        f'<div class="out"><div class="t">output before the fix</div>{_value_block(data["baseline"]["output"], changed)}</div>'
+        f'<div class="out"><div class="t">output after the fix</div>{_value_block(after["baseline"]["output"], changed)}</div>'
+        "</div>"
+    )
+    cls = "proof" if proof["clean"] else "proof bad"
+    return f'<div class="card {cls}">{"".join(parts)}</div>'
+
+
+def _diff_block(diff: str) -> str:
+    rows = []
+    for line in diff.splitlines():
+        if line.startswith(("+++", "---")):
+            cls = "hunk"
+        elif line.startswith("@@"):
+            cls = "hunk"
+        elif line.startswith("+"):
+            cls = "add"
+        elif line.startswith("-"):
+            cls = "del"
+        else:
+            cls = ""
+        rows.append(f'<div class="{cls}">{escape(line) or " "}</div>')
+    return f'<div class="diff">{"".join(rows)}</div>'
 
 
 def _describe(fork: dict[str, Any], original: str) -> str:
@@ -270,8 +401,8 @@ def _value_block(value: Any, highlight: list[str] | None = None) -> str:
     return f"<pre>{escape(value if isinstance(value, str) else json.dumps(value, indent=2))}</pre>"
 
 
-def _badge(verdict: dict[str, Any]) -> str:
-    cls = {SILENT_PASSTHROUGH: "silent", PHANTOM_SENSITIVITY: "phantom"}.get(verdict["verdict"], "plain")
+def _badge(verdict: dict[str, Any], fixed: bool = False) -> str:
+    cls = {SILENT_PASSTHROUGH: "silent", PHANTOM_SENSITIVITY: "phantom"}.get(verdict["verdict"], "ok" if fixed else "plain")
     text = verdict["verdict"].upper() if verdict["defect"] else verdict["verdict"]
     return f'<span class="badge {cls}">{escape(text)}</span>'
 

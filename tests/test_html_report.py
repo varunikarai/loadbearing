@@ -32,9 +32,11 @@ class HtmlReportTests(unittest.TestCase):
         self.assertEqual(svg.count("<path "), len(self.data["forks"]))
 
     def test_the_page_fetches_nothing(self):
+        # Links a reader can click are fine; nothing may load on its own.
         self.assertNotIn("<script", self.page)
-        self.assertNotIn("http://", self.page)
-        self.assertNotIn("https://", self.page)
+        self.assertNotIn("<link", self.page)
+        self.assertNotIn("src=", self.page)
+        self.assertNotIn("@import", self.page)
 
     def test_pipeline_output_is_escaped(self):
         hostile = dict(self.data)
@@ -49,6 +51,61 @@ class HtmlReportTests(unittest.TestCase):
         clean = dict(self.data, defects=[])
         clean["verdicts"] = [dict(v, defect=False, verdict="inert") for v in self.data["verdicts"]]
         self.assertIn("Every declared input does what the pipeline claims", render_html(clean))
+
+
+
+class HtmlReportV2Tests(unittest.TestCase):
+    """The schema 2 panels: noise floor, model text, evidence, and the proven fix."""
+
+    @classmethod
+    def setUpClass(cls):
+        from fakes import FakeRouter
+        from loadbearing.prove import Pinned, close_loop
+
+        target = load_target(EXAMPLE)
+        backend = LocalBackend()
+        try:
+            pinned = Pinned(backend)
+            before = probe(target, pinned)
+            ultra = FakeRouter(write_fix=lambda v, src: (
+                ({"pipeline.py": src["pipeline.py"].replace("'bdoy'", "'body'")}, "Read the real key.")
+                if v.field == "body" else ({"pipeline.py": "("}, "broken")))
+            loop = close_loop(target, backend, before, ultra, checkpoint=pinned.pinned)
+        finally:
+            backend.close()
+        cls.data = report_json.to_dict(before, loop, target)
+        body = next(v for v in cls.data["verdicts"] if v["field"] == "body")
+        body.update(
+            reconciliation="Super says <b>no</b>.",
+            explanation="Ultra says the key is misspelled.",
+            evidence={"intent": "relevant", "quote": "Priority comes from the body.",
+                      "url": "https://example.com/spec?a=1&b=2"},
+        )
+        cls.page = render_html(cls.data)
+
+    def test_the_proven_fix_is_shown_with_its_diff_and_verdict_change(self):
+        self.assertIn("The fix, proven", self.page)
+        self.assertIn("body · fixed by Nemotron Ultra", self.page)
+        self.assertIn('<div class="add">', self.page)
+        self.assertIn('<div class="del">', self.page)
+        self.assertIn("the defect is gone, and no other field gained one", self.page)
+        self.assertIn("1/2</div>", self.page)
+
+    def test_a_refused_fix_is_listed_with_its_reason(self):
+        self.assertIn("No fix applied for <b>submitted_at</b>", self.page)
+
+    def test_model_text_and_evidence_are_escaped_and_linked(self):
+        self.assertIn("NEMOTRON SUPER", self.page)
+        self.assertIn("Super says &lt;b&gt;no&lt;/b&gt;.", self.page)
+        self.assertIn("NEMOTRON ULTRA", self.page)
+        self.assertIn('href="https://example.com/spec?a=1&amp;b=2"', self.page)
+
+    def test_the_noise_floor_is_explained_not_called_unsound(self):
+        noisy = dict(self.data, unstable_keys=["answer"], baseline_runs=5, void=False)
+        page = render_html(noisy)
+        self.assertIn("ran <b>5</b> times", page)
+        self.assertNotIn('class="warn"', page)
+        self.assertIn('class="warn"', render_html(dict(noisy, void=True)))
 
 
 if __name__ == "__main__":
