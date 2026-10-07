@@ -96,6 +96,14 @@ Problem statement: [SPEC.md](SPEC.md). Setup, target format, layout: [README.md]
 
 Newest first.
 
+### 2026-10-07 (b)
+- **V2 offline half done** (Varunika, merge `5287f6c`): reasoning traces stripped in every form (a complete block, a trace whose opening tag the template supplied, one cut off); `tests/fixtures/diffs.json`, 20 labelled diffs (10 meaningful, 10 noise); `scripts/eval_nano.py` scores Nano against them and fails below 18/20; `probe(..., explain_with=router)` gives each defect, and only defects, Super's statement and Ultra's account of the code path. The Nano score itself waits on V1's keys.
+- **V4 done offline** (Varunika, merge `991e29b`): `tavily.extract` for `docs.urls` and whole pages from search; `NemotronRouter.infer_intent` (Super); `intent.infer_expects(target, router)`, which drops any answer whose quote is not really in the excerpt it cites and caches docs and intents under `runs/`; `probe(..., inferred=...)` judges undeclared fields by inferred intent, marked `inferred` with the evidence. On the toy target with `submitted_at` undeclared, the spec sentence turns it from an observation into a cited phantom sensitivity. 111 tests pass.
+- **Hand-offs to Aeshvarya**, in addition to the five above:
+  6. `--explain`: `probe(..., explain_with=NemotronRouter.from_env(tiers=("super", "ultra")))`.
+  7. `--intent`: `inferred = infer_expects(target, NemotronRouter.from_env(tiers=("super",)))`, then `probe(..., inferred=inferred)`. Cache lands in `runs/`, same as the demo server's.
+  8. A3: give the RAG target a `docs` block (a query, and URLs if there is a canonical page) so V4 runs live on it.
+
 ### 2026-10-07
 - **V5 writer done offline** (Varunika, merge `51b0ef5`): `NemotronRouter.write_fix` (Ultra returns whole new file contents and a rationale) and `fix.write_fix`, which refuses any fix that touches a file outside `sources`, no longer compiles, changes nothing, or rewrites more than half a file. The C5 fields are on `FieldVerdict` (`intent_source`, `evidence`, `reconciliation`, `explanation`), and `tests/fakes.py` gives both sides an offline Token Factory client and router. An offline loop test probes the toy target, has a fake Ultra fix `body`, and runs `prove()`: `body` becomes load-bearing, the outage ticket comes out P1, no new defect. Live Ultra check waits on V1.
 - **V3 noise floor done** (Varunika, merge `e21d43e`): the unmutated record runs `baseline_runs` times alongside the forks; keys that differ between those runs are left out of every comparison; `Report.unstable_keys`, `Report.baseline_runs` and `Report.void` exist; `probe(..., baseline_runs=N)` overrides the target. The toy target is unchanged. 84 tests pass.
