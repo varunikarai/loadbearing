@@ -9,6 +9,7 @@ Every task below is written so either builder can pick it up cold: why it exists
 1. Read the **Board** and your own tasks. Read the other builder's tasks only where yours depend on them.
 2. When you finish a task, set its Status on the Board to `done` and add a Log entry in [PROGRESS.md](PROGRESS.md).
 3. Due dates are hand-off dates: the other builder may start depending on your output that day.
+   They are the latest a task lands, not the earliest: start any task as soon as what it needs is on `main`, and pull the other builder's work before you start.
 4. If a date will slip, say so in PROGRESS.md the day you know, not the day it is due.
 
 ## Board
