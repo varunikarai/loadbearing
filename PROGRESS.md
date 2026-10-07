@@ -95,6 +95,17 @@ Problem statement: [SPEC.md](SPEC.md). Setup, target format, layout: [README.md]
 
 Newest first.
 
+### 2026-10-07
+- **V5 writer done offline** (Varunika, merge `51b0ef5`): `NemotronRouter.write_fix` (Ultra returns whole new file contents and a rationale) and `fix.write_fix`, which refuses any fix that touches a file outside `sources`, no longer compiles, changes nothing, or rewrites more than half a file. The C5 fields are on `FieldVerdict` (`intent_source`, `evidence`, `reconciliation`, `explanation`), and `tests/fakes.py` gives both sides an offline Token Factory client and router. An offline loop test probes the toy target, has a fake Ultra fix `body`, and runs `prove()`: `body` becomes load-bearing, the outage ticket comes out P1, no new defect. Live Ultra check waits on V1.
+- **V3 noise floor done** (Varunika, merge `e21d43e`): the unmutated record runs `baseline_runs` times alongside the forks; keys that differ between those runs are left out of every comparison; `Report.unstable_keys`, `Report.baseline_runs` and `Report.void` exist; `probe(..., baseline_runs=N)` overrides the target. The toy target is unchanged. 84 tests pass.
+- **Hand-offs to Aeshvarya**, all in his files:
+  1. `--fix` and `--prove`: the writer is ready. `write_fix(verdict, target, NemotronRouter.from_env(tiers=("ultra",)))` per defect, then `prove()`.
+  2. `--baseline-runs`: pass it as `probe(..., baseline_runs=args.baseline_runs)`.
+  3. `cli.render`: the "baseline disagrees with itself, so no verdict below is sound" warning should key on `report.void`, not `not report.deterministic`, and list `report.unstable_keys` when there are any. Today it would wrongly void an LLM target's whole report.
+  4. Run counts: `timing_line` and `report.py` count runs as `len(report.forks) + 2`; with the noise floor that is `+ report.baseline_runs`.
+  5. Schema 2 (A5): `baseline_runs`, `unstable_keys` and the four new verdict fields are on the dataclasses now.
+- **Waiting on Varunika:** the A3 pick (RAG answerer, weather agent, or summariser).
+
 ### 2026-10-06 (g)
 - Sandboxes backend rebuilt on contree-sdk 0.3.6 after reading its source (Aeshvarya): the old client import did not exist, the project variable is `NEBIUS_PROJECT_ID`, and there is no `contree auth`. Networking is on by default, so a fork can call Nemotron.
 - A1 contracts (C1, C2, C5, C6) and A2 secrets into forks merged, three and four days early. A setup run can no longer write a key into a checkpoint.
