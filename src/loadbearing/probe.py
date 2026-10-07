@@ -13,7 +13,7 @@ from loadbearing.compare import Diff, compare
 from loadbearing.fix import read_sources
 from loadbearing.mutations import Mutation, plan
 from loadbearing.target import Target
-from loadbearing.verdict import FieldVerdict, intent_of, judge
+from loadbearing.verdict import INFERRED, UNDECLARED, Evidence, FieldVerdict, intent_of, judge
 
 # Given (mutation, baseline, fork) for a fork whose output moved,
 # return "meaningful" or "noise". Nemotron Nano fills this role.
@@ -67,10 +67,13 @@ def probe(
     workers: int = 8,
     baseline_runs: Optional[int] = None,
     explain_with: Optional[Any] = None,
+    inferred: Optional[dict[str, Evidence]] = None,
 ) -> Report:
     """`baseline_runs` overrides the target's own setting (the --baseline-runs flag).
     `explain_with` is a Nemotron router: each defect gets Super's statement and
-    Ultra's account of the code path (the --explain flag)."""
+    Ultra's account of the code path (the --explain flag). `inferred` maps
+    undeclared fields to intents drawn from the docs (the --intent flag); a
+    declared intent always wins over an inferred one."""
     runs = baseline_runs if baseline_runs is not None else target.baseline_runs
     if runs < 2:
         raise ValueError("baseline_runs must be 2 or more: one run cannot show what varies")
@@ -104,7 +107,12 @@ def probe(
     verdicts = []
     for field in dict.fromkeys(m.field for m in mutations):
         moved = {f.mutation.kind: f.moved for f in forks if f.mutation.field == field}
-        verdicts.append(judge(field, intent_of(field, target.expects), moved))
+        intent = intent_of(field, target.expects)
+        evidence = (inferred or {}).get(field) if intent == UNDECLARED else None
+        verdict = judge(field, evidence.intent if evidence else intent, moved)
+        if evidence:
+            verdict.intent_source, verdict.evidence = INFERRED, evidence
+        verdicts.append(verdict)
     if explain_with is not None:
         explain_defects(verdicts, target, explain_with)
 

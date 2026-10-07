@@ -17,7 +17,7 @@ from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
     from loadbearing.backends.base import RunResult
     from loadbearing.mutations import Mutation
-    from loadbearing.verdict import FieldVerdict
+    from loadbearing.verdict import Evidence, FieldVerdict
 
 BASE_URL = "https://api.tokenfactory.nebius.com/v1/"
 TIERS = ("nano", "super", "ultra")
@@ -62,6 +62,18 @@ FIX_SYSTEM = (
     '{"rationale": "<one paragraph>", "files": {"<path>": "<complete new file content>"}}. '
     "Include only the files you change, each with its complete new content."
 )
+
+INTENT_SYSTEM = (
+    "You decide, from a pipeline's own documentation, whether each named input field should "
+    "change the pipeline's output. Answer 'relevant' when the docs say or clearly imply the "
+    "output depends on the field, 'irrelevant' when they say or clearly imply it must not "
+    "affect the output (for example an id or a timestamp kept only for logging), and "
+    "'unknown' when they do not settle it. Back every relevant or irrelevant answer with one "
+    "sentence copied word for word from an excerpt, and that excerpt's URL. Never paraphrase "
+    'a quote. Reply with one JSON object and nothing around it: {"fields": {"<field>": '
+    '{"intent": "relevant|irrelevant|unknown", "quote": "<verbatim>", "url": "<url>"}}}.'
+)
+_EXCERPT_CLIP = 6000
 
 
 class TokenFactory:
@@ -156,6 +168,31 @@ class NemotronRouter:
             raise ValueError("the fix reply has no rationale")
         return files, rationale
 
+    def infer_intent(
+        self, fields: list[str], excerpts: list[Any], record: dict | None = None
+    ) -> dict[str, Evidence]:
+        """Super. For each field, whether the docs say it should matter, with a quote and URL.
+        Only relevant and irrelevant answers come back; checking the quotes is the caller's job."""
+        from loadbearing.verdict import IRRELEVANT, RELEVANT, Evidence
+
+        lines = ["Fields, with their current values:"]
+        for field in fields:
+            value = _value_at(record, field) if record else None
+            lines.append(f"- {field}: {json.dumps(value)[:200]}")
+        lines.append("\nDocumentation excerpts:")
+        for n, excerpt in enumerate(excerpts, 1):
+            lines.append(f"\n[{n}] {excerpt.url}\n{excerpt.content[:_EXCERPT_CLIP]}")
+        reply = _json_object(self._ask("super", INTENT_SYSTEM, "\n".join(lines), max_tokens=2048))
+        answers = reply.get("fields")
+        if not isinstance(answers, dict):
+            raise ValueError("the intent reply has no fields mapping")
+        out = {}
+        for field, item in answers.items():
+            if not isinstance(item, dict) or item.get("intent") not in (RELEVANT, IRRELEVANT):
+                continue
+            out[field] = Evidence(item["intent"], str(item.get("quote", "")), str(item.get("url", "")))
+        return out
+
     def _ask(self, tier: str, system: str, prompt: str, max_tokens: int = 1024) -> str:
         messages = [{"role": "system", "content": system}, {"role": "user", "content": prompt}]
         return self.client.chat(self.models[tier], messages, max_tokens=max_tokens)
@@ -178,3 +215,12 @@ def _strip_reasoning(text: str) -> str:
     if "<think>" in text:
         text = text.split("<think>", 1)[0]
     return text.strip()
+
+
+def _value_at(record: dict, path: str) -> Any:
+    node: Any = record
+    for part in path.split("."):
+        if not isinstance(node, dict) or part not in node:
+            return None
+        node = node[part]
+    return node
