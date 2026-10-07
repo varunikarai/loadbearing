@@ -69,6 +69,14 @@ class ProveTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "other.py"):
             prove(self.target, self.backend, rogue, self.before, checkpoint=self.checkpoint)
 
+    def test_pinned_builds_its_checkpoint_once_and_times_the_real_build(self):
+        pinned = Pinned(self.backend)
+        first = probe(self.target, pinned)
+        built = pinned.pinned
+        probe(self.target, pinned)
+        self.assertIs(pinned.pinned, built)
+        self.assertGreater(first.checkpoint_seconds, 0)
+
     def test_without_a_checkpoint_it_builds_one_from_the_same_target(self):
         good = _fix(self.target, self.source.replace("bdoy", "body"))
         self.assertTrue(prove(self.target, self.backend, good, self.before).clean)
