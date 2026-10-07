@@ -8,6 +8,7 @@ from dataclasses import dataclass, field
 from typing import Callable, Optional
 
 from loadbearing.backends.base import Backend, RunResult
+from loadbearing import noise
 from loadbearing.compare import Diff, compare
 from loadbearing.mutations import Mutation, plan
 from loadbearing.target import Target
@@ -45,10 +46,17 @@ class Report:
     # The sum of every run in that phase: what it would cost one after another.
     fork_total_seconds: float = 0.0
     record: dict = field(default_factory=dict)  # the baseline input every fork mutated
+    baseline_runs: int = 2  # how often the unmutated record ran
+    unstable_keys: list[str] = field(default_factory=list)  # output keys that vary on their own
 
     @property
     def defects(self) -> list[FieldVerdict]:
         return [v for v in self.verdicts if v.defect]
+
+    @property
+    def void(self) -> bool:
+        """Nothing stable was left to judge, so no verdict in this report can be trusted."""
+        return noise.void(self.unstable_keys, self.baseline)
 
 
 def probe(
@@ -56,7 +64,12 @@ def probe(
     backend: Backend,
     classify: Optional[Classifier] = None,
     workers: int = 8,
+    baseline_runs: Optional[int] = None,
 ) -> Report:
+    """`baseline_runs` overrides the target's own setting (the --baseline-runs flag)."""
+    runs = baseline_runs if baseline_runs is not None else target.baseline_runs
+    if runs < 2:
+        raise ValueError("baseline_runs must be 2 or more: one run cannot show what varies")
     mutations = plan(target.record)
     started = time.perf_counter()
     checkpoint = backend.checkpoint(target)
@@ -68,14 +81,17 @@ def probe(
         result.seconds = time.perf_counter() - start
         return result
 
-    # The baseline runs twice. If it disagrees with itself, no comparison below means anything.
-    records = [target.record, target.record] + [m.apply(target.record) for m in mutations]
+    # The unmutated record runs `runs` times alongside the forks. Output keys that
+    # differ between those runs vary on their own, so the forks are judged without them.
+    records = [target.record] * runs + [m.apply(target.record) for m in mutations]
     with ThreadPoolExecutor(max_workers=workers) as pool:
         results = list(pool.map(run, records))
     forked = time.perf_counter()
-    first, second, *rest = results
+    baselines, rest = results[:runs], results[runs:]
+    first = baselines[0]
+    unstable = noise.unstable_keys(baselines)
 
-    forks = [Fork(m, r, compare(first, r)) for m, r in zip(mutations, rest)]
+    forks = [Fork(m, r, compare(first, r, ignore=unstable)) for m, r in zip(mutations, rest)]
     if classify is not None:
         for fork in forks:
             if fork.diff.moved:
@@ -89,7 +105,7 @@ def probe(
     return Report(
         target=target.name,
         backend=backend.name,
-        deterministic=not compare(first, second).moved,
+        deterministic=not unstable,
         baseline=first,
         forks=forks,
         verdicts=verdicts,
@@ -97,4 +113,6 @@ def probe(
         fork_wall_seconds=forked - checkpointed,
         fork_total_seconds=sum(r.seconds for r in results),
         record=target.record,
+        baseline_runs=runs,
+        unstable_keys=unstable,
     )
