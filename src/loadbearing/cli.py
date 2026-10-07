@@ -73,7 +73,6 @@ def main(argv: Optional[list[str]] = None) -> int:
 
 # Flag -> the task that builds it. A flag leaves this map when its function is on main.
 NOT_BUILT = {
-    "baseline_runs": "V3",
     "explain": "V2",
     "intent": "V4",
     "fix": "V5",
@@ -93,7 +92,9 @@ def _probe(args: argparse.Namespace) -> int:
         classify = NemotronRouter.from_env(tiers=("nano",)).classify_diff
     backend = make_backend(args.backend)
     try:
-        report = probe(target, backend, classify=classify, workers=args.workers)
+        report = probe(
+            target, backend, classify=classify, workers=args.workers, baseline_runs=args.baseline_runs
+        )
     finally:
         backend.close()
 
