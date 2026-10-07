@@ -96,6 +96,11 @@ Problem statement: [SPEC.md](SPEC.md). Setup, target format, layout: [README.md]
 
 Newest first.
 
+### 2026-10-07 (d)
+- **Follow-ups 2 to 4 merged** (Aeshvarya, `052394e`): `--baseline-runs` reaches the probe, the CLI warns only on a void report and otherwise names the unstable keys, and run counts use `baseline_runs`. 114 tests pass on `main`.
+- **SPEC.md matches the code** (Varunika, merge `080880a`): Super states each defect while a fixed rule decides it, inferred intents carry a checked quote, a fix passes three checks before a fork runs it, and a report is void only when nothing stable is left.
+- **V6 dry run, history clean** (Varunika): all 124 commits on every branch scanned for key patterns, tracked `.env` files, stray emails, trailers, and employer or tool names; nothing found. The one secret-shaped string is a made-up test value. The final audit still runs on 2026-10-18.
+
 ### 2026-10-07 (c)
 - **V7 drafted** (Varunika, merge `f99f265`): `docs/prior-art.md` (metamorphic testing, leave-one-feature-out with Sculley et al.'s own sentence quoted, input erasure, global sensitivity analysis, Lost in the Middle; how Loadbearing differs from each, including that it does not measure interactions between inputs) and a five-line README section. Three documented failures for Potential Impact: Air Canada's chatbot (*Moffatt v. Air Canada*, 2024 BCCRT 149), New York City's MyCity chatbot (The Markup, 2024-03-29), and Public Health England's missed cases (October 2020). Every source was opened before citing; one figure was corrected to what its source says (nearly 16,000, not 15,841).
 - With V7, every task of Varunika's that can be done without her keys, voice or drawing is done. What remains needs her: V1 live run (unblocks the live halves of V2, V4 and V5), V9 palette, V10 outline, then V6, V8, V11, V12.
