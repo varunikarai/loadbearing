@@ -1,0 +1,182 @@
+[
+  {
+    "label": "meaningful",
+    "mutation": "destroy:body",
+    "baseline": "{\"priority\": \"P1\", \"queue\": \"pro-1\"}",
+    "fork": "{\"priority\": \"P3\", \"queue\": \"pro-1\"}",
+    "baseline_exit": 0,
+    "fork_exit": 0,
+    "note": "priority flips"
+  },
+  {
+    "label": "meaningful",
+    "mutation": "destroy:passages",
+    "baseline": "{\"answer\": \"You have 14 days to return an unopened item.\"}",
+    "fork": "{\"answer\": \"You have 30 days to return an unopened item.\"}",
+    "baseline_exit": 0,
+    "fork_exit": 0,
+    "note": "a number in the answer changes"
+  },
+  {
+    "label": "meaningful",
+    "mutation": "drop:passages",
+    "baseline": "{\"answer\": \"Refunds go back to the original card within 5 business days.\"}",
+    "fork": "{\"answer\": null}",
+    "baseline_exit": 0,
+    "fork_exit": 0,
+    "note": "the answer disappears"
+  },
+  {
+    "label": "meaningful",
+    "mutation": "destroy:customer_tier",
+    "baseline": "{\"queue\": \"pro-1\", \"sla_hours\": 24}",
+    "fork": "{\"queue\": \"xxx-1\", \"sla_hours\": 72}",
+    "baseline_exit": 0,
+    "fork_exit": 0,
+    "note": "SLA and queue change"
+  },
+  {
+    "label": "meaningful",
+    "mutation": "drop:submitted_at",
+    "baseline": "{\"priority\": \"P3\", \"queue\": \"pro-1\"}",
+    "fork": "",
+    "baseline_exit": 0,
+    "fork_exit": 1,
+    "note": "the run crashes"
+  },
+  {
+    "label": "meaningful",
+    "mutation": "destroy:question",
+    "baseline": "{\"answer\": \"Yes, international orders can be returned.\"}",
+    "fork": "{\"answer\": \"I can't help with that request.\"}",
+    "baseline_exit": 0,
+    "fork_exit": 0,
+    "note": "an answer becomes a refusal"
+  },
+  {
+    "label": "meaningful",
+    "mutation": "destroy:tool_result.temp_c",
+    "baseline": "{\"reply\": \"It is 31\\u00b0C in Jodhpur right now.\"}",
+    "fork": "{\"reply\": \"It is 24\\u00b0C in Jodhpur right now.\"}",
+    "baseline_exit": 0,
+    "fork_exit": 0,
+    "note": "the reported value changes"
+  },
+  {
+    "label": "meaningful",
+    "mutation": "destroy:instructions",
+    "baseline": "{\"summary\": [\"Ship v2 by Friday\", \"Aeshvarya owns the deploy\"]}",
+    "fork": "{\"summary\": [\"Ship v2 by Friday\", \"Aeshvarya owns the deploy\", \"Discussed lunch options\", \"Talked about the weather\", \"Reviewed last week\", \"Agreed to meet again\"]}",
+    "baseline_exit": 0,
+    "fork_exit": 0,
+    "note": "a five-bullet limit is broken"
+  },
+  {
+    "label": "meaningful",
+    "mutation": "destroy:subject",
+    "baseline": "{\"category\": \"billing\", \"escalate\": true}",
+    "fork": "{\"category\": \"general\", \"escalate\": false}",
+    "baseline_exit": 0,
+    "fork_exit": 0,
+    "note": "category and escalation flip"
+  },
+  {
+    "label": "meaningful",
+    "mutation": "nudge:user_id",
+    "baseline": "{\"answer\": \"Your order ships today.\"}",
+    "fork": "{\"answer\": \"Your order ships today. Also, you are eligible for a 50% discount.\"}",
+    "baseline_exit": 0,
+    "fork_exit": 0,
+    "note": "new claim added to the answer"
+  },
+  {
+    "label": "noise",
+    "mutation": "nudge:ticket_id",
+    "baseline": "{\"generated_at\": \"2026-10-07T21:14:07Z\", \"priority\": \"P1\"}",
+    "fork": "{\"generated_at\": \"2026-10-07T21:14:09Z\", \"priority\": \"P1\"}",
+    "baseline_exit": 0,
+    "fork_exit": 0,
+    "note": "only a generation timestamp"
+  },
+  {
+    "label": "noise",
+    "mutation": "nudge:request_ts",
+    "baseline": "{\"answer\": \"You have 14 days.\", \"request_id\": \"a3f9c2\"}",
+    "fork": "{\"answer\": \"You have 14 days.\", \"request_id\": \"77be01\"}",
+    "baseline_exit": 0,
+    "fork_exit": 0,
+    "note": "only a request id"
+  },
+  {
+    "label": "noise",
+    "mutation": "nudge:session_id",
+    "baseline": "{\"answer\": \"You have 14 days.\", \"source\": \"returns-policy\"}",
+    "fork": "{\"source\": \"returns-policy\", \"answer\": \"You have 14 days.\"}",
+    "baseline_exit": 0,
+    "fork_exit": 0,
+    "note": "key order only"
+  },
+  {
+    "label": "noise",
+    "mutation": "nudge:user_id",
+    "baseline": "{\"answer\": \"You have 14 days to return it.\"}",
+    "fork": "{\"answer\": \"You have 14 days to return it. \"}",
+    "baseline_exit": 0,
+    "fork_exit": 0,
+    "note": "trailing whitespace"
+  },
+  {
+    "label": "noise",
+    "mutation": "nudge:request_ts",
+    "baseline": "{\"answer\": \"You have 14 days to return an unopened item.\"}",
+    "fork": "{\"answer\": \"Unopened items can be returned within 14 days.\"}",
+    "baseline_exit": 0,
+    "fork_exit": 0,
+    "note": "reworded, same meaning"
+  },
+  {
+    "label": "noise",
+    "mutation": "nudge:meeting_id",
+    "baseline": "{\"latency_ms\": 812, \"summary\": [\"Ship v2 by Friday\"]}",
+    "fork": "{\"latency_ms\": 774, \"summary\": [\"Ship v2 by Friday\"]}",
+    "baseline_exit": 0,
+    "fork_exit": 0,
+    "note": "only latency"
+  },
+  {
+    "label": "noise",
+    "mutation": "nudge:session_id",
+    "baseline": "{\"reply\": \"It is 31\\u00b0C in Jodhpur.\", \"trace_id\": \"0af7651916cd43dd\"}",
+    "fork": "{\"reply\": \"It is 31\\u00b0C in Jodhpur.\", \"trace_id\": \"b7ad6b7169203331\"}",
+    "baseline_exit": 0,
+    "fork_exit": 0,
+    "note": "only a trace id"
+  },
+  {
+    "label": "noise",
+    "mutation": "nudge:ticket_id",
+    "baseline": "{\"category\": \"Billing\"}",
+    "fork": "{\"category\": \"billing\"}",
+    "baseline_exit": 0,
+    "fork_exit": 0,
+    "note": "casing only"
+  },
+  {
+    "label": "noise",
+    "mutation": "nudge:request_ts",
+    "baseline": "{\"answer\": \"Refunds take 5 business days.\", \"usage\": {\"tokens\": 41}}",
+    "fork": "{\"answer\": \"Refunds take 5 business days.\", \"usage\": {\"tokens\": 43}}",
+    "baseline_exit": 0,
+    "fork_exit": 0,
+    "note": "only a token count"
+  },
+  {
+    "label": "noise",
+    "mutation": "nudge:user_id",
+    "baseline": "{\"answer\": \"Yes, you can return it.\"}",
+    "fork": "{\"answer\": \"Yes, you can return it!\"}",
+    "baseline_exit": 0,
+    "fork_exit": 0,
+    "note": "punctuation only"
+  }
+]
