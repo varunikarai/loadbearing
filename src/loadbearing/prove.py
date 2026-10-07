@@ -88,3 +88,46 @@ def prove(
     was = {v.field for v in before.defects}
     new_defects = [v.field for v in after.defects if v.field not in was]
     return Proof(fix=fix, after=after, fixed=fixed, new_defects=new_defects)
+
+
+@dataclass
+class Loop:
+    """Everything closing the loop produced for one probe."""
+
+    fixes: list[Fix]
+    proofs: list[Proof]
+    rejected: list[tuple[str, str]]  # (field, why no fix was applied)
+
+
+def close_loop(
+    target: Target,
+    backend: Backend,
+    before: Report,
+    router: Any,
+    checkpoint: Any,
+    prove_fixes: bool = True,
+    classify: Optional[Classifier] = None,
+    workers: int = 8,
+    baseline_runs: Optional[int] = None,
+) -> Loop:
+    """For every defect in `before`: Ultra writes a fix, and (with prove_fixes) a fork proves it.
+
+    A fix the writer refuses, or a reply that is not a usable fix, is recorded
+    with its reason instead of stopping the run: one bad answer from the model
+    should not cost the proofs of the others.
+    """
+    from loadbearing.fix import write_fix
+
+    loop = Loop(fixes=[], proofs=[], rejected=[])
+    for verdict in before.defects:
+        try:
+            loop.fixes.append(write_fix(verdict, target, router))
+        except ValueError as exc:  # FixRejected, or a reply with no usable fix in it
+            loop.rejected.append((verdict.field, str(exc)))
+    if prove_fixes:
+        for fix in loop.fixes:
+            loop.proofs.append(
+                prove(target, backend, fix, before, checkpoint=checkpoint, classify=classify,
+                      workers=workers, baseline_runs=baseline_runs)
+            )
+    return loop
