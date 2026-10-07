@@ -21,6 +21,8 @@ Empirically. Checkpoint the pipeline once, fork that checkpoint per mutation, ru
 
 Then close the loop. Ultra writes the smallest fix for each defect, the fix is applied in a fresh fork of the same checkpoint, and the probe re-runs on that fork to show the defect gone. **Find, explain, fix, prove**, with the same checkpoint primitive at every step.
 
+A fix is checked before any fork runs it: it may change only the pipeline's own source files, a Python file must still compile, and it may not remove or replace more than half of a file's lines (three, in a file shorter than six). A fix that fails a check is rejected, not applied.
+
 ## The claim we defend
 
 For any pipeline, we tell you which inputs actually change its behaviour, and we prove it by running it, not by reading it.
@@ -31,13 +33,13 @@ For any pipeline, we tell you which inputs actually change its behaviour, and we
 |---|---|---|
 | Nebius Token Factory Sandboxes | Checkpoint once, fork per mutation, fork again to prove a fix | The comparison is only sound if every fork starts from a byte-identical environment. Checkpoint-and-fork makes "hold everything constant except one input" a primitive instead of N rebuilds, and the same primitive makes "this fix removed the defect, and nothing else changed" provable. |
 | Nemotron Nano | Classify each fork's diff | One cheap call per fork: is this change meaningful or noise? |
-| Nemotron Super | Reconcile across forks | Turns many per-fork diffs into one defect class per input. |
+| Nemotron Super | Reconcile across forks | States, for each defect, what its destroy, drop and nudge forks show together. The defect class itself comes from a fixed rule over the forks, never from a model, so no model can invent a defect. |
 | Nemotron Ultra | Explain the defect and write the fix | Long-horizon reasoning over the pipeline source: why does this path not read the field, and what is the smallest change that makes it? |
-| Tavily | Infer which fields should matter | Pulls the upstream spec or docs and fills in `expects` for fields nobody declared, so an undeclared field can carry a defect claim. That is what makes phantom sensitivity a finding rather than a guess. |
+| Tavily | Infer which fields should matter | Pulls the upstream spec or docs, and Super reads them to fill in `expects` for fields nobody declared, so an undeclared field can carry a defect claim. Each inferred intent carries a verbatim quote and its link, and a quote that is not in the page it cites is thrown away. That is what makes phantom sensitivity a finding rather than a guess. |
 
 ## LLM pipelines
 
-The demo target is an LLM pipeline, because that is where silent passthrough does the most damage: a retrieval or tool-calling step that answers fluently while ignoring what it retrieved. An LLM's output varies on its own, so a two-run determinism check would void every verdict. Instead the baseline runs k times, and output keys that vary with no mutation at all are marked **unstable** and left out of verdicts. Everything else is still judged.
+The demo target is an LLM pipeline, because that is where silent passthrough does the most damage: a retrieval or tool-calling step that answers fluently while ignoring what it retrieved. An LLM's output varies on its own, so a two-run determinism check would void every verdict. Instead the baseline runs k times, and output keys that vary with no mutation at all are marked **unstable** and left out of verdicts. Everything else is still judged. Only when nothing stable is left (every key varies, the exit code varies, or the output is not JSON and varies) is the report void, and it says so instead of judging.
 
 ## Scope for the vertical slice
 
