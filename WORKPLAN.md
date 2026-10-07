@@ -19,7 +19,7 @@ Every task below is written so either builder can pick it up cold: why it exists
 | V1 | Sandboxes live run | tech | 4 | Sat 10-10 | todo |
 | V2 | Nemotron layer verified | tech | 6 | Sun 10-11 | offline done 10-07; Nano score and live run after V1 |
 | V3 | Noise floor | tech | 3 | Sat 10-10 | done 10-07 |
-| V4 | Tavily intent inference | tech | 5 | Sat 10-17 | todo |
+| V4 | Tavily intent inference | tech | 5 | Sat 10-17 | offline done 10-07; live run once A3 has `docs` |
 | V5 | Fix writer | tech | 4 | contract Sat 10-10, done Sat 10-17 | writer done offline 10-07; live Ultra check after V1 |
 | V6 | Pre-public audit and the public flip | tech | 2 | Sun 10-18 | todo |
 | V7 | Prior art and evidence | non-tech | 3 | Tue 10-20 | todo |
