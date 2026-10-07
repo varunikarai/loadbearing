@@ -66,7 +66,7 @@ class DemoServerTests(unittest.TestCase):
         self.assertEqual(status, 200)
         self.assertIn("body · silent passthrough", body)
         status, body = self.get(base + "/t/ticket_triage.json")
-        self.assertIn('"schema": 1', body)
+        self.assertIn('"schema": 2', body)
         _, index = self.get(base + "/")
         self.assertIn("2 defects", index)
 

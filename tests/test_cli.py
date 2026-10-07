@@ -1,4 +1,5 @@
 import contextlib
+import json
 import io
 import unittest
 from unittest import mock
@@ -31,6 +32,42 @@ class ReservedFlagTests(unittest.TestCase):
         with contextlib.redirect_stdout(io.StringIO()):
             self.assertEqual(main(["probe", EXAMPLE]), 1)  # two defects
 
+
+
+def _ultra(verdict, sources):
+    if verdict.field == "body":
+        return {"pipeline.py": sources["pipeline.py"].replace("'bdoy'", "'body'")}, "Read the body under its real key."
+    return {"pipeline.py": "("}, "broken"
+
+
+class LoopFlagTests(unittest.TestCase):
+    def run_cli(self, *flags):
+        from fakes import FakeRouter
+        from loadbearing.nemotron import NemotronRouter
+
+        out = io.StringIO()
+        with mock.patch.object(NemotronRouter, "from_env", return_value=FakeRouter(write_fix=_ultra)), \
+                contextlib.redirect_stdout(out):
+            code = main(["probe", EXAMPLE, *flags])
+        return code, out.getvalue()
+
+    def test_prove_prints_the_fix_its_diff_and_the_proof(self):
+        code, text = self.run_cli("--prove")
+        self.assertEqual(code, 1)  # the pipeline as given still has defects
+        self.assertIn("fix for body (silent passthrough): Read the body under its real key.", text)
+        self.assertIn("+++ b/pipeline.py", text)
+        self.assertIn("proof: body is now load-bearing, and no other field gained a defect.", text)
+        self.assertIn("no fix for submitted_at:", text)
+
+    def test_fix_writes_without_proving(self):
+        _, text = self.run_cli("--fix")
+        self.assertIn("fix for body", text)
+        self.assertNotIn("proof:", text)
+
+    def test_prove_lands_in_the_json(self):
+        _, text = self.run_cli("--prove", "--json")
+        data = json.loads(text)
+        self.assertTrue(data["proofs"][0]["clean"])
 
 
 class RenderTests(unittest.TestCase):

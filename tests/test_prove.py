@@ -6,7 +6,8 @@ from pathlib import Path
 from loadbearing.backends.local import LocalBackend
 from loadbearing.fix import Fix
 from loadbearing.probe import probe
-from loadbearing.prove import Pinned, prove
+from loadbearing.prove import Pinned, close_loop, prove
+from fakes import FakeRouter
 from loadbearing.target import load_target
 from loadbearing.verdict import LOAD_BEARING, PHANTOM_SENSITIVITY, SILENT_PASSTHROUGH
 
@@ -69,9 +70,61 @@ class ProveTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "other.py"):
             prove(self.target, self.backend, rogue, self.before, checkpoint=self.checkpoint)
 
+    def test_pinned_builds_its_checkpoint_once_and_times_the_real_build(self):
+        pinned = Pinned(self.backend)
+        first = probe(self.target, pinned)
+        built = pinned.pinned
+        probe(self.target, pinned)
+        self.assertIs(pinned.pinned, built)
+        self.assertGreater(first.checkpoint_seconds, 0)
+
     def test_without_a_checkpoint_it_builds_one_from_the_same_target(self):
         good = _fix(self.target, self.source.replace("bdoy", "body"))
         self.assertTrue(prove(self.target, self.backend, good, self.before).clean)
+
+
+
+class CloseLoopTests(unittest.TestCase):
+    """Both defects of the toy target through the loop, with a scripted Ultra."""
+
+    def setUp(self):
+        self.backend = LocalBackend()
+        self.target = load_target(EXAMPLE)
+        self.source = (self.target.root / "pipeline.py").read_text()
+        self.pinned = Pinned(self.backend)
+        self.before = probe(self.target, self.pinned)
+
+    def tearDown(self):
+        self.backend.close()
+
+    def ultra(self, verdict, sources):
+        if verdict.field == "body":
+            return {"pipeline.py": sources["pipeline.py"].replace("'bdoy'", "'body'")}, "Read the real key."
+        return {"pipeline.py": "this is not python ("}, "A broken answer."
+
+    def test_good_fixes_are_proven_and_bad_ones_are_recorded_not_fatal(self):
+        loop = close_loop(self.target, self.backend, self.before, FakeRouter(write_fix=self.ultra),
+                          checkpoint=self.pinned.pinned)
+        self.assertEqual([f.field for f in loop.fixes], ["body"])
+        self.assertEqual(len(loop.proofs), 1)
+        self.assertTrue(loop.proofs[0].clean)
+        (field, why), = loop.rejected
+        self.assertEqual(field, "submitted_at")
+        self.assertIn("no longer compiles", why)
+
+    def test_fix_only_writes_without_proving(self):
+        loop = close_loop(self.target, self.backend, self.before, FakeRouter(write_fix=self.ultra),
+                          checkpoint=self.pinned.pinned, prove_fixes=False)
+        self.assertEqual(len(loop.fixes), 1)
+        self.assertEqual(loop.proofs, [])
+
+    def test_a_reply_with_no_usable_fix_is_recorded(self):
+        def nonsense(verdict, sources):
+            raise ValueError("the reply holds no JSON object")
+
+        loop = close_loop(self.target, self.backend, self.before, FakeRouter(write_fix=nonsense),
+                          checkpoint=self.pinned.pinned)
+        self.assertEqual(sorted(f for f, _ in loop.rejected), ["body", "submitted_at"])
 
 
 if __name__ == "__main__":

@@ -45,9 +45,49 @@ class ReportJsonTests(unittest.TestCase):
     def test_an_old_schema_is_refused_not_misread(self):
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "r.json"
-            path.write_text(json.dumps(dict(self.data, schema=0)))
-            with self.assertRaises(RuntimeError):
-                report_json.load(path)
+            for old in (0, 1):
+                path.write_text(json.dumps(dict(self.data, schema=old)))
+                with self.subTest(schema=old), self.assertRaises(RuntimeError):
+                    report_json.load(path)
+
+    def test_schema_2_fields_are_present_and_empty_on_a_plain_probe(self):
+        self.assertEqual(self.data["schema"], 2)
+        self.assertEqual(self.data["baseline_runs"], 2)
+        self.assertEqual(self.data["unstable_keys"], [])
+        self.assertFalse(self.data["void"])
+        self.assertEqual((self.data["fixes"], self.data["proofs"], self.data["rejected_fixes"]), ([], [], []))
+        body = next(v for v in self.data["verdicts"] if v["field"] == "body")
+        self.assertEqual(body["intent_source"], "declared")
+        self.assertIsNone(body["evidence"])
+        self.assertIsNone(body["explanation"])
+
+
+class LoopReportTests(unittest.TestCase):
+    """A closed loop serialises its fix, diff and proof."""
+
+    def test_fix_diff_and_proof_are_in_the_report(self):
+        from fakes import FakeRouter
+        from loadbearing.prove import Pinned, close_loop
+
+        target = load_target(EXAMPLE)
+        backend = LocalBackend()
+        try:
+            pinned = Pinned(backend)
+            before = probe(target, pinned)
+            ultra = FakeRouter(write_fix=lambda v, src: (
+                ({"pipeline.py": src["pipeline.py"].replace("'bdoy'", "'body'")}, "Read the real key.")
+                if v.field == "body" else ({"pipeline.py": "("}, "broken")))
+            loop = close_loop(target, backend, before, ultra, checkpoint=pinned.pinned)
+        finally:
+            backend.close()
+        data = json.loads(json.dumps(report_json.to_dict(before, loop, target)))
+        (fix,) = data["fixes"]
+        self.assertIn("-    text = f\"{ticket.get('subject', '')} {ticket.get('bdoy', '')}\".lower()", fix["diff"])
+        (proof,) = data["proofs"]
+        self.assertTrue(proof["clean"])
+        self.assertEqual(proof["after"]["baseline"]["output"]["priority"], "P1")
+        self.assertNotIn("fixes", proof["after"])
+        self.assertEqual([r["field"] for r in data["rejected_fixes"]], ["submitted_at"])
 
 
 if __name__ == "__main__":

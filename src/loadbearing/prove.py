@@ -31,19 +31,22 @@ class Proof:
 
 
 class Pinned:
-    """A backend whose checkpoint is already built, so a probe reuses it instead of rebuilding.
+    """A backend that builds one checkpoint and reuses it for every probe.
 
     Used for the probe before a fix, so the proof can derive from that exact
-    checkpoint, and for the probe after, on the derived one. The wrapped backend
-    is closed by whoever opened it, not here.
+    checkpoint, and for the probe after, on the derived one. Given no
+    checkpoint, it builds one on first use, so the first probe still times the
+    real build. The wrapped backend is closed by whoever opened it, not here.
     """
 
-    def __init__(self, backend: Backend, checkpoint: Any) -> None:
+    def __init__(self, backend: Backend, checkpoint: Optional[Any] = None) -> None:
         self.backend = backend
         self.pinned = checkpoint
         self.name = backend.name
 
     def checkpoint(self, target: Target) -> Any:
+        if self.pinned is None:
+            self.pinned = self.backend.checkpoint(target)
         return self.pinned
 
     def run(self, checkpoint: Any, target: Target, record: dict) -> RunResult:
@@ -64,6 +67,7 @@ def prove(
     checkpoint: Optional[Any] = None,
     classify: Optional[Classifier] = None,
     workers: int = 8,
+    baseline_runs: Optional[int] = None,
 ) -> Proof:
     """Apply `fix` to `checkpoint` (or a fresh one) and probe again.
 
@@ -75,10 +79,55 @@ def prove(
         raise ValueError(f"the fix writes {', '.join(outside)}, which the target does not list in sources")
     base = checkpoint if checkpoint is not None else backend.checkpoint(target)
     patched = backend.apply(base, fix.files)
-    after = probe(target, Pinned(backend, patched), classify=classify, workers=workers)
+    after = probe(
+        target, Pinned(backend, patched), classify=classify, workers=workers, baseline_runs=baseline_runs
+    )
 
     verdict = next((v for v in after.verdicts if v.field == fix.field), None)
     fixed = verdict is not None and verdict.verdict != fix.defect
     was = {v.field for v in before.defects}
     new_defects = [v.field for v in after.defects if v.field not in was]
     return Proof(fix=fix, after=after, fixed=fixed, new_defects=new_defects)
+
+
+@dataclass
+class Loop:
+    """Everything closing the loop produced for one probe."""
+
+    fixes: list[Fix]
+    proofs: list[Proof]
+    rejected: list[tuple[str, str]]  # (field, why no fix was applied)
+
+
+def close_loop(
+    target: Target,
+    backend: Backend,
+    before: Report,
+    router: Any,
+    checkpoint: Any,
+    prove_fixes: bool = True,
+    classify: Optional[Classifier] = None,
+    workers: int = 8,
+    baseline_runs: Optional[int] = None,
+) -> Loop:
+    """For every defect in `before`: Ultra writes a fix, and (with prove_fixes) a fork proves it.
+
+    A fix the writer refuses, or a reply that is not a usable fix, is recorded
+    with its reason instead of stopping the run: one bad answer from the model
+    should not cost the proofs of the others.
+    """
+    from loadbearing.fix import write_fix
+
+    loop = Loop(fixes=[], proofs=[], rejected=[])
+    for verdict in before.defects:
+        try:
+            loop.fixes.append(write_fix(verdict, target, router))
+        except ValueError as exc:  # FixRejected, or a reply with no usable fix in it
+            loop.rejected.append((verdict.field, str(exc)))
+    if prove_fixes:
+        for fix in loop.fixes:
+            loop.proofs.append(
+                prove(target, backend, fix, before, checkpoint=checkpoint, classify=classify,
+                      workers=workers, baseline_runs=baseline_runs)
+            )
+    return loop
