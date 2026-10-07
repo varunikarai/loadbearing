@@ -41,7 +41,7 @@ def to_dict(report: Report) -> dict[str, Any]:
             "checkpoint_seconds": report.checkpoint_seconds,
             "fork_wall_seconds": report.fork_wall_seconds,
             "fork_total_seconds": report.fork_total_seconds,
-            "runs": len(report.forks) + 2,
+            "runs": len(report.forks) + report.baseline_runs,
         },
         "record": report.record,
         "baseline": _run(report.baseline),

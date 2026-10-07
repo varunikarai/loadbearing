@@ -73,7 +73,6 @@ def main(argv: Optional[list[str]] = None) -> int:
 
 # Flag -> the task that builds it. A flag leaves this map when its function is on main.
 NOT_BUILT = {
-    "baseline_runs": "V3",
     "explain": "V2",
     "intent": "V4",
     "fix": "V5",
@@ -93,7 +92,9 @@ def _probe(args: argparse.Namespace) -> int:
         classify = NemotronRouter.from_env(tiers=("nano",)).classify_diff
     backend = make_backend(args.backend)
     try:
-        report = probe(target, backend, classify=classify, workers=args.workers)
+        report = probe(
+            target, backend, classify=classify, workers=args.workers, baseline_runs=args.baseline_runs
+        )
     finally:
         backend.close()
 
@@ -157,8 +158,14 @@ def _models(show_all: bool) -> int:
 def render(report: Report) -> str:
     lines = [f"{report.target}: {len(report.forks)} forks from one checkpoint ({report.backend})"]
     lines.append(timing_line(report))
-    if not report.deterministic:
-        lines.append("WARNING: the baseline disagrees with itself, so no verdict below is sound.")
+    if report.void:
+        lines.append("WARNING: every output key varies on its own, so no verdict below is sound.")
+    elif report.unstable_keys:
+        # An LLM target is expected to land here: the noise floor removed these, the rest is judged.
+        lines.append(
+            f"noise floor: {report.baseline_runs} baseline runs; varies on its own, not judged: "
+            + ", ".join(report.unstable_keys)
+        )
 
     rows = [("field", "intent", *KINDS, "verdict")]
     for v in report.verdicts:
@@ -182,6 +189,6 @@ def timing_line(report: Report) -> str:
     wall, total = report.fork_wall_seconds, report.fork_total_seconds
     speedup = f", {total / wall:.1f}x parallel" if wall > 0 else ""
     return (
-        f"checkpoint {report.checkpoint_seconds:.2f}s, then {len(report.forks) + 2} runs "
+        f"checkpoint {report.checkpoint_seconds:.2f}s, then {len(report.forks) + report.baseline_runs} runs "
         f"in {wall:.2f}s wall ({total:.2f}s one after another{speedup})"
     )
