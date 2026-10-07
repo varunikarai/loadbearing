@@ -189,6 +189,6 @@ def timing_line(report: Report) -> str:
     wall, total = report.fork_wall_seconds, report.fork_total_seconds
     speedup = f", {total / wall:.1f}x parallel" if wall > 0 else ""
     return (
-        f"checkpoint {report.checkpoint_seconds:.2f}s, then {len(report.forks) + 2} runs "
+        f"checkpoint {report.checkpoint_seconds:.2f}s, then {len(report.forks) + report.baseline_runs} runs "
         f"in {wall:.2f}s wall ({total:.2f}s one after another{speedup})"
     )
