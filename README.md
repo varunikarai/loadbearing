@@ -87,12 +87,16 @@ as given. `--baseline-runs N` overrides the target's noise floor.
 ### The LLM demo target
 
 ```bash
-loadbearing probe examples/support_answerer/target.json --prove   # needs NEBIUS_API_KEY and NEMOTRON_NANO_MODEL
+loadbearing probe examples/support_answerer/target.json --intent --prove
+# needs NEBIUS_API_KEY, NEMOTRON_NANO_MODEL, NEMOTRON_SUPER_MODEL, NEMOTRON_ULTRA_MODEL, TAVILY_API_KEY
 ```
 
 A support answerer over retrieved policy text. The retriever writes `passages`, the prompt reads
 `context`, so a customer 20 days into a 14-day return window is told they have 30 days for a full
-refund. The probe finds `passages` is a silent passthrough; the proven fix makes the answer 14
+refund. Its target leaves `passages` undeclared on purpose: without `--intent` the probe only
+observes that the answer never moves when the passages are destroyed. With `--intent`, Tavily
+reads NVIDIA's own RAG guides, Super quotes the line saying the model answers from the retrieved
+data, and that observation becomes a cited silent passthrough. The proven fix makes the answer 14
 days and a warranty repair.
 
 ## The report

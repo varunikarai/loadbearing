@@ -46,9 +46,12 @@ class LoopFlagTests(unittest.TestCase):
         from loadbearing.nemotron import NemotronRouter
 
         out = io.StringIO()
-        with mock.patch.object(NemotronRouter, "from_env", return_value=FakeRouter(write_fix=_ultra)), \
+        fake = FakeRouter(write_fix=_ultra, reconcile="Super: it never moved.",
+                          explain="Ultra: read under a misspelled key.")
+        with mock.patch.object(NemotronRouter, "from_env", return_value=fake) as built, \
                 contextlib.redirect_stdout(out):
             code = main(["probe", EXAMPLE, *flags])
+        self.tiers = built.call_args.kwargs["tiers"] if built.called else None
         return code, out.getvalue()
 
     def test_prove_prints_the_fix_its_diff_and_the_proof(self):
@@ -63,6 +66,31 @@ class LoopFlagTests(unittest.TestCase):
         _, text = self.run_cli("--fix")
         self.assertIn("fix for body", text)
         self.assertNotIn("proof:", text)
+
+    def test_fix_implies_explain_and_asks_for_exactly_the_tiers_it_uses(self):
+        _, text = self.run_cli("--fix", "--json")
+        body = next(v for v in json.loads(text)["verdicts"] if v["field"] == "body")
+        self.assertEqual(body["explanation"], "Ultra: read under a misspelled key.")
+        self.assertEqual(self.tiers, ("super", "ultra"))
+
+    def test_explain_alone_annotates_defects_without_fixing(self):
+        _, text = self.run_cli("--explain", "--json")
+        data = json.loads(text)
+        body = next(v for v in data["verdicts"] if v["field"] == "body")
+        self.assertEqual(body["reconciliation"], "Super: it never moved.")
+        self.assertEqual(data["fixes"], [])
+
+    def test_intent_feeds_inferred_intents_to_the_probe_and_the_proof(self):
+        from loadbearing import cli
+        from loadbearing.verdict import Evidence
+
+        evidence = {"ticket_id": Evidence("irrelevant", "The id is for lookup only.", "https://x.test/spec")}
+        with mock.patch("loadbearing.intent.infer_expects", return_value=evidence) as infer, \
+                mock.patch.object(cli, "close_loop", wraps=cli.close_loop) as loop:
+            self.run_cli("--intent", "--prove")
+        infer.assert_called_once()
+        self.assertIs(loop.call_args.kwargs["inferred"], evidence)
+        self.assertEqual(self.tiers, ("super", "ultra"))
 
     def test_prove_lands_in_the_json(self):
         _, text = self.run_cli("--prove", "--json")
