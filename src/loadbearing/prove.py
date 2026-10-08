@@ -68,6 +68,7 @@ def prove(
     classify: Optional[Classifier] = None,
     workers: int = 8,
     baseline_runs: Optional[int] = None,
+    inferred: Optional[dict] = None,
 ) -> Proof:
     """Apply `fix` to `checkpoint` (or a fresh one) and probe again.
 
@@ -79,8 +80,10 @@ def prove(
         raise ValueError(f"the fix writes {', '.join(outside)}, which the target does not list in sources")
     base = checkpoint if checkpoint is not None else backend.checkpoint(target)
     patched = backend.apply(base, fix.files)
+    # Same noise floor and same inferred intents as `before`, so only the fix differs.
     after = probe(
-        target, Pinned(backend, patched), classify=classify, workers=workers, baseline_runs=baseline_runs
+        target, Pinned(backend, patched), classify=classify, workers=workers,
+        baseline_runs=baseline_runs, inferred=inferred,
     )
 
     verdict = next((v for v in after.verdicts if v.field == fix.field), None)
@@ -109,6 +112,7 @@ def close_loop(
     classify: Optional[Classifier] = None,
     workers: int = 8,
     baseline_runs: Optional[int] = None,
+    inferred: Optional[dict] = None,
 ) -> Loop:
     """For every defect in `before`: Ultra writes a fix, and (with prove_fixes) a fork proves it.
 
@@ -128,6 +132,6 @@ def close_loop(
         for fix in loop.fixes:
             loop.proofs.append(
                 prove(target, backend, fix, before, checkpoint=checkpoint, classify=classify,
-                      workers=workers, baseline_runs=baseline_runs)
+                      workers=workers, baseline_runs=baseline_runs, inferred=inferred)
             )
     return loop
