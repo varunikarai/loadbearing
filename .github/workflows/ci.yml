@@ -40,3 +40,28 @@ jobs:
           path: |
             report.json
             report.html
+
+  # A stranger's first five minutes: a fresh clone of exactly what was committed,
+  # `pip install .` into a clean environment, then the README quickstart as written,
+  # whose output must match what the README shows.
+  clean-clone:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Clone fresh and install into a clean venv
+        run: |
+          git clone --quiet "$GITHUB_WORKSPACE" /tmp/fresh
+          python -m venv /tmp/venv
+          /tmp/venv/bin/pip install --quiet /tmp/fresh
+      - name: The installed command runs from outside the source tree
+        working-directory: /tmp
+        run: |
+          set +e
+          /tmp/venv/bin/loadbearing probe /tmp/fresh/examples/ticket_triage/target.json
+          test $? -eq 1
+      - name: The README quickstart runs as written and prints what it shows
+        working-directory: /tmp/fresh
+        run: /tmp/venv/bin/python .github/check_readme.py
