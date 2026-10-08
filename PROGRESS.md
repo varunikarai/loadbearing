@@ -96,6 +96,11 @@ Problem statement: [SPEC.md](SPEC.md). Setup, target format, layout: [README.md]
 
 Newest first.
 
+### 2026-10-09 (b)
+- **Claimed, two new tasks (Aeshvarya), in new paths only:** A13, a benchmark of pipelines with planted input-handling bugs, reporting exact detection counts for Loadbearing and two baselines (a static check of whether each field is referenced, and Nemotron reading the code); A14, a GitHub Action that runs a probe and writes a job summary.
+- A8 done; the notes are kept outside the repo.
+- All nine hand-offs are on `main`: `--explain`, `--intent`, and the demo target leaves `passages` undeclared, with NVIDIA's RAG 101 post as its doc.
+
 ### 2026-10-09
 - **Correction (Aeshvarya):** the 10-06 (g) entry says there is no `contree auth`. There is, in `contree-cli` (`uv tool install contree-cli`); it saves a profile `ContreeSync()` reads. V1 can use it or the two `.env` variables. The backend is unchanged. The CLI reads `NEBIUS_AI_PROJECT`, the SDK `NEBIUS_PROJECT_ID`; the docs' SDK page also shows a `ContreeAsyncClient(...)` constructor that 0.3.6 does not take. Both go in the feedback files.
 
