@@ -96,6 +96,9 @@ Problem statement: [SPEC.md](SPEC.md). Setup, target format, layout: [README.md]
 
 Newest first.
 
+### 2026-10-09
+- **Correction (Aeshvarya):** the 10-06 (g) entry says there is no `contree auth`. There is, in `contree-cli` (`uv tool install contree-cli`); it saves a profile `ContreeSync()` reads. V1 can use it or the two `.env` variables. The backend is unchanged. The CLI reads `NEBIUS_AI_PROJECT`, the SDK `NEBIUS_PROJECT_ID`; the docs' SDK page also shows a `ContreeAsyncClient(...)` constructor that 0.3.6 does not take. Both go in the feedback files.
+
 ### 2026-10-07 (e)
 - **A4 loop and A5 schema 2 merged** (Aeshvarya, `c03d3cf`): `close_loop()`, `--fix` and `--prove` on one pinned checkpoint, report schema 2. **A3 built and proven offline** (Aeshvarya, `213554d`): `examples/support_answerer`, the RAG answerer with a `docs` block. 127 tests pass. Checked: every malformed Ultra reply in `write_fix` raises `ValueError`, which `close_loop` catches.
 - **Hand-off 9 to Aeshvarya, proposed:** the demo target declares all five fields, so `infer_expects` finds no undeclared field and Tavily never runs on it. Leave `passages` out of `expects` (keep `question` relevant and the three ids irrelevant). Then `--intent` has real work: the RAG docs say answers must be grounded in the retrieved passages, Super quotes that with its link, and the silent passthrough on `passages` becomes a defect only Tavily could have claimed. The $3,000 Tavily prize needs exactly that runtime job (WORKPLAN, V4 "Why").
