@@ -59,7 +59,7 @@ The ticket body reports a full outage, and the pipeline still says P3, because i
 
 ```bash
 pip install -e '.[sandbox]'
-cp .env.example .env        # set NEBIUS_API_KEY and NEBIUS_PROJECT_ID
+cp .env.example .env        # set NEBIUS_API_KEY and NEBIUS_PROJECT_ID, or run `contree auth` once
 loadbearing probe examples/ticket_triage/target.json --backend sandbox
 ```
 

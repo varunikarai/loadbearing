@@ -160,7 +160,7 @@ Every function behind a flag must also be callable without the CLI, so it can be
 **Needs.** Nothing.
 **Steps.**
 1. Claim the hackathon credit (the promo form, activation code `NEBIUS-DEVPOST-GLOBAL26`) and the Builders Program credit. Note both balances.
-2. `pip install -e '.[sandbox]'`, then put `NEBIUS_API_KEY` and `NEBIUS_PROJECT_ID` in `.env`. There is no `contree auth` step: the SDK reads both from the environment.
+2. `pip install -e '.[sandbox]'`, then put `NEBIUS_API_KEY` and `NEBIUS_PROJECT_ID` in `.env`. Or install the CLI (`uv tool install contree-cli`) and run `contree auth`: it saves a profile the SDK also reads. Note the CLI calls the project variable `NEBIUS_AI_PROJECT`; the SDK calls it `NEBIUS_PROJECT_ID`.
 3. Create a Token Factory key, put `NEBIUS_API_KEY` in `.env`, run `loadbearing models`, and paste the Nano, Super and Ultra IDs into `.env`.
 4. `loadbearing probe examples/ticket_triage/target.json --backend sandbox`, then again with `--nano`.
 5. If it breaks, make the smallest fix in `contree.py`, one commit per fix, and keep the exact error text for V11.
