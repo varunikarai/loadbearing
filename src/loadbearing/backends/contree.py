@@ -4,8 +4,9 @@ Checkpoint: the image left behind by the setup run with disposable=False, which
 snapshots the whole filesystem. Fork: a disposable run from that image with one
 mutated input file dropped in. Every fork starts from the same snapshot.
 
-Credentials: contree-sdk reads NEBIUS_API_KEY and NEBIUS_PROJECT_ID from the
-environment (which `loadbearing` fills from .env), and talks to the Token
+Credentials, either way works: `contree auth` (from `uv tool install contree-cli`)
+saves a profile the SDK reads, or NEBIUS_API_KEY and NEBIUS_PROJECT_ID in the
+environment, which `loadbearing` fills from .env. The SDK talks to the Token
 Factory Sandboxes endpoint by default.
 
 Checked against contree-sdk 0.3.6 by reading its source; not yet run against a
