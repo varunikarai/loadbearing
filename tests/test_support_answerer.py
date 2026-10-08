@@ -19,10 +19,13 @@ from loadbearing.fix import Fix
 from loadbearing.probe import probe
 from loadbearing.prove import Pinned, prove
 from loadbearing.target import load_target
-from loadbearing.verdict import INERT, LOAD_BEARING, SILENT_PASSTHROUGH
+from loadbearing.verdict import INERT, LOAD_BEARING, RELEVANT, SILENT_PASSTHROUGH, Evidence
 
 TARGET = Path(__file__).resolve().parent.parent / "examples" / "support_answerer" / "target.json"
 _calls = itertools.count(1)
+# What V4 is expected to find live: Tavily extracts this page, Super quotes it.
+NVIDIA_RAG_101 = "https://developer.nvidia.com/blog/rag-101-demystifying-retrieval-augmented-generation-pipelines/"
+RAG_QUOTE = "The LLMs then use the retrieved data to craft appropriate responses."
 
 
 def grounded_model(prompt: str) -> dict:
@@ -71,6 +74,8 @@ class SupportAnswererTests(unittest.TestCase):
         cls.backend = LocalBackend()
         cls.pinned = Pinned(cls.backend)
         cls.report = probe(cls.target, cls.pinned)
+        cls.inferred = {"passages": Evidence(RELEVANT, RAG_QUOTE, NVIDIA_RAG_101)}
+        cls.inferred_report = probe(cls.target, cls.pinned, inferred=cls.inferred)
 
     @classmethod
     def tearDownClass(cls):
@@ -89,15 +94,23 @@ class SupportAnswererTests(unittest.TestCase):
         self.assertEqual(self.report.unstable_keys, ["answer"])
         self.assertFalse(self.report.void)
 
-    def test_the_retrieved_passages_are_a_silent_passthrough(self):
+    def test_without_tavily_passages_is_only_an_observation(self):
+        # passages is left undeclared on purpose: claiming it is a defect is Tavily's job.
         verdicts = {v.field: v.verdict for v in self.report.verdicts}
         self.assertEqual(verdicts, {
             "request_id": INERT,
             "user_id": INERT,
             "received_at": INERT,
             "question": LOAD_BEARING,
-            "passages": SILENT_PASSTHROUGH,
+            "passages": INERT,
         })
+        self.assertFalse(self.report.defects)
+
+    def test_with_the_docs_intent_passages_is_a_cited_silent_passthrough(self):
+        verdict = next(v for v in self.inferred_report.verdicts if v.field == "passages")
+        self.assertEqual(verdict.verdict, SILENT_PASSTHROUGH)
+        self.assertEqual(verdict.intent_source, "inferred")
+        self.assertEqual(verdict.evidence.url, NVIDIA_RAG_101)
 
     def test_the_one_line_fix_is_proven_and_the_answer_becomes_14_days(self):
         source = (self.target.root / "pipeline.py").read_text()
@@ -107,7 +120,8 @@ class SupportAnswererTests(unittest.TestCase):
         )
         self.assertNotEqual(fixed, source)
         fix = Fix("passages", SILENT_PASSTHROUGH, {"pipeline.py": fixed}, "Read the passages the retriever writes.")
-        proof = prove(self.target, self.backend, fix, self.report, checkpoint=self.pinned.pinned)
+        proof = prove(self.target, self.backend, fix, self.inferred_report,
+                      checkpoint=self.pinned.pinned, inferred=self.inferred)
         self.assertTrue(proof.clean)
         after = proof.after.baseline.output()
         self.assertEqual((after["can_return"], after["return_window_days"]), (False, 14))

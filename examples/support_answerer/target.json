@@ -2,19 +2,35 @@
   "name": "support-answerer",
   "image": "python:3.12-slim",
   "setup": "python3 --version",
-  "files": ["pipeline.py"],
+  "files": [
+    "pipeline.py"
+  ],
   "command": "python3 pipeline.py input.json",
   "record": "request.json",
   "timeout": 120,
   "expects": {
-    "relevant": ["question", "passages"],
-    "irrelevant": ["request_id", "user_id", "received_at"]
+    "relevant": [
+      "question"
+    ],
+    "irrelevant": [
+      "request_id",
+      "user_id",
+      "received_at"
+    ]
   },
   "baseline_runs": 5,
-  "env": ["NEBIUS_API_KEY", "NEMOTRON_NANO_MODEL"],
+  "env": [
+    "NEBIUS_API_KEY",
+    "NEMOTRON_NANO_MODEL"
+  ],
   "docs": {
-    "query": "retrieval-augmented generation: the answer must be grounded in the retrieved passages, not the model's prior knowledge",
-    "urls": []
+    "query": "retrieval-augmented generation: the LLM answers from the retrieved documents, not only its training data",
+    "urls": [
+      "https://developer.nvidia.com/blog/rag-101-demystifying-retrieval-augmented-generation-pipelines/",
+      "https://blogs.nvidia.com/blog/what-is-retrieval-augmented-generation/"
+    ]
   },
-  "sources": ["pipeline.py"]
+  "sources": [
+    "pipeline.py"
+  ]
 }
