@@ -73,10 +73,8 @@ def main(argv: Optional[list[str]] = None) -> int:
 
 
 # Flag -> the task that builds it. A flag leaves this map when its function is on main.
-NOT_BUILT = {
-    "explain": "V2",
-    "intent": "V4",
-}
+# Every flag reserved in contract C6 is built now.
+NOT_BUILT: dict[str, str] = {}
 
 
 def _probe(args: argparse.Namespace) -> int:
@@ -84,28 +82,40 @@ def _probe(args: argparse.Namespace) -> int:
         if getattr(args, flag) not in (None, False):
             raise RuntimeError(f"--{flag.replace('_', '-')} is not built yet ({task})")
     target = load_target(args.target)
-    classify = None
-    if args.nano:
-        from loadbearing.nemotron import NemotronRouter
-
-        classify = NemotronRouter.from_env(tiers=("nano",)).classify_diff
+    explain = args.explain or args.fix or args.prove  # C6: --fix implies --explain
+    # One router, with exactly the tiers these flags use, built before any run so a
+    # missing model ID or key fails before a single credit is spent.
+    tiers = sorted(
+        ({"nano"} if args.nano else set())
+        | ({"super", "ultra"} if explain else set())
+        | ({"super"} if args.intent else set())
+        | ({"ultra"} if args.fix or args.prove else set())
+    )
     router = None
-    if args.fix or args.prove:
+    if tiers:
         from loadbearing.nemotron import NemotronRouter
 
-        router = NemotronRouter.from_env(tiers=("ultra",))  # before any run, so a missing ID costs nothing
+        router = NemotronRouter.from_env(tiers=tuple(tiers))
+    classify = router.classify_diff if args.nano else None
+    inferred = None
+    if args.intent:
+        from loadbearing.intent import infer_expects
+
+        inferred = infer_expects(target, router)  # Tavily, then Super; cached under runs/
     backend = make_backend(args.backend)
     loop = None
     try:
         # One checkpoint for the probe and every proof, so a fix is the only difference.
         pinned = Pinned(backend)
         report = probe(
-            target, pinned, classify=classify, workers=args.workers, baseline_runs=args.baseline_runs
+            target, pinned, classify=classify, workers=args.workers, baseline_runs=args.baseline_runs,
+            explain_with=router if explain else None, inferred=inferred,
         )
-        if router is not None and report.defects:
+        if (args.fix or args.prove) and report.defects:
             loop = close_loop(
                 target, backend, report, router, checkpoint=pinned.pinned, prove_fixes=args.prove,
                 classify=classify, workers=args.workers, baseline_runs=args.baseline_runs,
+                inferred=inferred,
             )
     finally:
         backend.close()
