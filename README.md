@@ -11,21 +11,21 @@ The problem statement is in [SPEC.md](SPEC.md).
 
 ## Status
 
+Built and tested offline unless it says live. Nothing has run against a live Nebius account yet.
+
 - [x] Mutation engine: destroy (template-replace), drop, nudge
-- [x] Checkpoint-and-fork engine, with the baseline run twice to prove it is deterministic
+- [x] Checkpoint-and-fork engine, timed: checkpoint, parallel wall time, and the same runs one after another
 - [x] Verdicts: silent passthrough and phantom sensitivity
-- [x] Local backend, and a toy target with two planted bugs, both caught end to end
-- [ ] Sandboxes backend run against a live account (written against the documented SDK, not yet exercised)
-- [ ] Nemotron Nano diff classification verified with real model IDs
-- [ ] Super reconciliation and Ultra explanation in the report
+- [x] Noise floor: the baseline runs `baseline_runs` times, and keys that vary on their own are set aside
+- [x] Close the loop: Ultra writes the fix, validated before use; a fresh fork of the same checkpoint proves it
+- [x] An LLM demo target: a support answerer over retrieved policy, with a planted rename bug
+- [x] Report schema 2 and a self-contained HTML report: the fork tree, the evidence, the proven fix
+- [x] Demo server with cached runs and a read-only mode; Dockerfile; CI with a probe gate and a clean-clone check
+- [x] Secrets reach forks only, never a checkpoint
+- [x] Prior art: metamorphic testing, leave-one-feature-out, input erasure
+- [ ] Sandboxes backend run against a live account (checked against the contree-sdk 0.3.6 source, not yet run)
+- [ ] Nemotron Nano, Super and Ultra verified live with real model IDs
 - [ ] Tavily inferring which fields should matter, from upstream docs
-- [ ] Noise floor: a k-run baseline marks keys that vary on their own as unstable
-- [ ] Close the loop: Ultra writes the fix, a fresh fork of the same checkpoint proves the defect gone
-- [ ] An LLM pipeline on Nemotron as the demo target
-- [ ] Prior art: metamorphic testing and input ablation
-- [x] Timing: checkpoint, parallel wall time, and the same runs summed one after another
-- [x] Versioned JSON report, and a self-contained HTML report built around the fork tree
-- [x] Demo server with cached runs and a read-only mode; Dockerfile; CI with a probe gate
 - [ ] Hosted demo deployed at a public URL
 - [ ] Demo video
 
@@ -71,6 +71,30 @@ loadbearing models          # prints the Nemotron IDs your key can call; paste t
 loadbearing probe examples/ticket_triage/target.json --nano
 ```
 
+### Find, fix, prove
+
+```bash
+loadbearing probe examples/ticket_triage/target.json --fix     # Ultra writes a fix per defect
+loadbearing probe examples/ticket_triage/target.json --prove   # ...and a fresh fork proves each one
+```
+
+With `--prove`, the probe and every proof share one checkpoint, so a fix is the only thing that
+differs. Each proof says whether the defect is gone and whether any other field gained one. A
+fix is refused before it runs if it touches a file outside the target's `sources`, no longer
+compiles, changes nothing, or rewrites most of a file. The exit code still reflects the pipeline
+as given. `--baseline-runs N` overrides the target's noise floor.
+
+### The LLM demo target
+
+```bash
+loadbearing probe examples/support_answerer/target.json --prove   # needs NEBIUS_API_KEY and NEMOTRON_NANO_MODEL
+```
+
+A support answerer over retrieved policy text. The retriever writes `passages`, the prompt reads
+`context`, so a customer 20 days into a 14-day return window is told they have 30 days for a full
+refund. The probe finds `passages` is a silent passthrough; the proven fix makes the answer 14
+days and a warranty repair.
+
 ## The report
 
 ```bash
@@ -109,8 +133,14 @@ A target is a JSON file next to the pipeline it describes.
 | `record` | The baseline input |
 | `expects.relevant` | Fields that should change the output. Never moving is a silent passthrough |
 | `expects.irrelevant` | Fields that should not. Moving is a phantom sensitivity |
+| `timeout` | Seconds a single run may take. Default 60 |
+| `baseline_runs` | How often the unmutated record runs, for the noise floor. 2 or more, default 2 |
+| `env` | Variable names passed from the host to baseline and fork runs only, never to setup |
+| `docs` | `{"query": ..., "urls": [...]}`: where Tavily looks for what the pipeline should read |
+| `sources` | Files a fix may rewrite. Default: `files` |
 
-Undeclared fields are still probed and reported, but never flagged as defects.
+Undeclared fields are still probed and reported, but never flagged as defects. Every key after
+`expects` is optional, so a target written for the first version still loads unchanged.
 
 ## How it uses Nebius and NVIDIA
 
@@ -130,16 +160,20 @@ src/loadbearing/
   probe.py           checkpoint once, fork per mutation in parallel, compare, judge
   compare.py         did the output move, and which keys
   verdict.py         silent passthrough, phantom sensitivity
+  noise.py           the noise floor: keys that vary with no mutation
   target.py          target file loader
   backends/local.py  directory snapshot, for development with no account
   backends/contree.py  Nebius Token Factory Sandboxes
   nemotron.py        Token Factory client, Nano / Super / Ultra routing
   tavily.py          Tavily search client
+  fix.py             a fix, and the checks it passes before any fork applies it
+  prove.py           re-probe a fix from the same checkpoint; the whole loop
   report.py          the versioned JSON report
   html_report.py     the self-contained HTML report and fork tree
   serve.py           the demo server
   cli.py             loadbearing probe | report | serve | models
-examples/ticket_triage/  toy pipeline with two planted bugs
+examples/ticket_triage/     toy pipeline with two planted bugs
+examples/support_answerer/  LLM pipeline on Nemotron that ignores what it retrieved
 ```
 
 ## Tests
@@ -147,6 +181,9 @@ examples/ticket_triage/  toy pipeline with two planted bugs
 ```bash
 PYTHONPATH=src python3 -m unittest discover -s tests
 ```
+
+Every test runs offline, with no key. Nemotron and Token Factory are replaced by fakes, including
+a fake Token Factory server that the LLM demo target talks to over HTTP, unmodified.
 
 ## Prior art
 
