@@ -1,0 +1,6 @@
+{
+  "defects": {
+    "destination_zone": "silent passthrough"
+  },
+  "operator": "stale key"
+}

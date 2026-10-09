@@ -1,0 +1,6 @@
+{
+  "defects": {
+    "employment": "silent passthrough"
+  },
+  "operator": "stale key"
+}

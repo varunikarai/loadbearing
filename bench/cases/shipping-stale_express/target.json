@@ -1,0 +1,19 @@
+{
+  "name": "shipping-stale_express",
+  "files": [
+    "pipeline.py"
+  ],
+  "command": "python3 pipeline.py input.json",
+  "record": "record.json",
+  "expects": {
+    "relevant": [
+      "destination_zone",
+      "weight_kg",
+      "express"
+    ],
+    "irrelevant": [
+      "order_id",
+      "created_at"
+    ]
+  }
+}
