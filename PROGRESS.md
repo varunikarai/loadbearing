@@ -13,11 +13,11 @@ Where Loadbearing is, what happens next, and what has already happened. **Now**,
 
 ## Now
 
-_Updated 2026-10-07_
+_Updated 2026-10-09_
 
-- **State:** on the local backend the whole loop runs offline: probe with a noise floor, Super and Ultra on defects, Tavily-inferred intent with checked quotes, Ultra's fix validated and proven in a fresh fork. `--baseline-runs`, `--fix` and `--prove` are wired, and the JSON report is schema 2. The RAG demo target is built and proven offline. 127 tests pass on `main`. Nothing has yet run against a live Nebius account: not the Sandboxes backend, not Token Factory, not Tavily.
-- **Next action:** Sat 2026-10-10, Varunika: before 11:00, V1 prep (credits, `pip install -e '.[sandbox]'`, `NEBIUS_API_KEY`, `NEBIUS_PROJECT_ID` and the three model IDs into `.env`); from 12:00, V1 live, `loadbearing probe examples/ticket_triage/target.json --backend sandbox --nano`, pass = the same two defects, found on Nebius; then `scripts/eval_nano.py` (pass = 18/20). Aeshvarya, any time: follow-ups 6, 7 and 9 (`--explain`, `--intent`, and leaving `passages` undeclared so Tavily has work on the demo target) in the 2026-10-07 Log.
-- **Waiting on:** Aeshvarya confirming the split in WORKPLAN.md by 2026-10-09; V1's keys for every live check.
+- **State:** on the local backend the whole loop runs offline: probe with a noise floor, Super and Ultra on defects, Tavily-inferred intent with checked quotes, Ultra's fix validated and proven in a fresh fork. Every C6 flag is wired (`--baseline-runs`, `--explain`, `--intent`, `--fix`, `--prove`), the report is schema 2, and the RAG demo target leaves `passages` undeclared so Tavily has a runtime job on it. A clean clone runs the README as written (A7), a GitHub Action runs a probe in any repo's CI (A14), and the pre-public audit is a script (V6). 149 tests pass on `main`. Nothing has yet run against a live Nebius account: not the Sandboxes backend, not Token Factory, not Tavily.
+- **Next action:** Sat 2026-10-10, Varunika: before 11:00, V1 prep (credits; `pip install -e '.[sandbox]'`; then either `contree auth` or `NEBIUS_API_KEY` and `NEBIUS_PROJECT_ID` in `.env`; the three model IDs into `.env`); from 12:00, V1 live, `loadbearing probe examples/ticket_triage/target.json --backend sandbox --nano`, pass = the same two defects, found on Nebius; then `scripts/eval_nano.py` (pass = 18/20). Aeshvarya: hand-offs 10 to 12 in the 2026-10-09 (c) Log; A13 in progress.
+- **Waiting on:** Aeshvarya confirming or countering the split in WORKPLAN.md, due 2026-10-09; V1's keys for every live check.
 - **Deadline:** 2026-10-30 10:00 PT (22:30 IST). **Target submission: 2026-10-25.**
 
 ## Plan
@@ -95,6 +95,14 @@ Problem statement: [SPEC.md](SPEC.md). Setup, target format, layout: [README.md]
 ## Log
 
 Newest first.
+
+### 2026-10-09 (c)
+- **V6's audit is one command** (Varunika, `varunika/v6-audit`): `python3 scripts/audit.py` reads every version of every file on every branch, every committed path, commit messages, identities and branch names, for key shapes, `.env` and key files, addresses that are not ours, and trailers, and ends with go or no-go. `--also WORD` checks a name that must not go public without committing it. Go on all 189 commits; 149 tests pass.
+- **Reviewed Aeshvarya's 10-08 and 10-09 work** (A7, A14, `--explain`, `--intent`, hand-off 9, the `contree auth` correction): no secrets or traces, 139 tests pass on `main`. A13's branch seen, not reviewed: still in progress.
+- **Hand-offs to Aeshvarya**, in his files:
+  10. `cli.py`: a crash exits 1, the same code as "defects found". A missing target file and a target without `command` both do, with a traceback. So `probe-gate` and the clean-clone job (`test $? -eq 1`) pass on a crash, and any CI gating on the exit code reads a crash as a defect. In `main()`, after `except RuntimeError`, catch the rest: print the traceback, return 2.
+  11. `action.yml`: the `args` input's own example is `--backend sandbox --nano`, but the install step skips the sandbox extra, so that example exits 2 asking for `pip install -e '.[sandbox]'`, which an action user cannot run. Install `"$ACTION_PATH[sandbox]"`, and show the keys as `env:` from secrets in the README's "In CI" block.
+  12. Board: A8 still says todo; the 2026-10-09 (b) Log says done.
 
 ### 2026-10-09 (b)
 - **Claimed, two new tasks (Aeshvarya), in new paths only:** A13, a benchmark of pipelines with planted input-handling bugs, reporting exact detection counts for Loadbearing and two baselines (a static check of whether each field is referenced, and Nemotron reading the code); A14, a GitHub Action that runs a probe and writes a job summary.

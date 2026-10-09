@@ -21,7 +21,7 @@ Every task below is written so either builder can pick it up cold: why it exists
 | V3 | Noise floor | tech | 3 | Sat 10-10 | done 10-07 |
 | V4 | Tavily intent inference | tech | 5 | Sat 10-17 | offline done 10-07; live run needs V1 keys, `--intent` and hand-off 9 |
 | V5 | Fix writer | tech | 4 | contract Sat 10-10, done Sat 10-17 | writer done offline 10-07; live Ultra check after V1 |
-| V6 | Pre-public audit and the public flip | tech | 2 | Sun 10-18 | history dry run clean 10-07; final audit and flip Sun 10-18 |
+| V6 | Pre-public audit and the public flip | tech | 2 | Sun 10-18 | `scripts/audit.py` built 10-09, go on all history; final run and flip Sun 10-18 |
 | V7 | Prior art and evidence | non-tech | 3 | Tue 10-20 | drafted 10-07; Varunika to open each source |
 | V8 | README narrative ✍ | non-tech | 3 | Sun 10-18 | todo |
 | V9 | Visual identity | non-tech | 4 | palette Sat 10-10, rest Tue 10-20 | todo |
@@ -236,7 +236,7 @@ Every function behind a flag must also be callable without the CLI, so it can be
 **Owns.** The audit, the go or no-go Log entry, and the flip.
 **Needs.** Everything that is going public, merged.
 **Steps.**
-1. Scan all history, not just the current files: `git log -p --all` for key patterns (`eyJ`, `tvly-`, `sk-`), any `.env`, tokens, and email addresses that are not ours.
+1. Scan all history, not just the current files: `python3 scripts/audit.py`, with `--also WORD` for each name that must not go public (typed on the command line, never committed). It reads every version of every file on every branch, every committed path, commit messages, identities and branch names, for key shapes, `.env` and key files, addresses that are not ours, and trailers, and ends with go or no-go. Built 2026-10-09.
 2. Read every tracked file for personal detail and for anything from an employer or another project.
 3. If a secret is found anywhere in history: rotate that key first, then decide on a history rewrite together before flipping.
 4. On go: `gh repo edit varunikarai/loadbearing --visibility public --accept-visibility-change-consequences`, then check the repo page logged out: the licence must show as Apache-2.0.
