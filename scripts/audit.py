@@ -218,11 +218,12 @@ def main(argv: list[str] | None = None) -> int:
         "--also", action="append", default=[], metavar="WORD",
         help="a word that must appear nowhere public, case-insensitive; repeat for more",
     )
+    parser.add_argument("--repo", type=Path, default=ROOT, help="the checkout to scan (default: this one)")
     args = parser.parse_args(argv)
-    findings, counts = audit(words=args.also)
+    findings, counts = audit(args.repo, words=args.also)
     # Not findings: the names and addresses that go public with every commit.
     # Each should be one of the builders, as they meant to appear.
-    for who, n in sorted(identities().items()):
+    for who, n in sorted(identities(args.repo).items()):
         print(f"identity, check it is meant to be public: {who} on {n} commits")
     for f in findings:
         print(f"{f.kind}: {f.where}: {f.text}")
