@@ -65,3 +65,30 @@ jobs:
       - name: The README quickstart runs as written and prints what it shows
         working-directory: /tmp/fresh
         run: /tmp/venv/bin/python .github/check_readme.py
+
+  # The action as any repository would use it: it must report the example's two
+  # defects in the job summary, and fail the job only when asked to.
+  action:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Report without failing
+        id: report
+        uses: ./
+        with:
+          target: examples/ticket_triage/target.json
+          fail-on-defects: "false"
+      - name: The defects reached the step outputs
+        env:
+          DEFECTS: ${{ steps.report.outputs.defects }}
+        run: test "$DEFECTS" = "2"
+      - name: Gate on defects
+        id: gate
+        continue-on-error: true
+        uses: ./
+        with:
+          target: examples/ticket_triage/target.json
+      - name: The gate failed the step, as it should
+        env:
+          OUTCOME: ${{ steps.gate.outcome }}
+        run: test "$OUTCOME" = "failure"
