@@ -21,7 +21,7 @@ Every task below is written so either builder can pick it up cold: why it exists
 | V3 | Noise floor | tech | 3 | Sat 10-10 | done 10-07 |
 | V4 | Tavily intent inference | tech | 5 | Sat 10-17 | offline done 10-07; live run needs V1 keys, `--intent` and hand-off 9 |
 | V5 | Fix writer | tech | 4 | contract Sat 10-10, done Sat 10-17 | writer done offline 10-07; live Ultra check after V1 |
-| V6 | Pre-public audit and the public flip | tech | 2 | Sun 10-18 | history dry run clean 10-07; final audit and flip Sun 10-18 |
+| V6 | Pre-public audit and the public flip | tech | 2 | Sun 10-18 | `scripts/audit.py` built 10-09, go on all history; final run and flip Sun 10-18 |
 | V7 | Prior art and evidence | non-tech | 3 | Tue 10-20 | drafted 10-07; Varunika to open each source |
 | V8 | README narrative ✍ | non-tech | 3 | Sun 10-18 | todo |
 | V9 | Visual identity | non-tech | 4 | palette Sat 10-10, rest Tue 10-20 | todo |
