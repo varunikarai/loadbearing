@@ -1,10 +1,11 @@
 """The hosted demo: list targets, run a probe on one, serve the report.
 
 Every run is cached as JSON and re-rendered on request, so a page view never
-costs a run. With --readonly nothing new can be run at all, which is how the
-public demo keeps paid Sandboxes credits alive through judging. One probe
-runs at a time; a second request waits for the first instead of doubling the
-bill.
+costs a run. With --readonly only free runs are allowed: a target with no keys,
+on the local backend, with no model calls. Anything that would spend credits
+(Sandboxes, Nemotron) is served as its recorded run instead, so a visitor can
+run the free targets themselves and can never spend a credit. One probe runs at
+a time; a second request waits for the first instead of doubling the bill.
 """
 
 from __future__ import annotations
@@ -27,16 +28,25 @@ from loadbearing.target import load_target
 class Demo:
     def __init__(
         self,
-        targets_dir: str | Path,
+        targets_dir: str | Path | list,
         cache_dir: str | Path,
         backend: str = "local",
         readonly: bool = False,
         classify_factory: Optional[Callable] = None,
     ) -> None:
         # Only targets found here can be named in a URL, so a path never comes from a request.
-        self.targets = {
-            p.parent.name: p for p in sorted(Path(targets_dir).glob("*/target.json"))
-        }
+        dirs = [targets_dir] if isinstance(targets_dir, (str, Path)) else list(targets_dir)
+        self.targets: dict[str, Path] = {}
+        self.groups: list[tuple[str, list[str]]] = []
+        for folder in map(Path, dirs):
+            names = []
+            for p in sorted(folder.glob("*/target.json")):
+                name = p.parent.name
+                if name in self.targets:
+                    raise ValueError(f"two targets are called {name!r}")
+                self.targets[name] = p
+                names.append(name)
+            self.groups.append((folder.name, names))
         self.cache = Path(cache_dir)
         self.cache.mkdir(parents=True, exist_ok=True)
         self.backend = backend
@@ -44,16 +54,27 @@ class Demo:
         self.classify_factory = classify_factory
         self._lock = threading.Lock()
 
+    def can_run(self, name: str) -> bool:
+        """Read-only still runs what costs nothing: local, no keys, no model calls."""
+        if not self.readonly:
+            return True
+        free = self.backend == "local" and self.classify_factory is None
+        return free and not load_target(self.targets[name]).env
+
     def cached(self, name: str) -> Optional[dict]:
-        path = self._cache_path(name)
-        if not path.is_file():
-            return None
-        try:
-            return report_json.load(path)
-        except RuntimeError:
-            return None  # an old schema is treated as never run
+        """This backend's latest run, else a recorded run from another backend."""
+        for backend in dict.fromkeys((self.backend, "sandbox", "local")):
+            path = self.cache / f"{name}.{backend}.json"
+            if path.is_file():
+                try:
+                    return report_json.load(path)
+                except RuntimeError:
+                    continue  # an old schema is treated as never run
+        return None
 
     def run(self, name: str) -> dict:
+        if not self.can_run(name):
+            raise PermissionError(name)
         with self._lock:
             target = load_target(self.targets[name])
             classify = self.classify_factory() if self.classify_factory else None
@@ -62,10 +83,7 @@ class Demo:
                 result = probe(target, backend, classify=classify)
             finally:
                 backend.close()
-            return report_json.save(result, self._cache_path(name))
-
-    def _cache_path(self, name: str) -> Path:
-        return self.cache / f"{name}.{self.backend}.json"
+            return report_json.save(result, self.cache / f"{name}.{self.backend}.json")
 
 
 def make_handler(demo: Demo) -> type[BaseHTTPRequestHandler]:
@@ -87,17 +105,19 @@ def make_handler(demo: Demo) -> type[BaseHTTPRequestHandler]:
                     return self._send(HTTPStatus.NOT_FOUND, '{"error": "not run yet"}', "application/json")
                 return self._send(HTTPStatus.OK, json.dumps(data, indent=2), "application/json")
             if data is None:
-                return self._send(HTTPStatus.OK, _not_run(name, demo.readonly))
+                return self._send(HTTPStatus.OK, _not_run(name, not demo.can_run(name)))
             return self._send(HTTPStatus.OK, render_html(data))
 
         def do_POST(self) -> None:
             name, kind = _route(self.path.rstrip("/"))
             if kind != "run" or name not in demo.targets:
                 return self._send(HTTPStatus.NOT_FOUND, _page("Not found", "<p>No such target.</p>"))
-            if demo.readonly:
+            if not demo.can_run(name):
                 return self._send(
                     HTTPStatus.FORBIDDEN,
-                    _page("Read only", "<p>This demo serves recorded runs only.</p>"),
+                    _page("Recorded run only", "<p>This target calls paid services (Nebius Sandboxes "
+                          "or Nemotron), so this demo shows its recorded run. The free targets can be "
+                          "run from the index.</p>"),
                 )
             try:
                 demo.run(name)
@@ -124,8 +144,14 @@ def make_handler(demo: Demo) -> type[BaseHTTPRequestHandler]:
     return Handler
 
 
+class _Server(ThreadingHTTPServer):
+    # The default listen backlog is 5; a few visitors at once would see refused connections.
+    request_queue_size = 64
+    daemon_threads = True
+
+
 def serve(demo: Demo, host: str = "127.0.0.1", port: int = 8000) -> ThreadingHTTPServer:
-    return ThreadingHTTPServer((host, port), make_handler(demo))
+    return _Server((host, port), make_handler(demo))
 
 
 def _route(path: str) -> tuple[str, str]:
@@ -141,24 +167,31 @@ def _route(path: str) -> tuple[str, str]:
 
 
 def _index(demo: Demo) -> str:
-    rows = []
-    for name in demo.targets:
-        data = demo.cached(name)
-        if data is None:
-            status = '<span class="badge plain">not run yet</span>'
-        elif data["defects"]:
-            n = len(data["defects"])
-            status = f'<span class="badge silent">{n} defect{"s" if n != 1 else ""}</span>'
-        else:
-            status = '<span class="badge plain">clean</span>'
-        rows.append(
-            f'<tr><td class="f"><a href="/t/{escape(name)}">{escape(name)}</a></td>'
-            f"<td>{status}</td><td>{_run_button(name, demo.readonly)}</td></tr>"
-        )
+    sections = []
+    for label, names in demo.groups:
+        rows = []
+        for name in names:
+            data = demo.cached(name)
+            if data is None:
+                status = '<span class="badge plain">not run yet</span>'
+            elif data["defects"]:
+                n = len(data["defects"])
+                status = f'<span class="badge silent">{n} defect{"s" if n != 1 else ""}</span>'
+            else:
+                status = '<span class="badge plain">clean</span>'
+            where = f' <span class="badge plain">recorded on {escape(data["backend"])}</span>' if (
+                data and data["backend"] != demo.backend) else ""
+            button = _run_button(name, not demo.can_run(name))
+            rows.append(
+                f'<tr><td class="f"><a href="/t/{escape(name)}">{escape(name)}</a></td>'
+                f"<td>{status}{where}</td><td>{button}</td></tr>"
+            )
+        sections.append(f"<h2>{escape(label)} ({len(names)})</h2>"
+                        f'<div class="panel"><table><tbody>{"".join(rows)}</tbody></table></div>')
     body = (
         '<p class="lede">Pick a pipeline. Loadbearing checkpoints it once, forks it once per '
         "mutated input, runs every fork in parallel, and tells you which inputs it really reads.</p>"
-        f'<div class="panel"><table><tbody>{"".join(rows)}</tbody></table></div>'
+        + "".join(sections)
     )
     return _page("Loadbearing", body)
 

@@ -48,7 +48,8 @@ def main(argv: Optional[list[str]] = None) -> int:
     r.add_argument("-o", "--output", metavar="FILE", help="where to write it (default: next to the report)")
 
     s = sub.add_parser("serve", help="the demo: list targets, run probes, serve the reports")
-    s.add_argument("--targets", default="examples", help="directory of <name>/target.json")
+    s.add_argument("--targets", action="append", metavar="DIR",
+                   help="directory of <name>/target.json; repeat for more (default: examples)")
     s.add_argument("--cache", default="runs", help="where finished runs are kept")
     s.add_argument("--backend", choices=("local", "sandbox"), default="local")
     s.add_argument("--nano", action="store_true", help="have Nemotron Nano judge each moved diff")
@@ -168,9 +169,9 @@ def _serve(args: argparse.Namespace) -> int:
         from loadbearing.nemotron import NemotronRouter
 
         classify_factory = lambda: NemotronRouter.from_env(tiers=("nano",)).classify_diff  # noqa: E731
-    demo = Demo(args.targets, args.cache, args.backend, args.readonly, classify_factory)
+    demo = Demo(args.targets or ["examples"], args.cache, args.backend, args.readonly, classify_factory)
     server = serve(demo, args.host, args.port)
-    mode = "read only" if args.readonly else f"runs on {args.backend}"
+    mode = "free runs only, paid runs recorded" if args.readonly else f"runs on {args.backend}"
     print(f"loadbearing: {len(demo.targets)} target(s), {mode}, http://{args.host}:{server.server_address[1]}", flush=True)
     try:
         server.serve_forever()
