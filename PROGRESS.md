@@ -13,10 +13,10 @@ Where Loadbearing is, what happens next, and what has already happened. **Now**,
 
 ## Now
 
-_Updated 2026-10-09_
+_Updated 2026-10-10_
 
-- **State:** on the local backend the whole loop runs offline: probe with a noise floor, Super and Ultra on defects, Tavily-inferred intent with checked quotes, Ultra's fix validated and proven in a fresh fork. Every C6 flag is wired (`--baseline-runs`, `--explain`, `--intent`, `--fix`, `--prove`), the report is schema 2, and the RAG demo target leaves `passages` undeclared so Tavily has a runtime job on it. A clean clone runs the README as written (A7), a GitHub Action runs a probe in any repo's CI (A14), and the pre-public audit is a script (V6). 149 tests pass on `main`. Nothing has yet run against a live Nebius account: not the Sandboxes backend, not Token Factory, not Tavily.
-- **Next action:** Sat 2026-10-10, Varunika: before 11:00, V1 prep (credits; `pip install -e '.[sandbox]'`; then either `contree auth` or `NEBIUS_API_KEY` and `NEBIUS_PROJECT_ID` in `.env`; the three model IDs into `.env`); from 12:00, V1 live, `loadbearing probe examples/ticket_triage/target.json --backend sandbox --nano`, pass = the same two defects, found on Nebius; then `scripts/eval_nano.py` (pass = 18/20). Aeshvarya: hand-offs 10 to 12 in the 2026-10-09 (c) Log; A13 in progress.
+- **State:** on the local backend the whole loop runs offline: probe with a noise floor, Super and Ultra on defects, Tavily-inferred intent with checked quotes, Ultra's fix validated and proven in a fresh fork. Every C6 flag is wired (`--baseline-runs`, `--explain`, `--intent`, `--fix`, `--prove`), the report is schema 2, and the RAG demo target leaves `passages` undeclared so Tavily has a runtime job on it. A clean clone runs the README as written (A7), a GitHub Action runs a probe in any repo's CI (A14), the pre-public audit is a script (V6), and a 54-case benchmark scores the probe against a static check (A13). 154 tests pass on `main`. Nothing has yet run against a live Nebius account: not the Sandboxes backend, not Token Factory, not Tavily.
+- **Next action:** Sat 2026-10-10, Varunika: before 11:00, V1 prep (credits; `pip install -e '.[sandbox]'`; then either `contree auth` or `NEBIUS_API_KEY` and `NEBIUS_PROJECT_ID` in `.env`; the three model IDs into `.env`); from 12:00, V1 live, `loadbearing probe examples/ticket_triage/target.json --backend sandbox --nano`, pass = the same two defects, found on Nebius; then `scripts/eval_nano.py` (pass = 18/20). Aeshvarya: hand-off 13 in the 2026-10-10 Log; own credits, then the live A3 run and `bench/run.py --llm`; A6 host.
 - **Waiting on:** Aeshvarya confirming or countering the split in WORKPLAN.md, due 2026-10-09; V1's keys for every live check.
 - **Deadline:** 2026-10-30 10:00 PT (22:30 IST). **Target submission: 2026-10-25.**
 
@@ -95,6 +95,11 @@ Problem statement: [SPEC.md](SPEC.md). Setup, target format, layout: [README.md]
 ## Log
 
 Newest first.
+
+### 2026-10-10
+- **Hand-offs 10 to 12 checked on `main`** (Varunika): a crash exits 2 with its traceback, the action installs the sandbox extra, A8 is done. 154 tests pass; audit go on 201 commits.
+- **A13 reproduced** (Varunika): `bench/generate.py` rebuilds every case byte for byte and `bench/run.py` gives the same calls (48 of 49 with 3 false alarms; static 35 with 22); only the seconds differ. p = 1.86e-07 and the precision and recall figures recomputed by hand: all match.
+- **Hand-off 13 to Aeshvarya**, `README.md` and `bench/README.md`: the field-level McNemar treats the 266 fields as independent, and they are not. Of the 36 fields only the probe gets right, 22 come from one design choice (two pipelines log their id to stderr, repeated over 11 cases each) and 12 from the overwritten operator. Add the case level (the probe is fully right on 50 of 54 cases, the static check on 26; exact McNemar on cases, p = 1.9e-05), and say under "What this does and does not show" that the p-values describe these generated cases and that two mechanisms produce most of the gap. The result stands either way; a judge who checks should find that we said it first.
 
 ### 2026-10-09 (d)
 - **A13 offline** (Aeshvarya, `bench/`): 54 generated pipelines, 266 declared fields, 49 planted defects. The probe finds 48 with 3 false alarms; a static check of whether each field is named in the code finds 35 with 22; paired, p = 1.9e-07 (exact McNemar). The probe's errors are the two limit cases built to find them and one cascade, all listed. A test pins the cases and the probe's calls. The Nemotron-reads-the-code baseline (`bench/run.py --llm`) runs once there is a key.
