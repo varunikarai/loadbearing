@@ -70,11 +70,42 @@ class DemoServerTests(unittest.TestCase):
         _, index = self.get(base + "/")
         self.assertIn("2 defects", index)
 
-    def test_readonly_refuses_to_run(self):
+    def test_readonly_still_runs_free_targets(self):
         base = self.start(readonly=True)
         status, _ = self.post(base + "/t/ticket_triage/run")
+        self.assertEqual(status, 303)
+        self.assertIn("2 defects", self.get(base + "/")[1])
+
+    def test_readonly_refuses_a_target_that_needs_keys(self):
+        base = self.start(readonly=True)
+        status, _ = self.post(base + "/t/support_answerer/run")
         self.assertEqual(status, 403)
-        self.assertNotIn("Run probe", self.get(base + "/")[1])
+
+    def test_a_recorded_run_from_another_backend_is_served(self):
+        import json as _json
+        from loadbearing import report as report_json
+        from loadbearing.backends.local import LocalBackend
+        from loadbearing.probe import probe
+        from loadbearing.target import load_target
+
+        backend = LocalBackend()
+        try:
+            data = report_json.to_dict(probe(load_target(EXAMPLES / "ticket_triage" / "target.json"), backend))
+        finally:
+            backend.close()
+        data["backend"] = "sandbox"
+        Path(self._tmp.name, "support_answerer.sandbox.json").write_text(_json.dumps(data))
+        base = self.start(readonly=True)
+        status, body = self.get(base + "/t/support_answerer")
+        self.assertEqual(status, 200)
+        self.assertIn("Backend: sandbox", body)
+        self.assertIn("recorded on sandbox", self.get(base + "/")[1])
+
+    def test_several_target_folders_are_listed_in_sections(self):
+        demo = Demo([EXAMPLES, EXAMPLES.parent / "bench" / "cases"], self._tmp.name, readonly=True)
+        self.assertIn("loan-typo_annual_income", demo.targets)
+        self.assertEqual([label for label, _ in demo.groups], ["examples", "cases"])
+        self.assertTrue(demo.can_run("loan-typo_annual_income"))
 
     def test_only_known_targets_can_be_named(self):
         base = self.start()

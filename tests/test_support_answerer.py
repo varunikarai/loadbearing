@@ -59,10 +59,16 @@ class FakeTokenFactory(BaseHTTPRequestHandler):
         pass
 
 
+class Server(ThreadingHTTPServer):
+    # The probe fires a dozen runs at once; the default listen backlog of 5 refuses some.
+    request_queue_size = 64
+    daemon_threads = True
+
+
 class SupportAnswererTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.server = ThreadingHTTPServer(("127.0.0.1", 0), FakeTokenFactory)
+        cls.server = Server(("127.0.0.1", 0), FakeTokenFactory)
         threading.Thread(target=cls.server.serve_forever, daemon=True).start()
         cls._env = dict(os.environ)
         os.environ.update({
