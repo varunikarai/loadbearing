@@ -35,7 +35,7 @@ Every task below is written so either builder can pick it up cold: why it exists
 | A5 | Report and UI v2 | tech | 5 | Sat 10-17 | schema 2 and panels done 10-07; palette and logo wait on V9 |
 | A6 | Hosted demo | tech | 4 | live Sun 10-11, final Sat 10-17 | todo |
 | A7 | CI and clean-clone check | tech | 2 | Sun 10-18 | done 10-08 |
-| A8 | Field scan | non-tech | 2 | Tue 10-13 | todo |
+| A8 | Field scan | non-tech | 2 | Tue 10-13 | done 10-09 |
 | A9 | Video production | non-tech | 5 | uploaded Wed 10-21 | todo |
 | A10 | Devpost page ✍ | non-tech | 3 | draft Tue 10-20, final Fri 10-23 | todo |
 | A11 | Feedback: Token Factory and Nemotron ✍ | non-tech | 1.5 | Fri 10-23 | todo |

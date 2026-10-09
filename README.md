@@ -114,6 +114,19 @@ The job fails when a probe finds a defect, and the run page shows the verdict ta
 defect, and any proven fix as a job summary. `fail-on-defects: "false"` reports without
 failing; the `defects` output carries the count.
 
+On Nebius, with Nemotron judging each diff, pass the keys from repository secrets:
+
+```yaml
+- uses: varunikarai/loadbearing@main
+  with:
+    target: path/to/target.json
+    args: --backend sandbox --nano
+  env:
+    NEBIUS_API_KEY: ${{ secrets.NEBIUS_API_KEY }}
+    NEBIUS_PROJECT_ID: ${{ secrets.NEBIUS_PROJECT_ID }}
+    NEMOTRON_NANO_MODEL: ${{ vars.NEMOTRON_NANO_MODEL }}
+```
+
 ## The report
 
 ```bash

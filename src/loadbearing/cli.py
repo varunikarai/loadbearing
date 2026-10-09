@@ -6,6 +6,7 @@ import argparse
 import json
 import os
 import sys
+import traceback
 from pathlib import Path
 from typing import Optional
 
@@ -70,6 +71,11 @@ def main(argv: Optional[list[str]] = None) -> int:
         return _probe(args)
     except RuntimeError as exc:
         print(f"loadbearing: {exc}", file=sys.stderr)
+        return 2
+    except Exception:
+        # Exit 1 means "defects found", and CI gates on it. A crash must never read as
+        # a finding, so anything unexpected exits 2, with the traceback to debug it.
+        traceback.print_exc()
         return 2
 
 

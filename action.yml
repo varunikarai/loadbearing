@@ -35,7 +35,8 @@ runs:
       shell: bash
       env:
         ACTION_PATH: ${{ github.action_path }}
-      run: python -m pip install --quiet "$ACTION_PATH"
+      # With the sandbox extra, so --backend sandbox works from the action as documented.
+      run: python -m pip install --quiet "${ACTION_PATH}[sandbox]"
     - name: Probe
       id: probe
       shell: bash
