@@ -33,6 +33,12 @@ KEY_SHAPES = {
     ),
 }
 
+# Made-up values that look like keys on purpose. Each is listed with where it
+# lives, so a reviewer can check it is still a fake and not a real key.
+KNOWN_FAKES = {
+    "lb-secret-value-6f1c": "tests/test_secrets.py, the A2 test's stand-in secret",
+}
+
 
 @dataclass(frozen=True)
 class Finding:
@@ -85,7 +91,7 @@ def scan_keys(versions: dict[str, str], contents: dict[str, str]) -> list[Findin
         for line in contents[sha].splitlines():
             for kind, shape in KEY_SHAPES.items():
                 match = shape.search(line)
-                if match:
+                if match and not any(fake in line for fake in KNOWN_FAKES):
                     found.add(Finding(kind, f"{path} ({sha[:7]})", match.group(0)[:24] + "..."))
     return sorted(found, key=lambda f: (f.where, f.kind))
 
