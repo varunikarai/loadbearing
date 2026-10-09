@@ -114,16 +114,50 @@ def scan_paths(paths: set[str]) -> list[Finding]:
     )
 
 
+EMAIL = re.compile(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}")
+EXAMPLE_DOMAINS = {"example.com", "example.org", "example.net"}
+
+
+def identities(repo: Path = ROOT) -> dict[str, int]:
+    """Every author and committer on any ref, with how many commits carry it."""
+    out = git("log", "--all", "--format=%an <%ae>%x00%cn <%ce>", repo=repo).decode()
+    counts: dict[str, int] = {}
+    for line in out.splitlines():
+        for who in set(line.split("\0")):  # once per commit, even when author and committer match
+            counts[who] = counts.get(who, 0) + 1
+    return counts
+
+
+def scan_emails(versions: dict[str, str], contents: dict[str, str], ours: set[str]) -> list[Finding]:
+    """Addresses in any file version that are neither a commit identity nor an example domain."""
+    found = set()
+    for sha, path in versions.items():
+        for address in EMAIL.findall(contents[sha]):
+            domain = address.rsplit("@", 1)[1].lower()
+            if address.lower() not in ours and domain not in EXAMPLE_DOMAINS:
+                found.add(Finding("email address", f"{path} ({sha[:7]})", address))
+    return sorted(found)
+
+
 def audit(repo: Path = ROOT) -> tuple[list[Finding], dict[str, int]]:
     versions = file_versions(repo)
     contents = read_blobs(list(versions), repo)
-    findings = scan_keys(versions, contents) + scan_paths(every_path(repo))
+    ours = {who.rsplit("<", 1)[1].rstrip(">").lower() for who in identities(repo)}
+    findings = (
+        scan_keys(versions, contents)
+        + scan_paths(every_path(repo))
+        + scan_emails(versions, contents, ours)
+    )
     commits = len(git("rev-list", "--all", repo=repo).decode().split())
     return findings, {"commits": commits, "file versions": len(versions)}
 
 
 def main() -> int:
     findings, counts = audit()
+    # Not findings: the names and addresses that go public with every commit.
+    # Each should be one of the builders, as they meant to appear.
+    for who, n in sorted(identities().items()):
+        print(f"identity, check it is meant to be public: {who} on {n} commits")
     for f in findings:
         print(f"{f.kind}: {f.where}: {f.text}")
     scanned = ", ".join(f"{n} {what}" for what, n in counts.items())
