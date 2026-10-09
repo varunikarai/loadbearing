@@ -99,6 +99,19 @@ reads NVIDIA's own RAG guides, Super quotes the line saying the model answers fr
 data, and that observation becomes a cited silent passthrough. The proven fix makes the answer 14
 days and a warranty repair.
 
+## In CI
+
+```yaml
+- uses: actions/checkout@v4
+- uses: varunikarai/loadbearing@main
+  with:
+    target: path/to/target.json      # args: "--baseline-runs 5" for an LLM pipeline
+```
+
+The job fails when a probe finds a defect, and the run page shows the verdict table, each
+defect, and any proven fix as a job summary. `fail-on-defects: "false"` reports without
+failing; the `defects` output carries the count.
+
 ## The report
 
 ```bash
@@ -174,6 +187,7 @@ src/loadbearing/
   prove.py           re-probe a fix from the same checkpoint; the whole loop
   report.py          the versioned JSON report
   html_report.py     the self-contained HTML report and fork tree
+  markdown_report.py the Markdown summary for CI job summaries
   serve.py           the demo server
   cli.py             loadbearing probe | report | serve | models
 examples/ticket_triage/     toy pipeline with two planted bugs

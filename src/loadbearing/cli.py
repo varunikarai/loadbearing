@@ -34,6 +34,7 @@ def main(argv: Optional[list[str]] = None) -> int:
     p.add_argument("--json", action="store_true", help="print the full report as JSON")
     p.add_argument("--out", metavar="FILE", help="also save the full report as JSON")
     p.add_argument("--html", metavar="FILE", help="also save the report as a self-contained web page")
+    p.add_argument("--markdown", metavar="FILE", help="also append a Markdown summary (e.g. $GITHUB_STEP_SUMMARY)")
     # Contract C6: reserved now, wired as each function lands on main.
     p.add_argument("--baseline-runs", type=int, metavar="N", help="override the target's baseline_runs")
     p.add_argument("--explain", action="store_true", help="Super reconciliation and Ultra explanation per field")
@@ -125,6 +126,11 @@ def _probe(args: argparse.Namespace) -> int:
         Path(args.out).write_text(json.dumps(data, indent=2))
     if args.html:
         _write_html(data, args.html)
+    if args.markdown:
+        from loadbearing.markdown_report import render_markdown
+
+        with open(args.markdown, "a") as fh:  # append: a job summary may hold several probes
+            fh.write(render_markdown(data) + "\n")
     if args.json:
         print(json.dumps(data, indent=2))
     else:
