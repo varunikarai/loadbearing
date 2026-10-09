@@ -38,7 +38,10 @@ class Demo:
         dirs = [targets_dir] if isinstance(targets_dir, (str, Path)) else list(targets_dir)
         self.targets: dict[str, Path] = {}
         self.groups: list[tuple[str, list[str]]] = []
-        for folder in map(Path, dirs):
+        for given in dirs:
+            folder = Path(given)
+            # A relative path reads well as a heading ("bench/cases"); an absolute one does not.
+            label = str(given) if not folder.is_absolute() else folder.name
             names = []
             for p in sorted(folder.glob("*/target.json")):
                 name = p.parent.name
@@ -46,7 +49,7 @@ class Demo:
                     raise ValueError(f"two targets are called {name!r}")
                 self.targets[name] = p
                 names.append(name)
-            self.groups.append((folder.name, names))
+            self.groups.append((label, names))
         self.cache = Path(cache_dir)
         self.cache.mkdir(parents=True, exist_ok=True)
         self.backend = backend
