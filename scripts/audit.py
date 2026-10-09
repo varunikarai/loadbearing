@@ -139,6 +139,32 @@ def scan_emails(versions: dict[str, str], contents: dict[str, str], ours: set[st
     return sorted(found)
 
 
+# Git trailers such as "Signed-off-by:" add a name the commit's author did not
+# choose to publish. The rule here is that each person commits only as themselves.
+TRAILER = re.compile(r"^[A-Z][A-Za-z]*(?:-[A-Za-z]+)*-by:\s", re.M)
+
+
+def messages(repo: Path = ROOT) -> dict[str, str]:
+    """Every commit message on any ref, keyed by commit."""
+    out = git("log", "--all", "--format=%H%x00%B%x01", repo=repo).decode("utf-8", errors="replace")
+    return dict(
+        entry.strip("\n").split("\0", 1) for entry in out.split("\x01") if entry.strip()
+    )
+
+
+def scan_messages(by_commit: dict[str, str]) -> list[Finding]:
+    found = set()
+    for sha, text in by_commit.items():
+        for line in text.splitlines():
+            if TRAILER.match(line):
+                found.add(Finding("trailer in a commit message", f"commit {sha[:7]}", line.strip()))
+            for kind, shape in KEY_SHAPES.items():
+                match = shape.search(line)
+                if match:
+                    found.add(Finding(kind, f"commit {sha[:7]} message", match.group(0)[:24] + "..."))
+    return sorted(found)
+
+
 def audit(repo: Path = ROOT) -> tuple[list[Finding], dict[str, int]]:
     versions = file_versions(repo)
     contents = read_blobs(list(versions), repo)
@@ -147,6 +173,7 @@ def audit(repo: Path = ROOT) -> tuple[list[Finding], dict[str, int]]:
         scan_keys(versions, contents)
         + scan_paths(every_path(repo))
         + scan_emails(versions, contents, ours)
+        + scan_messages(messages(repo))
     )
     commits = len(git("rev-list", "--all", repo=repo).decode().split())
     return findings, {"commits": commits, "file versions": len(versions)}
