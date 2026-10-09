@@ -16,7 +16,7 @@ Where Loadbearing is, what happens next, and what has already happened. **Now**,
 _Updated 2026-10-10_
 
 - **State:** on the local backend the whole loop runs offline: probe with a noise floor, Super and Ultra on defects, Tavily-inferred intent with checked quotes, Ultra's fix validated and proven in a fresh fork. Every C6 flag is wired (`--baseline-runs`, `--explain`, `--intent`, `--fix`, `--prove`), the report is schema 2, and the RAG demo target leaves `passages` undeclared so Tavily has a runtime job on it. A clean clone runs the README as written (A7), a GitHub Action runs a probe in any repo's CI (A14), the pre-public audit is a script (V6), and a 54-case benchmark scores the probe against a static check (A13). 154 tests pass on `main`. Nothing has yet run against a live Nebius account: not the Sandboxes backend, not Token Factory, not Tavily.
-- **Next action:** Sat 2026-10-10, Varunika: before 11:00, V1 prep (credits; `pip install -e '.[sandbox]'`; then either `contree auth` or `NEBIUS_API_KEY` and `NEBIUS_PROJECT_ID` in `.env`; the three model IDs into `.env`); from 12:00, V1 live, `loadbearing probe examples/ticket_triage/target.json --backend sandbox --nano`, pass = the same two defects, found on Nebius; then `scripts/eval_nano.py` (pass = 18/20). Aeshvarya: hand-off 13 in the 2026-10-10 Log; own credits, then the live A3 run and `bench/run.py --llm`; A6 host.
+- **Next action:** Sat 2026-10-10, Varunika: before 11:00, V1 prep (credits; `pip install -e '.[sandbox]'`; then either `contree auth` or `NEBIUS_API_KEY` and `NEBIUS_PROJECT_ID` in `.env`; the three model IDs into `.env`); from 12:00, V1 live, `loadbearing probe examples/ticket_triage/target.json --backend sandbox --nano`, pass = the same two defects, found on Nebius; then `scripts/eval_nano.py` (pass = 18/20). Aeshvarya: hand-offs 13 and 14 in the 2026-10-10 Log; own credits, then the live A3 run and `bench/run.py --llm`; A6 host. Both: the three gaps in the 2026-10-10 (b) V12 dry run.
 - **Waiting on:** Aeshvarya confirming or countering the split in WORKPLAN.md, due 2026-10-09; V1's keys for every live check.
 - **Deadline:** 2026-10-30 10:00 PT (22:30 IST). **Target submission: 2026-10-25.**
 
@@ -95,6 +95,14 @@ Problem statement: [SPEC.md](SPEC.md). Setup, target format, layout: [README.md]
 ## Log
 
 Newest first.
+
+### 2026-10-10 (b)
+- **V12 dry run** (Varunika, early; the two scored reviews stay on 10-20 and 10-23). Scored against the rules' own wording as if submitted today, out of 10: **Technological Implementation 4** (well built: 154 tests, CI, a reproducible benchmark; but the criterion asks how effectively it *uses* Token Factory and Nemotron, and nothing has run live), **Design 4** ("a complete, coherent product experience": the CLI, report and Action exist, but there is no URL to open, no identity, no video), **Potential Impact 5** (real cases with sources, but "based on what's demonstrated" the demo target has only met a fake Token Factory, and the README never names who it is for), **Quality of the Idea 7** (checkpoint-and-fork as an ablation primitive, rules decide defects so no model can invent one, intent drawn from cited sources, honest limits). Stage One would fail today on schedule alone: private repo, no demo URL, no video, no live call.
+- **Top three gaps, each with an owner:**
+  1. **Nothing live.** Moves Technological Implementation, Potential Impact, Stage One and the Tavily prize at once. Varunika, V1 today; then Aeshvarya, A3 live.
+  2. **No product a judge can touch.** The rules require "a working Project for judging and testing... without any restriction", and the demo as planned runs `--readonly`, so a judge could not run anything. Aeshvarya, A6 (hand-off 14); Varunika, V9.
+  3. **The README does not yet answer the rules' question:** "highlight how you've used NVIDIA Nemotron... and where Token Factory accelerated your workflow". The table at line 177 says what each model does, not what it bought. It needs V1's numbers (one checkpoint instead of N setups, parallel speedup, Nano's cost per fork) and should sit near the top, with the audience named. Varunika, V8 after V1.
+- **Hand-off 14 to Aeshvarya**, `serve.py` (A6), a proposal: let anyone run the targets that cost nothing (the toy target and the benchmark cases on the local backend), and serve the Sandboxes and Nemotron runs as recorded; keep only paid runs read-only. Judges can then press run and see it work, and the credits stay safe.
 
 ### 2026-10-10
 - **Hand-offs 10 to 12 checked on `main`** (Varunika): a crash exits 2 with its traceback, the action installs the sandbox extra, A8 is done. 154 tests pass; audit go on 201 commits.
