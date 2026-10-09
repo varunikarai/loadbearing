@@ -96,6 +96,14 @@ Problem statement: [SPEC.md](SPEC.md). Setup, target format, layout: [README.md]
 
 Newest first.
 
+### 2026-10-09 (c)
+- **V6's audit is one command** (Varunika, `varunika/v6-audit`): `python3 scripts/audit.py` reads every version of every file on every branch, every committed path, commit messages, identities and branch names, for key shapes, `.env` and key files, addresses that are not ours, and trailers, and ends with go or no-go. `--also WORD` checks a name that must not go public without committing it. Go on all 189 commits; 149 tests pass.
+- **Reviewed Aeshvarya's 10-08 and 10-09 work** (A7, A14, `--explain`, `--intent`, hand-off 9, the `contree auth` correction): no secrets or traces, 139 tests pass on `main`. A13's branch seen, not reviewed: still in progress.
+- **Hand-offs to Aeshvarya**, in his files:
+  10. `cli.py`: a crash exits 1, the same code as "defects found". A missing target file and a target without `command` both do, with a traceback. So `probe-gate` and the clean-clone job (`test $? -eq 1`) pass on a crash, and any CI gating on the exit code reads a crash as a defect. In `main()`, after `except RuntimeError`, catch the rest: print the traceback, return 2.
+  11. `action.yml`: the `args` input's own example is `--backend sandbox --nano`, but the install step skips the sandbox extra, so that example exits 2 asking for `pip install -e '.[sandbox]'`, which an action user cannot run. Install `"$ACTION_PATH[sandbox]"`, and show the keys as `env:` from secrets in the README's "In CI" block.
+  12. Board: A8 still says todo; the 2026-10-09 (b) Log says done.
+
 ### 2026-10-09 (b)
 - **Claimed, two new tasks (Aeshvarya), in new paths only:** A13, a benchmark of pipelines with planted input-handling bugs, reporting exact detection counts for Loadbearing and two baselines (a static check of whether each field is referenced, and Nemotron reading the code); A14, a GitHub Action that runs a probe and writes a job summary.
 - A8 done; the notes are kept outside the repo.
