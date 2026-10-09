@@ -16,9 +16,15 @@ By defect class:
 | Static name check (reads it) | silent passthrough | 22 | 14 | 0 |
 | Static name check (reads it) | phantom sensitivity | 13 | 0 | 22 |
 
-Paired on every field (exact McNemar test):
+Whole cases right (every declared field called correctly):
 
-- Loadbearing (runs it) right where Static name check (reads it) was wrong: **36** fields; the reverse: **4**; p = 1.9e-07.
+- Loadbearing (runs it): **50** of 54
+- Static name check (reads it): **26** of 54
+
+Paired, exact McNemar test. One unit per case is the conservative test, since fields within a case are not independent:
+
+- per case: Loadbearing (runs it) right where Static name check (reads it) was wrong **28** times, the reverse **4**; p = 1.9e-05.
+- per field: **36** against **4**; p = 1.9e-07. Treats the fields as independent, so it overstates the evidence; see the README.
 
 Every case, and what each detector called:
 

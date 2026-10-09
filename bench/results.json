@@ -316,11 +316,22 @@
     }
   },
   "cases": 54,
+  "cases_right": {
+    "Loadbearing (runs it)": 50,
+    "Static name check (reads it)": 26
+  },
   "mcnemar": {
     "Static name check (reads it)": [
       36,
       4,
       1.8570244719740003e-07
+    ]
+  },
+  "mcnemar_cases": {
+    "Static name check (reads it)": [
+      28,
+      4,
+      1.9301194697618484e-05
     ]
   },
   "scores": {
@@ -372,7 +383,7 @@
     }
   },
   "seconds": {
-    "Loadbearing (runs it)": 3.8821897910675034,
-    "Static name check (reads it)": 0.0027216250309720635
+    "Loadbearing (runs it)": 3.9307248749537393,
+    "Static name check (reads it)": 0.002797790919430554
   }
 }
