@@ -33,13 +33,13 @@ Every task below is written so either builder can pick it up cold: why it exists
 | A3 | LLM demo target | tech | 6 | shortlist Fri 10-09, done Sat 10-17 | built and proven offline 10-07 (fake Token Factory); live run waits on V1 and my key |
 | A4 | Fix and prove | tech | 5 | toy Tue 10-13, done Sat 10-17 | toy and CLI done 10-07; LLM target on Sandboxes waits on V1 and A3 |
 | A5 | Report and UI v2 | tech | 5 | Sat 10-17 | schema 2 and panels done 10-07; palette and logo wait on V9 |
-| A6 | Hosted demo | tech | 4 | live Sun 10-11, final Sat 10-17 | todo |
+| A6 | Hosted demo | tech | 4 | live Sun 10-11, final Sat 10-17 | deploy-ready 10-10 (Dockerfile, render.yaml, keep-warm); live once the host account exists |
 | A7 | CI and clean-clone check | tech | 2 | Sun 10-18 | done 10-08 |
 | A8 | Field scan | non-tech | 2 | Tue 10-13 | done 10-09 |
-| A9 | Video production | non-tech | 5 | uploaded Wed 10-21 | todo |
+| A9 | Video production | non-tech | 5 | uploaded Wed 10-21 | storyboard drafted 10-10, kept outside the repo; recording after the live run |
 | A10 | Devpost page ✍ | non-tech | 3 | draft Tue 10-20, final Fri 10-23 | todo |
 | A11 | Feedback: Token Factory and Nemotron ✍ | non-tech | 1.5 | Fri 10-23 | todo |
-| A12 | Compliance and submission | non-tech | 2 | checklist Tue 10-20, submit Sun 10-25 | todo |
+| A12 | Compliance and submission | non-tech | 2 | checklist Tue 10-20, submit Sun 10-25 | checklist drafted 10-10, kept outside the repo |
 | A13 | Benchmark: detection on planted bugs against two baselines | tech | 4 | Sat 10-17 | offline done 10-09; Nemotron baseline waits on keys |
 | A14 | GitHub Action: run a probe in any repo's CI | tech | 2 | Tue 10-13 | done 10-09 |
 
