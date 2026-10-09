@@ -236,7 +236,7 @@ Every function behind a flag must also be callable without the CLI, so it can be
 **Owns.** The audit, the go or no-go Log entry, and the flip.
 **Needs.** Everything that is going public, merged.
 **Steps.**
-1. Scan all history, not just the current files: `git log -p --all` for key patterns (`eyJ`, `tvly-`, `sk-`), any `.env`, tokens, and email addresses that are not ours.
+1. Scan all history, not just the current files: `python3 scripts/audit.py`, with `--also WORD` for each name that must not go public (typed on the command line, never committed). It reads every version of every file on every branch, every committed path, commit messages, identities and branch names, for key shapes, `.env` and key files, addresses that are not ours, and trailers, and ends with go or no-go. Built 2026-10-09.
 2. Read every tracked file for personal detail and for anything from an employer or another project.
 3. If a secret is found anywhere in history: rotate that key first, then decide on a history rewrite together before flipping.
 4. On go: `gh repo edit varunikarai/loadbearing --visibility public --accept-visibility-change-consequences`, then check the repo page logged out: the licence must show as Apache-2.0.
