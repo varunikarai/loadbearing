@@ -1,0 +1,19 @@
+{
+  "name": "moderation-clean",
+  "files": [
+    "pipeline.py"
+  ],
+  "command": "python3 pipeline.py input.json",
+  "record": "record.json",
+  "expects": {
+    "relevant": [
+      "text",
+      "reports",
+      "author_trust"
+    ],
+    "irrelevant": [
+      "post_id",
+      "posted_at"
+    ]
+  }
+}

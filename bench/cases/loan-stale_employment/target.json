@@ -1,0 +1,19 @@
+{
+  "name": "loan-stale_employment",
+  "files": [
+    "pipeline.py"
+  ],
+  "command": "python3 pipeline.py input.json",
+  "record": "record.json",
+  "expects": {
+    "relevant": [
+      "annual_income",
+      "requested_amount",
+      "employment"
+    ],
+    "irrelevant": [
+      "application_id",
+      "received_at"
+    ]
+  }
+}

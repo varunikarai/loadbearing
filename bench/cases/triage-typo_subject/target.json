@@ -1,0 +1,19 @@
+{
+  "name": "triage-typo_subject",
+  "files": [
+    "pipeline.py"
+  ],
+  "command": "python3 pipeline.py input.json",
+  "record": "record.json",
+  "expects": {
+    "relevant": [
+      "subject",
+      "body",
+      "customer_tier"
+    ],
+    "irrelevant": [
+      "ticket_id",
+      "submitted_at"
+    ]
+  }
+}

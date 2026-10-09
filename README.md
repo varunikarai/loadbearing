@@ -23,6 +23,8 @@ Built and tested offline unless it says live. Nothing has run against a live Neb
 - [x] Demo server with cached runs and a read-only mode; Dockerfile; CI with a probe gate and a clean-clone check
 - [x] Secrets reach forks only, never a checkpoint
 - [x] Prior art: metamorphic testing, leave-one-feature-out, input erasure
+- [x] Benchmark: 54 pipelines with planted bugs; the probe finds 48 of 49, a static check 35 ([bench/](bench/))
+- [x] GitHub Action with a job summary
 - [ ] Sandboxes backend run against a live account (checked against the contree-sdk 0.3.6 source, not yet run)
 - [ ] Nemotron Nano, Super and Ultra verified live with real model IDs
 - [ ] Tavily inferring which fields should matter, from upstream docs
@@ -202,6 +204,19 @@ PYTHONPATH=src python3 -m unittest discover -s tests
 
 Every test runs offline, with no key. Nemotron and Token Factory are replaced by fakes, including
 a fake Token Factory server that the LLM demo target talks to over HTTP, unmodified.
+
+## Benchmark
+
+54 small pipelines with planted input-handling bugs, scored field by field:
+
+| detector | found | missed | false alarms |
+|---|---|---|---|
+| Loadbearing (runs it) | 48 | 1 | 3 |
+| Static name check (reads it) | 35 | 14 | 22 |
+
+Exact McNemar test on paired calls: p = 1.9e-07. The misses and false alarms are listed case by
+case, and include two cases built to find the probe's limits. Nemotron reading the code is the
+next baseline. How the cases are built and what this does not show: [bench/README.md](bench/README.md).
 
 ## Prior art
 

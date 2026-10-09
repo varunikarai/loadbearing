@@ -40,7 +40,7 @@ Every task below is written so either builder can pick it up cold: why it exists
 | A10 | Devpost page ✍ | non-tech | 3 | draft Tue 10-20, final Fri 10-23 | todo |
 | A11 | Feedback: Token Factory and Nemotron ✍ | non-tech | 1.5 | Fri 10-23 | todo |
 | A12 | Compliance and submission | non-tech | 2 | checklist Tue 10-20, submit Sun 10-25 | todo |
-| A13 | Benchmark: detection on planted bugs against two baselines | tech | 4 | Sat 10-17 | claimed 10-09 |
+| A13 | Benchmark: detection on planted bugs against two baselines | tech | 4 | Sat 10-17 | offline done 10-09; Nemotron baseline waits on keys |
 | A14 | GitHub Action: run a probe in any repo's CI | tech | 2 | Tue 10-13 | done 10-09 |
 
 V = Varunika, A = Aeshvarya. One point is roughly one focused hour; the points are estimates for balance, not promises. ✍ marks text that judges read as ours: its final words are the owner's own.

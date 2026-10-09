@@ -1,0 +1,6 @@
+{
+  "defects": {
+    "customer_tier": "silent passthrough"
+  },
+  "operator": "overwritten"
+}
