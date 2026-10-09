@@ -96,6 +96,12 @@ Problem statement: [SPEC.md](SPEC.md). Setup, target format, layout: [README.md]
 
 Newest first.
 
+### 2026-10-09 (d)
+- **A13 offline** (Aeshvarya, `bench/`): 54 generated pipelines, 266 declared fields, 49 planted defects. The probe finds 48 with 3 false alarms; a static check of whether each field is named in the code finds 35 with 22; paired, p = 1.9e-07 (exact McNemar). The probe's errors are the two limit cases built to find them and one cascade, all listed. A test pins the cases and the probe's calls. The Nemotron-reads-the-code baseline (`bench/run.py --llm`) runs once there is a key.
+- **A14 done** (Aeshvarya): `action.yml` with a Markdown job summary (`probe --markdown`), run on this repository in CI.
+- **Hand-offs 10 to 12 done** (Aeshvarya): crashes exit 2, never 1; the action installs the sandbox extra and the README shows the keys from secrets; A8 marked done.
+- Next for Aeshvarya: own Nebius credits, then the live A3 run and `bench/run.py --llm`; A6 host.
+
 ### 2026-10-09 (c)
 - **V6's audit is one command** (Varunika, `varunika/v6-audit`): `python3 scripts/audit.py` reads every version of every file on every branch, every committed path, commit messages, identities and branch names, for key shapes, `.env` and key files, addresses that are not ours, and trailers, and ends with go or no-go. `--also WORD` checks a name that must not go public without committing it. Go on all 189 commits; 149 tests pass.
 - **Reviewed Aeshvarya's 10-08 and 10-09 work** (A7, A14, `--explain`, `--intent`, hand-off 9, the `contree auth` correction): no secrets or traces, 139 tests pass on `main`. A13's branch seen, not reviewed: still in progress.
