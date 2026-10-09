@@ -121,6 +121,20 @@ def mcnemar(a: dict, b: dict, cases: list[Path]) -> tuple[int, int, float]:
     return only_a, only_b, p
 
 
+def case_right(calls: dict[str, str], case: Path) -> bool:
+    """A case is right when every declared field's call matches its truth."""
+    return all(calls.get(f, "") == t for f, t in units(case))
+
+
+def mcnemar_cases(a: dict, b: dict, cases: list[Path]) -> tuple[int, int, float]:
+    """The same exact test with one unit per case, since fields in one case are not independent."""
+    only_a = sum(case_right(a[c.name], c) and not case_right(b[c.name], c) for c in cases)
+    only_b = sum(case_right(b[c.name], c) and not case_right(a[c.name], c) for c in cases)
+    n, k = only_a + only_b, min(only_a, only_b)
+    p = min(1.0, 2 * sum(math.comb(n, i) for i in range(k + 1)) / 2 ** n) if n else 1.0
+    return only_a, only_b, p
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--llm", action="store_true", help="also run Nemotron reading the code")
@@ -142,15 +156,18 @@ def main() -> int:
     scores = {name: score(r, cases) for name, r in results.items()}
     lb, *others = list(results)
     tests = {other: mcnemar(results[lb], results[other], cases) for other in others}
+    case_tests = {other: mcnemar_cases(results[lb], results[other], cases) for other in others}
+    cases_right = {name: sum(case_right(r[c.name], c) for c in cases) for name, r in results.items()}
     (HERE / "results.json").write_text(json.dumps(
-        {"cases": len(cases), "scores": scores, "mcnemar": tests,
+        {"cases": len(cases), "scores": scores, "mcnemar": tests, "mcnemar_cases": case_tests,
+         "cases_right": cases_right,
          "calls": results, "seconds": seconds}, indent=2, sort_keys=True) + "\n")
-    (HERE / "RESULTS.md").write_text(render(cases, results, scores, tests, seconds))
+    (HERE / "RESULTS.md").write_text(render(cases, results, scores, tests, seconds, case_tests, cases_right))
     print((HERE / "RESULTS.md").read_text())
     return 0
 
 
-def render(cases, results, scores, tests, seconds) -> str:
+def render(cases, results, scores, tests, seconds, case_tests, cases_right) -> str:
     n_units = sum(len(units(c)) for c in cases)
     n_bugs = sum(1 for c in cases for _, t in units(c) if t)
     lines = [
@@ -172,10 +189,17 @@ def render(cases, results, scores, tests, seconds) -> str:
         for cls in CLASSES:
             c = s[cls]
             lines.append(f"| {name} | {cls} | {c['tp']} | {c['fn']} | {c['fp']} |")
-    lines += ["", "Paired on every field (exact McNemar test):", ""]
     lb = next(iter(results))
+    lines += ["", "Whole cases right (every declared field called correctly):", ""]
+    for name, n in cases_right.items():
+        lines.append(f"- {name}: **{n}** of {len(cases)}")
+    lines += ["", "Paired, exact McNemar test. One unit per case is the conservative test, since fields "
+              "within a case are not independent:", ""]
+    for other, (a, b, p) in case_tests.items():
+        lines.append(f"- per case: {lb} right where {other} was wrong **{a}** times, the reverse **{b}**; p = {p:.2g}.")
     for other, (a, b, p) in tests.items():
-        lines.append(f"- {lb} right where {other} was wrong: **{a}** fields; the reverse: **{b}**; p = {p:.2g}.")
+        lines.append(f"- per field: **{a}** against **{b}**; p = {p:.2g}. Treats the fields as independent, "
+                     "so it overstates the evidence; see the README.")
     lines += ["", "Every case, and what each detector called:", "",
               "| case | planted | " + " | ".join(results) + " |", "|---|---|" + "---|" * len(results)]
     for case in cases:
