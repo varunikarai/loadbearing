@@ -13,11 +13,11 @@ Where Loadbearing is, what happens next, and what has already happened. **Now**,
 
 ## Now
 
-_Updated 2026-10-07_
+_Updated 2026-10-09_
 
-- **State:** on the local backend the whole loop runs offline: probe with a noise floor, Super and Ultra on defects, Tavily-inferred intent with checked quotes, Ultra's fix validated and proven in a fresh fork. `--baseline-runs`, `--fix` and `--prove` are wired, and the JSON report is schema 2. The RAG demo target is built and proven offline. 127 tests pass on `main`. Nothing has yet run against a live Nebius account: not the Sandboxes backend, not Token Factory, not Tavily.
-- **Next action:** Sat 2026-10-10, Varunika: before 11:00, V1 prep (credits, `pip install -e '.[sandbox]'`, `NEBIUS_API_KEY`, `NEBIUS_PROJECT_ID` and the three model IDs into `.env`); from 12:00, V1 live, `loadbearing probe examples/ticket_triage/target.json --backend sandbox --nano`, pass = the same two defects, found on Nebius; then `scripts/eval_nano.py` (pass = 18/20). Aeshvarya, any time: follow-ups 6, 7 and 9 (`--explain`, `--intent`, and leaving `passages` undeclared so Tavily has work on the demo target) in the 2026-10-07 Log.
-- **Waiting on:** Aeshvarya confirming the split in WORKPLAN.md by 2026-10-09; V1's keys for every live check.
+- **State:** on the local backend the whole loop runs offline: probe with a noise floor, Super and Ultra on defects, Tavily-inferred intent with checked quotes, Ultra's fix validated and proven in a fresh fork. Every C6 flag is wired (`--baseline-runs`, `--explain`, `--intent`, `--fix`, `--prove`), the report is schema 2, and the RAG demo target leaves `passages` undeclared so Tavily has a runtime job on it. A clean clone runs the README as written (A7), a GitHub Action runs a probe in any repo's CI (A14), and the pre-public audit is a script (V6). 149 tests pass on `main`. Nothing has yet run against a live Nebius account: not the Sandboxes backend, not Token Factory, not Tavily.
+- **Next action:** Sat 2026-10-10, Varunika: before 11:00, V1 prep (credits; `pip install -e '.[sandbox]'`; then either `contree auth` or `NEBIUS_API_KEY` and `NEBIUS_PROJECT_ID` in `.env`; the three model IDs into `.env`); from 12:00, V1 live, `loadbearing probe examples/ticket_triage/target.json --backend sandbox --nano`, pass = the same two defects, found on Nebius; then `scripts/eval_nano.py` (pass = 18/20). Aeshvarya: hand-offs 10 to 12 in the 2026-10-09 (c) Log; A13 in progress.
+- **Waiting on:** Aeshvarya confirming or countering the split in WORKPLAN.md, due 2026-10-09; V1's keys for every live check.
 - **Deadline:** 2026-10-30 10:00 PT (22:30 IST). **Target submission: 2026-10-25.**
 
 ## Plan
