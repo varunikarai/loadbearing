@@ -1,0 +1,10 @@
+# Render blueprint for the hosted demo: New > Blueprint, pick this repository.
+# Free plan; it sleeps when idle, and .github/workflows/keep-warm.yml wakes it.
+services:
+  - type: web
+    name: loadbearing-demo
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /healthz
+    autoDeploy: true
