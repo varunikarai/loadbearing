@@ -96,6 +96,12 @@ Problem statement: [SPEC.md](SPEC.md). Setup, target format, layout: [README.md]
 
 Newest first.
 
+### 2026-10-10 (c)
+- **Hand-offs 13 and 14 done** (Aeshvarya): the benchmark is scored per case too (50 of 54 against 26, exact McNemar on cases p = 1.9e-05) and both READMEs lead with it and name the two mechanisms; the read-only demo runs any free target (no keys, local, no model calls) and serves paid runs as recorded, with several target folders listed in sections.
+- Fixed a flaky test: the fake Token Factory's listen backlog of 5 refused connections under the probe's parallel runs. Passed 15 in a row.
+- **A6 deploy-ready** (Aeshvarya): the image serves the examples and all 54 benchmark cases read-only and copies `demo/runs/` recordings into its cache; `render.yaml`; a keep-warm ping to `DEMO_URL`. Checked in a container. Live once the host account exists.
+- A9 storyboard and A12 checklist drafted, kept outside the repo.
+
 ### 2026-10-10 (b)
 - **V12 dry run** (Varunika, early; the two scored reviews stay on 10-20 and 10-23). Scored against the rules' own wording as if submitted today, out of 10: **Technological Implementation 4** (well built: 154 tests, CI, a reproducible benchmark; but the criterion asks how effectively it *uses* Token Factory and Nemotron, and nothing has run live), **Design 4** ("a complete, coherent product experience": the CLI, report and Action exist, but there is no URL to open, no identity, no video), **Potential Impact 5** (real cases with sources, but "based on what's demonstrated" the demo target has only met a fake Token Factory, and the README never names who it is for), **Quality of the Idea 7** (checkpoint-and-fork as an ablation primitive, rules decide defects so no model can invent one, intent drawn from cited sources, honest limits). Stage One would fail today on schedule alone: private repo, no demo URL, no video, no live call.
 - **Top three gaps, each with an owner:**
