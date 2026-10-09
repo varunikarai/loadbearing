@@ -55,8 +55,12 @@ not removed.
 
 One unit is one declared field in one case. A call is right only when it
 matches the truth exactly; the wrong defect class counts as a false alarm and a
-miss. Detectors are compared pairwise with an exact McNemar test on the units
-where exactly one of them is right.
+miss. A case is fully right when every one of its fields is.
+
+Detectors are compared with an exact McNemar test on the units where exactly one
+of them is right, at two levels. **Per case is the test to quote:** fields in the
+same case share one pipeline and are not independent. The per-field test is
+reported too, and overstates the evidence for that reason.
 
 ## What this does and does not show
 
@@ -70,5 +74,10 @@ where exactly one of them is right.
   the output either. Loadbearing says so, which is true of the program as given,
   but only one defect was planted, so it counts against Loadbearing. Fixing the
   income read clears both.
+- **Two mechanisms produce most of the gap.** Of the 36 fields only the probe
+  gets right, 22 come from one design choice (two pipelines log the request id
+  to stderr, so the static check flags it, in 11 cases each) and 12 from the
+  overwritten operator, which no name check can see. The p-values describe these
+  generated cases, not pipelines in general.
 - **No interactions.** Each mutation changes one field; a defect that needs two
   fields to change together is not tested here or by the probe.
