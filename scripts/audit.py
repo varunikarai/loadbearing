@@ -40,7 +40,7 @@ KNOWN_FAKES = {
 }
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, order=True)
 class Finding:
     kind: str
     where: str
@@ -96,10 +96,28 @@ def scan_keys(versions: dict[str, str], contents: dict[str, str]) -> list[Findin
     return sorted(found, key=lambda f: (f.where, f.kind))
 
 
+SECRET_FILES = re.compile(r"(?:^|/)(?:\.env(?:\.[^/]+)?|\.envrc|[^/]+\.pem|id_(?:rsa|dsa|ecdsa|ed25519)|\.netrc)$")
+SAFE_FILES = {".env.example"}
+
+
+def every_path(repo: Path = ROOT) -> set[str]:
+    """Every path any commit on any ref has added or changed, including deleted ones."""
+    out = git("log", "--all", "--name-only", "--format=", repo=repo).decode()
+    return {line for line in out.splitlines() if line}
+
+
+def scan_paths(paths: set[str]) -> list[Finding]:
+    return sorted(
+        Finding("secrets file committed", path, Path(path).name)
+        for path in paths
+        if SECRET_FILES.search(path) and Path(path).name not in SAFE_FILES
+    )
+
+
 def audit(repo: Path = ROOT) -> tuple[list[Finding], dict[str, int]]:
     versions = file_versions(repo)
     contents = read_blobs(list(versions), repo)
-    findings = scan_keys(versions, contents)
+    findings = scan_keys(versions, contents) + scan_paths(every_path(repo))
     commits = len(git("rev-list", "--all", repo=repo).decode().split())
     return findings, {"commits": commits, "file versions": len(versions)}
 
