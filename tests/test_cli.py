@@ -10,6 +10,29 @@ from loadbearing.cli import NOT_BUILT, main
 EXAMPLE = str(Path(__file__).resolve().parent.parent / "examples" / "ticket_triage" / "target.json")
 
 
+class CrashExitTests(unittest.TestCase):
+    """Exit 1 means defects were found; a crash must exit 2 so CI never reads it as a finding."""
+
+    def run_quietly(self, argv):
+        with contextlib.redirect_stderr(io.StringIO()) as err, contextlib.redirect_stdout(io.StringIO()):
+            code = main(argv)
+        return code, err.getvalue()
+
+    def test_a_missing_target_file_exits_2(self):
+        code, err = self.run_quietly(["probe", "/no/such/target.json"])
+        self.assertEqual(code, 2)
+        self.assertIn("Traceback", err)
+
+    def test_a_target_without_command_exits_2(self):
+        import json
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as tmp:
+            Path(tmp, "r.json").write_text("{}")
+            Path(tmp, "target.json").write_text(json.dumps({"record": "r.json"}))
+            self.assertEqual(self.run_quietly(["probe", str(Path(tmp, "target.json"))])[0], 2)
+
+
 class ReservedFlagTests(unittest.TestCase):
     def test_each_reserved_flag_says_it_is_not_built_and_runs_nothing(self):
         flags = {"explain": ["--explain"],
