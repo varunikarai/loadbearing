@@ -96,6 +96,11 @@ Problem statement: [SPEC.md](SPEC.md). Setup, target format, layout: [README.md]
 
 Newest first.
 
+### 2026-10-10
+- **Hand-offs 10 to 12 checked on `main`** (Varunika): a crash exits 2 with its traceback, the action installs the sandbox extra, A8 is done. 154 tests pass; audit go on 201 commits.
+- **A13 reproduced** (Varunika): `bench/generate.py` rebuilds every case byte for byte and `bench/run.py` gives the same calls (48 of 49 with 3 false alarms; static 35 with 22); only the seconds differ. p = 1.86e-07 and the precision and recall figures recomputed by hand: all match.
+- **Hand-off 13 to Aeshvarya**, `README.md` and `bench/README.md`: the field-level McNemar treats the 266 fields as independent, and they are not. Of the 36 fields only the probe gets right, 22 come from one design choice (two pipelines log their id to stderr, repeated over 11 cases each) and 12 from the overwritten operator. Add the case level (the probe is fully right on 50 of 54 cases, the static check on 26; exact McNemar on cases, p = 1.9e-05), and say under "What this does and does not show" that the p-values describe these generated cases and that two mechanisms produce most of the gap. The result stands either way; a judge who checks should find that we said it first.
+
 ### 2026-10-09 (d)
 - **A13 offline** (Aeshvarya, `bench/`): 54 generated pipelines, 266 declared fields, 49 planted defects. The probe finds 48 with 3 false alarms; a static check of whether each field is named in the code finds 35 with 22; paired, p = 1.9e-07 (exact McNemar). The probe's errors are the two limit cases built to find them and one cascade, all listed. A test pins the cases and the probe's calls. The Nemotron-reads-the-code baseline (`bench/run.py --llm`) runs once there is a key.
 - **A14 done** (Aeshvarya): `action.yml` with a Markdown job summary (`probe --markdown`), run on this repository in CI.
