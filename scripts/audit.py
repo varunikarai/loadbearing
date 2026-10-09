@@ -1,6 +1,7 @@
 """V6: scan every version of every file before the repository goes public.
 
     python3 scripts/audit.py
+    python3 scripts/audit.py --also NAME --also OTHER   # words that must not appear
 
 Reads the whole history on every branch, not only the current files: a key
 deleted in a later commit is still public once the repository is. Prints each
@@ -10,6 +11,7 @@ no-go. Needs only git and the standard library.
 
 from __future__ import annotations
 
+import argparse
 import re
 import subprocess
 import sys
@@ -165,22 +167,59 @@ def scan_messages(by_commit: dict[str, str]) -> list[Finding]:
     return sorted(found)
 
 
-def audit(repo: Path = ROOT) -> tuple[list[Finding], dict[str, int]]:
+def scan_words(
+    words: list[str],
+    versions: dict[str, str],
+    contents: dict[str, str],
+    paths: set[str],
+    by_commit: dict[str, str],
+    repo: Path = ROOT,
+) -> list[Finding]:
+    """Words that must not appear anywhere public: files, paths, messages, names, branches.
+
+    They come from the command line, so the list itself is never committed.
+    """
+    refs = git("for-each-ref", "--format=%(refname:short)", repo=repo).decode().splitlines()
+    places = (
+        [(f"{path} ({sha[:7]})", contents[sha]) for sha, path in versions.items()]
+        + [("a committed path", path) for path in paths]
+        + [(f"commit {sha[:7]} message", text) for sha, text in by_commit.items()]
+        + [("an identity", who) for who in identities(repo)]
+        + [("a branch name", ref) for ref in refs]
+    )
+    found = set()
+    for word in words:
+        pattern = re.compile(re.escape(word), re.I)
+        for where, text in places:
+            if pattern.search(text):
+                found.add(Finding(f"word {word!r}", where, word))
+    return sorted(found)
+
+
+def audit(repo: Path = ROOT, words: list[str] = ()) -> tuple[list[Finding], dict[str, int]]:
     versions = file_versions(repo)
     contents = read_blobs(list(versions), repo)
+    paths, by_commit = every_path(repo), messages(repo)
     ours = {who.rsplit("<", 1)[1].rstrip(">").lower() for who in identities(repo)}
     findings = (
         scan_keys(versions, contents)
-        + scan_paths(every_path(repo))
+        + scan_paths(paths)
         + scan_emails(versions, contents, ours)
-        + scan_messages(messages(repo))
+        + scan_messages(by_commit)
+        + scan_words(list(words), versions, contents, paths, by_commit, repo)
     )
     commits = len(git("rev-list", "--all", repo=repo).decode().split())
     return findings, {"commits": commits, "file versions": len(versions)}
 
 
-def main() -> int:
-    findings, counts = audit()
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description="Scan all history before the repository goes public.")
+    parser.add_argument(
+        "--also", action="append", default=[], metavar="WORD",
+        help="a word that must appear nowhere public, case-insensitive; repeat for more",
+    )
+    args = parser.parse_args(argv)
+    findings, counts = audit(words=args.also)
     # Not findings: the names and addresses that go public with every commit.
     # Each should be one of the builders, as they meant to appear.
     for who, n in sorted(identities().items()):
