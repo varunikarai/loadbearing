@@ -141,15 +141,16 @@ with the changed keys marked. It fetches nothing, so a saved copy always opens.
 ## The demo server
 
 ```bash
-loadbearing serve                          # http://127.0.0.1:8000
-loadbearing serve --backend sandbox --nano # runs on Nebius, Nano judging each diff
-loadbearing serve --readonly               # serve recorded runs only, never run
+loadbearing serve                                     # http://127.0.0.1:8000
+loadbearing serve --backend sandbox --nano            # runs on Nebius, Nano judging each diff
+loadbearing serve --readonly --targets examples --targets bench/cases
 ```
 
-It lists every `examples/<name>/target.json`, runs a probe on one when asked, and caches the
-result in `runs/`, so a page view never costs a run. `--readonly` refuses new runs, which is
-how a public deployment keeps Sandboxes credits intact. The Dockerfile runs it on any
-container host that sets `$PORT`.
+It lists every `<dir>/<name>/target.json`, one section per `--targets` folder, runs a probe on
+one when asked, and caches the result in `runs/`, so a page view never costs a run. With
+`--readonly`, anything free still runs (a target with no keys, on the local backend, with no
+model calls), and anything that would spend credits on Sandboxes or Nemotron is shown as its
+recorded run instead. The Dockerfile runs it on any container host that sets `$PORT`.
 
 ## Writing a target
 
