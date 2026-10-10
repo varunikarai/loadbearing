@@ -15,11 +15,12 @@ VERDICT = FieldVerdict(
 )
 SOURCES = {"pipeline.py": "text = ticket.get('bdoy', '')\n"}
 FIXED = {"pipeline.py": "text = ticket.get('body', '')\n"}
+EDIT = {"path": "pipeline.py", "old": "'bdoy'", "new": "'body'"}
 
 
 class WriteFixTests(unittest.TestCase):
     def test_parses_a_fenced_reply_and_asks_ultra(self):
-        reply = "```json\n" + json.dumps({"rationale": "misspelled key", "files": FIXED}) + "\n```"
+        reply = "```json\n" + json.dumps({"rationale": "misspelled key", "edits": [EDIT]}) + "\n```"
         r, client = router({"ultra": reply})
         files, rationale = r.write_fix(VERDICT, SOURCES)
         self.assertEqual(files, FIXED)
@@ -28,13 +29,37 @@ class WriteFixTests(unittest.TestCase):
         self.assertEqual(model, MODELS["ultra"])
 
     def test_the_prompt_carries_the_defect_the_why_the_evidence_and_the_source(self):
-        r, client = router({"ultra": json.dumps({"rationale": "r", "files": FIXED})})
+        r, client = router({"ultra": json.dumps({"rationale": "r", "edits": [EDIT]})})
         r.write_fix(VERDICT, SOURCES)
         prompt = client.calls[0][1][1]["content"]
         for expected in ("silent passthrough", "'body'", "bdoy", "https://example.org/spec", "--- pipeline.py"):
             self.assertIn(expected, prompt)
 
-    def test_a_reply_without_files_is_refused(self):
+    def test_lines_ultra_never_quoted_are_left_exactly_as_they_were(self):
+        sources = {"pipeline.py": 'TRACE = r"<think>.*?</think>"\ntext = ticket.get(\'bdoy\', \'\')'}
+        reply = "<think>quote only the key</think>" + json.dumps({"rationale": "r", "edits": [EDIT]})
+        r, _ = router({"ultra": reply})
+        files, _ = r.write_fix(VERDICT, sources)
+        self.assertEqual(files, {"pipeline.py": 'TRACE = r"<think>.*?</think>"\ntext = ticket.get(\'body\', \'\')'})
+
+    def test_an_edit_whose_old_text_is_missing_or_repeated_is_refused(self):
+        for old in ("'missing'", "", "ticket"):
+            sources = {"pipeline.py": "ticket = load()\ntext = ticket.get('bdoy', '')\n"}
+            r, _ = router({"ultra": json.dumps({"rationale": "r", "edits": [dict(EDIT, old=old)]})})
+            with self.assertRaises(ValueError, msg=old):
+                r.write_fix(VERDICT, sources)
+
+    def test_an_edit_outside_the_sources_is_refused(self):
+        r, _ = router({"ultra": json.dumps({"rationale": "r", "edits": [dict(EDIT, path="setup.py")]})})
+        with self.assertRaises(ValueError):
+            r.write_fix(VERDICT, SOURCES)
+
+    def test_a_whole_file_reply_is_refused(self):
+        r, _ = router({"ultra": json.dumps({"rationale": "r", "files": FIXED})})
+        with self.assertRaises(ValueError):
+            r.write_fix(VERDICT, SOURCES)
+
+    def test_a_reply_without_edits_is_refused(self):
         r, _ = router({"ultra": json.dumps({"rationale": "r"})})
         with self.assertRaises(ValueError):
             r.write_fix(VERDICT, SOURCES)
@@ -53,6 +78,8 @@ class ReasoningTests(unittest.TestCase):
             "the template opened it</think>\nmeaningful": "meaningful",
             "noise<think>cut off before the end": "noise",
             "  meaningful  ": "meaningful",
+            '<think>t</think>{"old": "r\\"<think>.*?</think>\\""}': '{"old": "r\\"<think>.*?</think>\\""}',
+            '{"new": "strip <think>x</think> here"}': '{"new": "strip <think>x</think> here"}',
         }
         for raw, answer in cases.items():
             self.assertEqual(_strip_reasoning(raw), answer, raw)
