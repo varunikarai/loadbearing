@@ -29,7 +29,7 @@ RAG_QUOTE = "The LLMs then use the retrieved data to craft appropriate responses
 
 
 def grounded_model(prompt: str) -> dict:
-    policy, _, question = prompt.partition("Customer question:\n")
+    policy, _, question = prompt.partition("Customer question:")
     n = next(_calls)
     if "return" not in question.lower():
         return {"answer": f"I can help with orders and returns. (ref {n})", "can_return": None,
