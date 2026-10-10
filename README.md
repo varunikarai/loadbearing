@@ -23,7 +23,7 @@ Built and tested offline unless it says live. Nothing has run against a live Neb
 - [x] Demo server with cached runs and a read-only mode; Dockerfile; CI with a probe gate and a clean-clone check
 - [x] Secrets reach forks only, never a checkpoint
 - [x] Prior art: metamorphic testing, leave-one-feature-out, input erasure
-- [x] Benchmark: 54 pipelines with planted bugs; the probe gets 50 cases fully right, a static check 26 ([bench/](bench/))
+- [x] Benchmark: 54 pipelines with planted bugs, against a static check and Nemotron reading the code ([bench/](bench/))
 - [x] GitHub Action with a job summary
 - [ ] Sandboxes backend run against a live account (checked against the contree-sdk 0.3.6 source, not yet run)
 - [ ] Nemotron Nano, Super and Ultra verified live with real model IDs
@@ -221,18 +221,21 @@ a fake Token Factory server that the LLM demo target talks to over HTTP, unmodif
 
 ## Benchmark
 
-54 small pipelines with planted input-handling bugs ([bench/](bench/)):
+54 small pipelines with planted input-handling bugs ([bench/](bench/)), three ways of finding them:
 
-| detector | cases fully right | defects found | missed | false alarms |
+| detector | cases fully right | defects found | false alarms | seconds |
 |---|---|---|---|---|
-| Loadbearing (runs it) | 50 of 54 | 48 of 49 | 1 | 3 |
-| Static name check (reads it) | 26 of 54 | 35 of 49 | 14 | 22 |
+| Loadbearing (runs it) | 50 of 54, every run | 48 of 49 | 3 | 4 |
+| Nemotron 3 Super reads the code | 49 to 51 of 54 over three runs | 45 to 47 | 1 | ~200 |
+| Static name check (reads it) | 26 of 54 | 35 of 49 | 22 | 0 |
 
-Exact McNemar test with one unit per case: p = 1.9e-05. Most of the gap comes from two
-mechanisms, both named in [bench/README.md](bench/README.md): fields overwritten after they are
-read, which no name check can see, and request ids that two pipelines only log. The misses and
-false alarms are listed case by case, including two cases built to find the probe's limits.
-Nemotron reading the code is the next baseline.
+On pipelines this small, a strong model reading the code finds about as much as running it.
+The difference is repeatability: the model's answer changes from run to run at temperature 0,
+including which cases it gets wrong, and every run it raised a false alarm on one clean
+pipeline. Loadbearing gives the same answer every run, shows the forks that justify it, and
+proves the fix. Against the static check, exact McNemar on cases: p = 1.9e-05. Against the
+model, the difference is not significant (p = 0.38). The misses and false alarms are listed
+case by case; how the cases are built and what this does not show: [bench/README.md](bench/README.md).
 
 ## Prior art
 

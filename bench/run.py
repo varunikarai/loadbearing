@@ -2,6 +2,7 @@
 
     PYTHONPATH=src python3 bench/run.py            Loadbearing and the static check, offline
     PYTHONPATH=src python3 bench/run.py --llm      also Nemotron reading the code (needs keys)
+    PYTHONPATH=src python3 bench/run.py --llm --llm-runs 3   ...three times, to show how much it varies
 
 Scoring unit: one declared field in one case. Its truth is "silent passthrough",
 "phantom sensitivity" or nothing. A detector is right on a unit when its call
@@ -138,8 +139,18 @@ def mcnemar_cases(a: dict, b: dict, cases: list[Path]) -> tuple[int, int, float]
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--llm", action="store_true", help="also run Nemotron reading the code")
+    parser.add_argument("--llm-runs", type=int, default=1, help="repeat the Nemotron review N times")
+    parser.add_argument("--from-json", action="store_true",
+                        help="re-render RESULTS.md from results.json without running anything")
     args = parser.parse_args()
     cases = sorted(p for p in (HERE / "cases").iterdir() if p.is_dir())
+    if args.from_json:
+        saved = json.loads((HERE / "results.json").read_text())
+        results, seconds, repeats = saved["calls"], saved["seconds"], saved.get("repeats", {})
+        # Keep the detector order the run used: Loadbearing, static check, then the model.
+        order = sorted(results, key=lambda n: (not n.startswith("Loadbearing"), n.startswith("Nemotron")))
+        results = {n: results[n] for n in order}
+        return _write(cases, results, seconds, repeats)
     detectors = {"Loadbearing (runs it)": loadbearing, "Static name check (reads it)": static}
     if args.llm:
         from loadbearing.config import load_dotenv
@@ -148,11 +159,21 @@ def main() -> int:
         load_dotenv()
         client, model = TokenFactory(), os.environ["NEMOTRON_SUPER_MODEL"]
         detectors[f"Nemotron reads the code ({model})"] = lambda c: llm_review(c, client, model)
+        # Extra runs only feed the repeatability section; the tables use the first run.
+        for i in range(2, args.llm_runs + 1):
+            detectors[f"Nemotron reads the code, run {i}"] = lambda c: llm_review(c, client, model)
     results, seconds = {}, {}
     for name, fn in detectors.items():
         start = time.perf_counter()
         results[name] = {case.name: fn(case) for case in cases}
         seconds[name] = time.perf_counter() - start
+    repeats = {n: r for n, r in results.items() if ", run " in n}
+    for n in repeats:
+        del results[n]
+    return _write(cases, results, seconds, repeats)
+
+
+def _write(cases, results, seconds, repeats) -> int:
     scores = {name: score(r, cases) for name, r in results.items()}
     lb, *others = list(results)
     tests = {other: mcnemar(results[lb], results[other], cases) for other in others}
@@ -160,14 +181,14 @@ def main() -> int:
     cases_right = {name: sum(case_right(r[c.name], c) for c in cases) for name, r in results.items()}
     (HERE / "results.json").write_text(json.dumps(
         {"cases": len(cases), "scores": scores, "mcnemar": tests, "mcnemar_cases": case_tests,
-         "cases_right": cases_right,
+         "cases_right": cases_right, "repeats": repeats,
          "calls": results, "seconds": seconds}, indent=2, sort_keys=True) + "\n")
-    (HERE / "RESULTS.md").write_text(render(cases, results, scores, tests, seconds, case_tests, cases_right))
+    (HERE / "RESULTS.md").write_text(render(cases, results, scores, tests, seconds, case_tests, cases_right, repeats))
     print((HERE / "RESULTS.md").read_text())
     return 0
 
 
-def render(cases, results, scores, tests, seconds, case_tests, cases_right) -> str:
+def render(cases, results, scores, tests, seconds, case_tests, cases_right, repeats=None) -> str:
     n_units = sum(len(units(c)) for c in cases)
     n_bugs = sum(1 for c in cases for _, t in units(c) if t)
     lines = [
@@ -200,6 +221,21 @@ def render(cases, results, scores, tests, seconds, case_tests, cases_right) -> s
     for other, (a, b, p) in tests.items():
         lines.append(f"- per field: **{a}** against **{b}**; p = {p:.2g}. Treats the fields as independent, "
                      "so it overstates the evidence; see the README.")
+    llm = next((n for n in results if n.startswith("Nemotron")), None)
+    if llm and repeats:
+        runs = [results[llm]] + list(repeats.values())
+        lines += ["", "Repeatability: the same detector, the same 54 cases, run again:", "",
+                  "| run | cases fully right | defects found | false alarms | cases it got wrong |", "|---|---|---|---|---|"]
+        for i, calls in enumerate(runs, 1):
+            s1 = score(calls, cases)["all"]
+            wrong = [c.name for c in cases if not case_right(calls[c.name], c)]
+            lines.append(f"| Nemotron, run {i} | {sum(case_right(calls[c.name], c) for c in cases)} | {s1['tp']} | "
+                         f"{s1['fp']} | {', '.join(f'`{w}`' for w in wrong) or 'none'} |")
+        lb_wrong = [c.name for c in cases if not case_right(results[lb][c.name], c)]
+        lines.append(f"| Loadbearing, every run | {cases_right[lb]} | {scores[lb]['all']['tp']} | "
+                     f"{scores[lb]['all']['fp']} | {', '.join(f'`{w}`' for w in lb_wrong)} |")
+        lines += ["", "Loadbearing's calls are identical on every run (a test pins them). The model's change "
+                  "from run to run, at temperature 0, including which cases it gets wrong."]
     lines += ["", "Every case, and what each detector called:", "",
               "| case | planted | " + " | ".join(results) + " |", "|---|---|" + "---|" * len(results)]
     for case in cases:
