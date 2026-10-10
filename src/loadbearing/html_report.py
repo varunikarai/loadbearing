@@ -8,6 +8,7 @@ escaped: a pipeline's output is untrusted and lands in this page verbatim.
 from __future__ import annotations
 
 import json
+import re
 from html import escape
 from typing import Any
 
@@ -31,7 +32,7 @@ h1{font-size:clamp(34px,6vw,64px);font-weight:900;letter-spacing:-.035em;line-he
 .lede{font-size:clamp(18px,2.4vw,24px);font-weight:700;letter-spacing:-.01em;margin:0 0 32px;max-width:46ch}
 .lede .n{color:var(--silent)}
 h2{font-size:22px;font-weight:850;letter-spacing:-.02em;margin:48px 0 14px}
-.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
 .stat{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px 18px}
 .stat .v{font-size:34px;font-weight:900;letter-spacing:-.03em;line-height:1.1}
 .stat .k{color:var(--dim);font-weight:600;font-size:14px;margin-top:4px}
@@ -71,7 +72,9 @@ footer{margin-top:56px;color:var(--dim);font-size:13px;font-weight:600}
 .model .who{font-size:12px;font-weight:900;letter-spacing:.02em;color:var(--dim);margin-bottom:4px}
 .model p{margin:0 0 10px}
 blockquote{margin:0 0 6px;padding:8px 14px;border-left:4px solid var(--moved);font-weight:600}
-.src{font-size:13px;color:var(--dim);word-break:break-all}
+.src{font-size:13px;color:var(--dim);word-break:break-all;margin-bottom:14px}
+code{font:.88em ui-monospace,"SF Mono",Menlo,Consolas,monospace;background:var(--bg);border:1px solid var(--line);border-radius:5px;padding:1px 5px}
+pre.code{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin:0 0 12px;max-width:70ch;overflow-x:auto;white-space:pre}
 .src a{color:inherit}
 .card.proof{border-left-color:var(--ok)}
 .card.proof.bad{border-left-color:var(--silent)}
@@ -290,10 +293,36 @@ def _model_text(verdict: dict[str, Any]) -> str:
             f'<div class="src"><a href="{link}" rel="noopener">{link}</a></div>'
         )
     if verdict.get("reconciliation"):
-        blocks.append(f'<div class="who">ACROSS ALL FORKS · NEMOTRON SUPER</div><p>{escape(verdict["reconciliation"])}</p>')
+        blocks.append(f'<div class="who">ACROSS ALL FORKS · NEMOTRON SUPER</div>{_prose(verdict["reconciliation"])}')
     if verdict.get("explanation"):
-        blocks.append(f'<div class="who">WHY · NEMOTRON ULTRA</div><p>{escape(verdict["explanation"])}</p>')
+        blocks.append(f'<div class="who">WHY · NEMOTRON ULTRA</div>{_prose(verdict["explanation"])}')
     return f'<div class="model">{"".join(blocks)}</div>' if blocks else ""
+
+
+_FENCE = re.compile(r"```[\w+-]*\n?(.*?)```", re.S)
+_INLINE = [
+    (re.compile(r"`([^`\n]+)`"), r"<code>\1</code>"),
+    (re.compile(r"\*\*([^*\n]+)\*\*"), r"<b>\1</b>"),
+    (re.compile(r"(?<![\w*])\*([^*\n]+)\*(?![\w*])"), r"<i>\1</i>"),
+]
+
+
+def _prose(text: str) -> str:
+    """A model's prose as HTML: paragraphs, fenced code, `code`, **bold** and *italics*.
+
+    Everything is escaped first, so the only tags that can appear are the ones made here."""
+    out = []
+    for i, part in enumerate(_FENCE.split(escape(text.strip()))):
+        if i % 2:  # inside a fence
+            out.append(f'<pre class="code">{part.strip(chr(10))}</pre>')
+            continue
+        for para in re.split(r"\n\s*\n", part.strip()):
+            if not para.strip():
+                continue
+            for pattern, repl in _INLINE:
+                para = pattern.sub(repl, para)
+            out.append("<p>" + "<br>".join(line.strip() for line in para.strip().splitlines()) + "</p>")
+    return "".join(out)
 
 
 def _floor_summary(data: dict[str, Any]) -> str:
@@ -321,7 +350,7 @@ def _fix_card(fix: dict[str, Any], data: dict[str, Any]) -> str:
     field = fix["field"]
     proof = next((p for p in data.get("proofs", []) if p["field"] == field), None)
     before_v = next((v for v in data["verdicts"] if v["field"] == field), {})
-    parts = [f"<h3>{escape(field)} · fixed by Nemotron Ultra</h3>", f"<p>{escape(fix['rationale'])}</p>"]
+    parts = [f"<h3>{escape(field)} · fixed by Nemotron Ultra</h3>", _prose(fix['rationale'])]
     if fix.get("diff"):
         parts.append(_diff_block(fix["diff"]))
     if proof is None:
