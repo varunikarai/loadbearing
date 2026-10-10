@@ -96,6 +96,14 @@ Problem statement: [SPEC.md](SPEC.md). Setup, target format, layout: [README.md]
 
 Newest first.
 
+### 2026-10-11
+- **Live keys and runs are Aeshvarya's from here** (agreed 10-11): Varunika needs no key, credits or Sandboxes access. CI, the Docker image and the hosted demo use no secrets, and every paid run is recorded into `demo/runs/`.
+- **The whole loop live with Tavily** (Aeshvarya): `--intent --prove` on the support answerer. `passages` was left out of `expects` (hand-off 9), Tavily and Super cite a RAG source saying answers are grounded in the retrieved passages, so the unread field is a defect. Ultra's fix is the one line `context` -> `passages`, the proof is clean, and the answer goes from "Yes... 30-day return window" to "No... the 14-day window has passed, but the warranty covers a repair or replacement". 19 runs in about 9 s on the local backend.
+- **Hand-offs 15 and 16, fixed in PR #1** (Aeshvarya, in Varunika's `nemotron.py`, for her review): the first live fix retyped all of `pipeline.py` and rewrote its `<think>` regex too. Ultra now answers with exact old/new edits, each quote unique in its file, so a line it never quoted comes back byte for byte; only a reasoning trace in front of the answer is stripped. The same PR adds the recording and fixes `.gitignore`, whose `runs/` also hid `demo/runs/` and would have left the Dockerfile's `COPY` with nothing on a fresh clone.
+- **V2 bar met live:** `scripts/eval_nano.py` scored 18, 19 and 19 of 20. Every run missed the same case, "only latency" (`latency_ms` 812 -> 774 called meaningful). **Hand-off 17 to Varunika**, the Nano prompt: worth naming timings next to ids and timestamps as noise.
+- `--explain` live on the toy target: Ultra quotes the `.second % AGENTS` line and the `'bdoy'` key. The CLI now prints the cited intent, Super and Ultra under each defect; before, they reached only `--out`.
+- README status now says what has run live.
+
 ### 2026-10-10 (e)
 - **A13 against Nemotron 3 Super reading the code** (Aeshvarya, three runs, about $0.30): 49, 51 and 49 of 54 cases right, against the probe's 50 on every run; not significant (p = 0.38). Its wrong cases change between runs at temperature 0, and every run it raised a false alarm on `shipping-clean`. Both READMEs now say plainly that on twenty-line pipelines with one-line bugs, reading does about as well; the stated difference is repeatability, the forks as evidence, and the proven fix.
 - **Proposal (Aeshvarya), not agreed:** a second benchmark track where the defect is not on a readable line: an LLM step that is given a field and ignores it, or reacts to a field that should not matter (a name, an id). Reading the code cannot see those; running can. It may need a value-swap mutation next to destroy, drop and nudge, which is `mutations.py` (Varunika's), so it is a question, not a claim.
