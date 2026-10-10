@@ -156,6 +156,154 @@
         "subject": "silent passthrough"
       }
     },
+    "Nemotron reads the code (nvidia/nemotron-3-super-120b-a12b)": {
+      "limit-keyword": {
+        "ticket_id": "phantom sensitivity"
+      },
+      "limit-threshold": {},
+      "loan-clean": {},
+      "loan-echo": {
+        "application_id": "phantom sensitivity"
+      },
+      "loan-id_bucket": {
+        "application_id": "phantom sensitivity"
+      },
+      "loan-overwrite_annual_income": {
+        "annual_income": "silent passthrough"
+      },
+      "loan-overwrite_employment": {
+        "employment": "silent passthrough"
+      },
+      "loan-overwrite_requested_amount": {},
+      "loan-stale_annual_income": {
+        "annual_income": "silent passthrough"
+      },
+      "loan-stale_employment": {},
+      "loan-stale_requested_amount": {
+        "requested_amount": "silent passthrough"
+      },
+      "loan-ts_leak": {
+        "received_at": "phantom sensitivity"
+      },
+      "loan-typo_annual_income": {
+        "annual_income": "silent passthrough"
+      },
+      "loan-typo_employment": {
+        "employment": "silent passthrough"
+      },
+      "loan-typo_requested_amount": {
+        "requested_amount": "silent passthrough"
+      },
+      "moderation-clean": {},
+      "moderation-echo": {
+        "post_id": "phantom sensitivity"
+      },
+      "moderation-id_bucket": {
+        "post_id": "phantom sensitivity"
+      },
+      "moderation-overwrite_author_trust": {
+        "author_trust": "silent passthrough"
+      },
+      "moderation-overwrite_reports": {
+        "reports": "silent passthrough"
+      },
+      "moderation-overwrite_text": {
+        "text": "silent passthrough"
+      },
+      "moderation-stale_author_trust": {},
+      "moderation-stale_reports": {
+        "reports": "silent passthrough"
+      },
+      "moderation-stale_text": {},
+      "moderation-ts_leak": {
+        "posted_at": "phantom sensitivity"
+      },
+      "moderation-typo_author_trust": {
+        "author_trust": "silent passthrough"
+      },
+      "moderation-typo_reports": {
+        "reports": "silent passthrough"
+      },
+      "moderation-typo_text": {
+        "text": "silent passthrough"
+      },
+      "shipping-clean": {
+        "order_id": "phantom sensitivity"
+      },
+      "shipping-echo": {
+        "order_id": "phantom sensitivity"
+      },
+      "shipping-id_bucket": {
+        "order_id": "phantom sensitivity"
+      },
+      "shipping-overwrite_destination_zone": {
+        "destination_zone": "silent passthrough"
+      },
+      "shipping-overwrite_express": {
+        "express": "silent passthrough"
+      },
+      "shipping-overwrite_weight_kg": {
+        "weight_kg": "silent passthrough"
+      },
+      "shipping-stale_destination_zone": {
+        "destination_zone": "silent passthrough"
+      },
+      "shipping-stale_express": {
+        "express": "silent passthrough"
+      },
+      "shipping-stale_weight_kg": {
+        "weight_kg": "silent passthrough"
+      },
+      "shipping-ts_leak": {
+        "created_at": "phantom sensitivity"
+      },
+      "shipping-typo_destination_zone": {
+        "destination_zone": "silent passthrough"
+      },
+      "shipping-typo_express": {
+        "express": "silent passthrough"
+      },
+      "shipping-typo_weight_kg": {
+        "weight_kg": "silent passthrough"
+      },
+      "triage-clean": {},
+      "triage-echo": {
+        "ticket_id": "phantom sensitivity"
+      },
+      "triage-id_bucket": {
+        "ticket_id": "phantom sensitivity"
+      },
+      "triage-overwrite_body": {
+        "body": "silent passthrough"
+      },
+      "triage-overwrite_customer_tier": {
+        "customer_tier": "silent passthrough"
+      },
+      "triage-overwrite_subject": {
+        "subject": "silent passthrough"
+      },
+      "triage-stale_body": {
+        "body": "silent passthrough"
+      },
+      "triage-stale_customer_tier": {
+        "customer_tier": "silent passthrough"
+      },
+      "triage-stale_subject": {
+        "subject": "silent passthrough"
+      },
+      "triage-ts_leak": {
+        "submitted_at": "phantom sensitivity"
+      },
+      "triage-typo_body": {
+        "body": "silent passthrough"
+      },
+      "triage-typo_customer_tier": {
+        "customer_tier": "silent passthrough"
+      },
+      "triage-typo_subject": {
+        "subject": "silent passthrough"
+      }
+    },
     "Static name check (reads it)": {
       "limit-keyword": {
         "ticket_id": "phantom sensitivity"
@@ -318,9 +466,15 @@
   "cases": 54,
   "cases_right": {
     "Loadbearing (runs it)": 50,
+    "Nemotron reads the code (nvidia/nemotron-3-super-120b-a12b)": 49,
     "Static name check (reads it)": 26
   },
   "mcnemar": {
+    "Nemotron reads the code (nvidia/nemotron-3-super-120b-a12b)": [
+      5,
+      4,
+      1.0
+    ],
     "Static name check (reads it)": [
       36,
       4,
@@ -328,11 +482,318 @@
     ]
   },
   "mcnemar_cases": {
+    "Nemotron reads the code (nvidia/nemotron-3-super-120b-a12b)": [
+      5,
+      4,
+      1.0
+    ],
     "Static name check (reads it)": [
       28,
       4,
       1.9301194697618484e-05
     ]
+  },
+  "repeats": {
+    "Nemotron reads the code, run 2": {
+      "limit-keyword": {
+        "ticket_id": "phantom sensitivity"
+      },
+      "limit-threshold": {},
+      "loan-clean": {},
+      "loan-echo": {
+        "application_id": "phantom sensitivity"
+      },
+      "loan-id_bucket": {
+        "application_id": "phantom sensitivity"
+      },
+      "loan-overwrite_annual_income": {
+        "annual_income": "silent passthrough"
+      },
+      "loan-overwrite_employment": {
+        "employment": "silent passthrough"
+      },
+      "loan-overwrite_requested_amount": {
+        "requested_amount": "silent passthrough"
+      },
+      "loan-stale_annual_income": {
+        "annual_income": "silent passthrough"
+      },
+      "loan-stale_employment": {
+        "employment": "silent passthrough"
+      },
+      "loan-stale_requested_amount": {
+        "requested_amount": "silent passthrough"
+      },
+      "loan-ts_leak": {
+        "received_at": "phantom sensitivity"
+      },
+      "loan-typo_annual_income": {
+        "annual_income": "silent passthrough"
+      },
+      "loan-typo_employment": {
+        "employment": "silent passthrough"
+      },
+      "loan-typo_requested_amount": {
+        "requested_amount": "silent passthrough"
+      },
+      "moderation-clean": {},
+      "moderation-echo": {
+        "post_id": "phantom sensitivity"
+      },
+      "moderation-id_bucket": {
+        "post_id": "phantom sensitivity"
+      },
+      "moderation-overwrite_author_trust": {
+        "author_trust": "silent passthrough"
+      },
+      "moderation-overwrite_reports": {
+        "reports": "silent passthrough"
+      },
+      "moderation-overwrite_text": {
+        "text": "silent passthrough"
+      },
+      "moderation-stale_author_trust": {},
+      "moderation-stale_reports": {
+        "reports": "silent passthrough"
+      },
+      "moderation-stale_text": {},
+      "moderation-ts_leak": {
+        "posted_at": "phantom sensitivity"
+      },
+      "moderation-typo_author_trust": {
+        "author_trust": "silent passthrough"
+      },
+      "moderation-typo_reports": {
+        "reports": "silent passthrough"
+      },
+      "moderation-typo_text": {
+        "text": "silent passthrough"
+      },
+      "shipping-clean": {
+        "order_id": "phantom sensitivity"
+      },
+      "shipping-echo": {
+        "order_id": "phantom sensitivity"
+      },
+      "shipping-id_bucket": {
+        "order_id": "phantom sensitivity"
+      },
+      "shipping-overwrite_destination_zone": {
+        "destination_zone": "silent passthrough"
+      },
+      "shipping-overwrite_express": {
+        "express": "silent passthrough"
+      },
+      "shipping-overwrite_weight_kg": {
+        "weight_kg": "silent passthrough"
+      },
+      "shipping-stale_destination_zone": {
+        "destination_zone": "silent passthrough"
+      },
+      "shipping-stale_express": {
+        "express": "silent passthrough"
+      },
+      "shipping-stale_weight_kg": {
+        "weight_kg": "silent passthrough"
+      },
+      "shipping-ts_leak": {
+        "created_at": "phantom sensitivity"
+      },
+      "shipping-typo_destination_zone": {
+        "destination_zone": "silent passthrough"
+      },
+      "shipping-typo_express": {
+        "express": "silent passthrough"
+      },
+      "shipping-typo_weight_kg": {
+        "weight_kg": "silent passthrough"
+      },
+      "triage-clean": {},
+      "triage-echo": {
+        "ticket_id": "phantom sensitivity"
+      },
+      "triage-id_bucket": {
+        "ticket_id": "phantom sensitivity"
+      },
+      "triage-overwrite_body": {
+        "body": "silent passthrough"
+      },
+      "triage-overwrite_customer_tier": {
+        "customer_tier": "silent passthrough"
+      },
+      "triage-overwrite_subject": {
+        "subject": "silent passthrough"
+      },
+      "triage-stale_body": {
+        "body": "silent passthrough"
+      },
+      "triage-stale_customer_tier": {
+        "customer_tier": "silent passthrough"
+      },
+      "triage-stale_subject": {
+        "subject": "silent passthrough"
+      },
+      "triage-ts_leak": {
+        "submitted_at": "phantom sensitivity"
+      },
+      "triage-typo_body": {
+        "body": "silent passthrough"
+      },
+      "triage-typo_customer_tier": {
+        "customer_tier": "silent passthrough"
+      },
+      "triage-typo_subject": {
+        "subject": "silent passthrough"
+      }
+    },
+    "Nemotron reads the code, run 3": {
+      "limit-keyword": {
+        "ticket_id": "phantom sensitivity"
+      },
+      "limit-threshold": {},
+      "loan-clean": {},
+      "loan-echo": {
+        "application_id": "phantom sensitivity"
+      },
+      "loan-id_bucket": {
+        "application_id": "phantom sensitivity"
+      },
+      "loan-overwrite_annual_income": {
+        "annual_income": "silent passthrough"
+      },
+      "loan-overwrite_employment": {
+        "employment": "silent passthrough"
+      },
+      "loan-overwrite_requested_amount": {
+        "requested_amount": "silent passthrough"
+      },
+      "loan-stale_annual_income": {},
+      "loan-stale_employment": {},
+      "loan-stale_requested_amount": {
+        "requested_amount": "silent passthrough"
+      },
+      "loan-ts_leak": {
+        "received_at": "phantom sensitivity"
+      },
+      "loan-typo_annual_income": {
+        "annual_income": "silent passthrough"
+      },
+      "loan-typo_employment": {
+        "employment": "silent passthrough"
+      },
+      "loan-typo_requested_amount": {
+        "requested_amount": "silent passthrough"
+      },
+      "moderation-clean": {},
+      "moderation-echo": {
+        "post_id": "phantom sensitivity"
+      },
+      "moderation-id_bucket": {
+        "post_id": "phantom sensitivity"
+      },
+      "moderation-overwrite_author_trust": {
+        "author_trust": "silent passthrough"
+      },
+      "moderation-overwrite_reports": {
+        "reports": "silent passthrough"
+      },
+      "moderation-overwrite_text": {
+        "text": "silent passthrough"
+      },
+      "moderation-stale_author_trust": {},
+      "moderation-stale_reports": {
+        "reports": "silent passthrough"
+      },
+      "moderation-stale_text": {},
+      "moderation-ts_leak": {
+        "posted_at": "phantom sensitivity"
+      },
+      "moderation-typo_author_trust": {
+        "author_trust": "silent passthrough"
+      },
+      "moderation-typo_reports": {
+        "reports": "silent passthrough"
+      },
+      "moderation-typo_text": {
+        "text": "silent passthrough"
+      },
+      "shipping-clean": {
+        "order_id": "phantom sensitivity"
+      },
+      "shipping-echo": {
+        "order_id": "phantom sensitivity"
+      },
+      "shipping-id_bucket": {
+        "order_id": "phantom sensitivity"
+      },
+      "shipping-overwrite_destination_zone": {
+        "destination_zone": "silent passthrough"
+      },
+      "shipping-overwrite_express": {
+        "express": "silent passthrough"
+      },
+      "shipping-overwrite_weight_kg": {
+        "weight_kg": "silent passthrough"
+      },
+      "shipping-stale_destination_zone": {
+        "destination_zone": "silent passthrough"
+      },
+      "shipping-stale_express": {
+        "express": "silent passthrough"
+      },
+      "shipping-stale_weight_kg": {
+        "weight_kg": "silent passthrough"
+      },
+      "shipping-ts_leak": {
+        "created_at": "phantom sensitivity"
+      },
+      "shipping-typo_destination_zone": {
+        "destination_zone": "silent passthrough"
+      },
+      "shipping-typo_express": {
+        "express": "silent passthrough"
+      },
+      "shipping-typo_weight_kg": {
+        "weight_kg": "silent passthrough"
+      },
+      "triage-clean": {},
+      "triage-echo": {
+        "ticket_id": "phantom sensitivity"
+      },
+      "triage-id_bucket": {
+        "ticket_id": "phantom sensitivity"
+      },
+      "triage-overwrite_body": {
+        "body": "silent passthrough"
+      },
+      "triage-overwrite_customer_tier": {
+        "customer_tier": "silent passthrough"
+      },
+      "triage-overwrite_subject": {
+        "subject": "silent passthrough"
+      },
+      "triage-stale_body": {
+        "body": "silent passthrough"
+      },
+      "triage-stale_customer_tier": {
+        "customer_tier": "silent passthrough"
+      },
+      "triage-stale_subject": {
+        "subject": "silent passthrough"
+      },
+      "triage-ts_leak": {
+        "submitted_at": "phantom sensitivity"
+      },
+      "triage-typo_body": {
+        "body": "silent passthrough"
+      },
+      "triage-typo_customer_tier": {
+        "customer_tier": "silent passthrough"
+      },
+      "triage-typo_subject": {
+        "subject": "silent passthrough"
+      }
+    }
   },
   "scores": {
     "Loadbearing (runs it)": {
@@ -356,6 +817,29 @@
         "precision": 0.9230769230769231,
         "recall": 1.0,
         "tp": 36
+      }
+    },
+    "Nemotron reads the code (nvidia/nemotron-3-super-120b-a12b)": {
+      "all": {
+        "fn": 4,
+        "fp": 1,
+        "precision": 0.9782608695652174,
+        "recall": 0.9183673469387755,
+        "tp": 45
+      },
+      "phantom sensitivity": {
+        "fn": 0,
+        "fp": 1,
+        "precision": 0.9285714285714286,
+        "recall": 1.0,
+        "tp": 13
+      },
+      "silent passthrough": {
+        "fn": 4,
+        "fp": 0,
+        "precision": 1.0,
+        "recall": 0.8888888888888888,
+        "tp": 32
       }
     },
     "Static name check (reads it)": {
@@ -383,7 +867,10 @@
     }
   },
   "seconds": {
-    "Loadbearing (runs it)": 3.9307248749537393,
-    "Static name check (reads it)": 0.002797790919430554
+    "Loadbearing (runs it)": 4.010147999972105,
+    "Nemotron reads the code (nvidia/nemotron-3-super-120b-a12b)": 201.020808625035,
+    "Nemotron reads the code, run 2": 197.7013539999025,
+    "Nemotron reads the code, run 3": 199.06937479204498,
+    "Static name check (reads it)": 0.0035813750000670552
   }
 }
