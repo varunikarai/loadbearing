@@ -17,10 +17,10 @@ Every task below is written so either builder can pick it up cold: why it exists
 | ID | Task | Type | Pts | Due | Status |
 |---|---|---|---|---|---|
 | V1 | Sandboxes live run | tech | 4 | Sat 10-10 | todo |
-| V2 | Nemotron layer verified | tech | 6 | Sun 10-11 | offline done 10-07; Nano score and live run after V1 |
+| V2 | Nemotron layer verified | tech | 6 | Sun 10-11 | live 10-10: Nano 18, 19, 19 of 20 (bar 18); `--explain` live on the toy target; Sandboxes run after V1 |
 | V3 | Noise floor | tech | 3 | Sat 10-10 | done 10-07 |
-| V4 | Tavily intent inference | tech | 5 | Sat 10-17 | offline done 10-07; live run needs V1 keys, `--intent` and hand-off 9 |
-| V5 | Fix writer | tech | 4 | contract Sat 10-10, done Sat 10-17 | writer done offline 10-07; live Ultra check after V1 |
+| V4 | Tavily intent inference | tech | 5 | Sat 10-17 | live 10-10 on the support answerer: `passages` inferred relevant from a quoted source |
+| V5 | Fix writer | tech | 4 | contract Sat 10-10, done Sat 10-17 | live 10-10: Ultra's fix proven on the support answerer; edits, not whole files (PR #1) |
 | V6 | Pre-public audit and the public flip | tech | 2 | Sun 10-18 | `scripts/audit.py` built 10-09, go on all history; final run and flip Sun 10-18 |
 | V7 | Prior art and evidence | non-tech | 3 | Tue 10-20 | drafted 10-07; Varunika to open each source |
 | V8 | README narrative ✍ | non-tech | 3 | Sun 10-18 | todo |
@@ -30,7 +30,7 @@ Every task below is written so either builder can pick it up cold: why it exists
 | V12 | Judging self-review | non-tech | 2 | Tue 10-20 and Fri 10-23 | dry run 10-10: three gaps, each with an owner; scored reviews 10-20 and 10-23 |
 | A1 | Contracts | tech | 2 | Fri 10-09 | done 10-06 |
 | A2 | Secrets into forks | tech | 2 | Sat 10-10 | done 10-06 |
-| A3 | LLM demo target | tech | 6 | shortlist Fri 10-09, done Sat 10-17 | built and proven offline 10-07 (fake Token Factory); live run waits on V1 and my key |
+| A3 | LLM demo target | tech | 6 | shortlist Fri 10-09, done Sat 10-17 | live 10-10 on the local backend, recorded (PR #1); Sandboxes recording after V1 |
 | A4 | Fix and prove | tech | 5 | toy Tue 10-13, done Sat 10-17 | toy and CLI done 10-07; LLM target on Sandboxes waits on V1 and A3 |
 | A5 | Report and UI v2 | tech | 5 | Sat 10-17 | schema 2 and panels done 10-07; palette and logo wait on V9 |
 | A6 | Hosted demo | tech | 4 | live Sun 10-11, final Sat 10-17 | deploy-ready 10-10 (Dockerfile, render.yaml, keep-warm); live once the host account exists |
@@ -40,7 +40,7 @@ Every task below is written so either builder can pick it up cold: why it exists
 | A10 | Devpost page ✍ | non-tech | 3 | draft Tue 10-20, final Fri 10-23 | todo |
 | A11 | Feedback: Token Factory and Nemotron ✍ | non-tech | 1.5 | Fri 10-23 | todo |
 | A12 | Compliance and submission | non-tech | 2 | checklist Tue 10-20, submit Sun 10-25 | checklist drafted 10-10, kept outside the repo |
-| A13 | Benchmark: detection on planted bugs against two baselines | tech | 4 | Sat 10-17 | offline done 10-09; Nemotron baseline waits on keys |
+| A13 | Benchmark: detection on planted bugs against two baselines | tech | 4 | Sat 10-17 | done 10-10: offline and against Nemotron Super reading the code |
 | A14 | GitHub Action: run a probe in any repo's CI | tech | 2 | Tue 10-13 | done 10-09 |
 
 V = Varunika, A = Aeshvarya. One point is roughly one focused hour; the points are estimates for balance, not promises. ✍ marks text that judges read as ours: its final words are the owner's own.
