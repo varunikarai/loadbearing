@@ -1,5 +1,6 @@
 """Intent inference: Tavily's docs turn an undeclared field into a checkable defect claim."""
 
+import json
 import tempfile
 import unittest
 from pathlib import Path
@@ -82,8 +83,17 @@ class GatherTests(unittest.TestCase):
             first = gather(target, tavily.search, tavily.extract, runs)
             second = gather(target, tavily.search, tavily.extract, runs)
         self.assertEqual([e.url for e in first], [SPEC_URL, "https://example.org/api"])
+        self.assertEqual([e.declared for e in first], [False, True])
         self.assertEqual(first, second)
         self.assertEqual((len(tavily.searches), len(tavily.extracts)), (1, 1))
+
+    def test_a_cache_written_before_the_declared_mark_still_loads(self):
+        target = toy_with_two_undeclared_fields()
+        with tempfile.TemporaryDirectory() as runs:
+            old = [{"url": SPEC_URL, "title": "Triage spec", "content": SPEC}]
+            (Path(runs) / f"{target.name}.docs.json").write_text(json.dumps(old))
+            excerpts = gather(target, FakeTavily().search, FakeTavily().extract, runs)
+        self.assertEqual(excerpts, [Excerpt(SPEC_URL, "Triage spec", SPEC, declared=False)])
 
 
 class InferExpectsTests(unittest.TestCase):
