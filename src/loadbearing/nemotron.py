@@ -10,7 +10,6 @@ from __future__ import annotations
 
 import json
 import os
-import re
 import urllib.request
 from typing import TYPE_CHECKING, Any
 
@@ -29,7 +28,6 @@ MODEL_ENV = {
     "ultra": "NEMOTRON_ULTRA_MODEL",
 }
 
-_THINK = re.compile(r"<think>.*?</think>", re.S)
 _CLIP = 4000
 
 CLASSIFY_SYSTEM = (
@@ -59,8 +57,10 @@ FIX_SYSTEM = (
     "running it: a field it should read but never does (silent passthrough), or a field it "
     "should ignore but reacts to (phantom sensitivity). Make the smallest change that removes "
     "that defect and nothing else. Reply with one JSON object and nothing around it: "
-    '{"rationale": "<one paragraph>", "files": {"<path>": "<complete new file content>"}}. '
-    "Include only the files you change, each with its complete new content."
+    '{"rationale": "<one paragraph>", "edits": [{"path": "<path>", "old": "<text copied '
+    'exactly from the file>", "new": "<what replaces it>"}]}. Each old text must appear in its '
+    "file exactly once and hold only the lines you change. Every line you do not quote stays "
+    "as it is."
 )
 
 INTENT_SYSTEM = (
@@ -146,7 +146,10 @@ class NemotronRouter:
         return self._ask("ultra", EXPLAIN_SYSTEM, prompt, max_tokens=2048)
 
     def write_fix(self, verdict: FieldVerdict, sources: dict[str, str]) -> tuple[dict[str, str], str]:
-        """Ultra. The smallest change that removes one defect: (path -> new content, rationale)."""
+        """Ultra. The smallest change that removes one defect: (path -> new content, rationale).
+
+        Ultra quotes the lines it changes instead of retyping whole files, so a line it
+        never quoted cannot come back altered."""
         lines = [
             f"Defect: {verdict.verdict} on input field '{verdict.field}', "
             f"which is supposed to be {verdict.intent}.",
@@ -159,14 +162,10 @@ class NemotronRouter:
         for path, content in sources.items():
             lines.append(f"\n--- {path}\n{content}")
         reply = _json_object(self._ask("ultra", FIX_SYSTEM, "\n".join(lines), max_tokens=4096))
-        files, rationale = reply.get("files"), reply.get("rationale")
-        if not isinstance(files, dict) or not all(
-            isinstance(k, str) and isinstance(v, str) for k, v in files.items()
-        ):
-            raise ValueError("the fix reply has no files mapping path to content")
+        rationale = reply.get("rationale")
         if not isinstance(rationale, str):
             raise ValueError("the fix reply has no rationale")
-        return files, rationale
+        return _apply_edits(reply.get("edits"), sources), rationale
 
     def infer_intent(
         self, fields: list[str], excerpts: list[Any], record: dict | None = None
@@ -206,14 +205,37 @@ def _json_object(text: str) -> dict:
     return json.loads(text[start : end + 1])
 
 
+def _apply_edits(edits: Any, sources: dict[str, str]) -> dict[str, str]:
+    """The files an edit list produces: each edit swaps one exact, unique quote for new text."""
+    if not isinstance(edits, list) or not edits:
+        raise ValueError("the fix reply has no edits")
+    files: dict[str, str] = {}
+    for edit in edits:
+        if not isinstance(edit, dict) or not all(isinstance(edit.get(k), str) for k in ("path", "old", "new")):
+            raise ValueError("an edit needs a path, the old text and the new text")
+        path, old = edit["path"], edit["old"]
+        if path not in sources:
+            raise ValueError(f"an edit names {path}, which is not among the target's sources")
+        text = files.get(path, sources[path])
+        found = text.count(old) if old else 0
+        if found != 1:
+            raise ValueError(f"an edit's old text appears {found} times in {path}, not once")
+        files[path] = text.replace(old, edit["new"], 1)
+    return files
+
+
 def _strip_reasoning(text: str) -> str:
-    """Drop reasoning traces: whole <think> blocks, a trace whose opening tag the
-    chat template supplied, and one cut off before its closing tag."""
-    text = _THINK.sub("", text)
-    if "</think>" in text:
-        text = text.rsplit("</think>", 1)[1]
-    if "<think>" in text:
-        text = text.split("<think>", 1)[0]
+    """Drop the reasoning trace in front of an answer: a whole <think> block, one whose
+    opening tag the chat template supplied, and one cut off before its closing tag.
+    Tags inside the answer itself, such as code a fix edits, are left alone."""
+    close = text.find("</think>")
+    if text.lstrip().startswith("<think>") or (close >= 0 and "<think>" not in text[:close]):
+        if close < 0:
+            return ""
+        text = text[close + len("</think>") :]
+    opened = text.rfind("<think>")
+    if opened >= 0 and "</think>" not in text[opened:]:
+        text = text[:opened]
     return text.strip()
 
 
