@@ -227,16 +227,24 @@ def _apply_edits(edits: Any, sources: dict[str, str]) -> dict[str, str]:
 def _strip_reasoning(text: str) -> str:
     """Drop the reasoning trace in front of an answer: a whole <think> block, one whose
     opening tag the chat template supplied, and one cut off before its closing tag.
-    Tags inside the answer itself, such as code a fix edits, are left alone."""
+    Tags inside the answer itself, such as code a fix edits, are left alone: a reply that
+    already starts as a JSON answer has no trace in front of it, and a tag inside that
+    JSON was not cut off."""
     close = text.find("</think>")
-    if text.lstrip().startswith("<think>") or (close >= 0 and "<think>" not in text[:close]):
+    template_opened = close >= 0 and "<think>" not in text[:close] and not _starts_as_answer(text)
+    if text.lstrip().startswith("<think>") or template_opened:
         if close < 0:
             return ""
         text = text[close + len("</think>") :]
     opened = text.rfind("<think>")
     if opened >= 0 and "</think>" not in text[opened:]:
-        text = text[:opened]
+        if not (_starts_as_answer(text) and opened < text.rfind("}")):
+            text = text[:opened]
     return text.strip()
+
+
+def _starts_as_answer(text: str) -> bool:
+    return text.lstrip().startswith(("{", "```"))
 
 
 def _value_at(record: dict, path: str) -> Any:
