@@ -80,6 +80,11 @@ class ReasoningTests(unittest.TestCase):
             "  meaningful  ": "meaningful",
             '<think>t</think>{"old": "r\\"<think>.*?</think>\\""}': '{"old": "r\\"<think>.*?</think>\\""}',
             '{"new": "strip <think>x</think> here"}': '{"new": "strip <think>x</think> here"}',
+            '{"old": "rsplit(\\"</think>\\", 1)"}': '{"old": "rsplit(\\"</think>\\", 1)"}',
+            '{"new": "split(\\"<think>\\", 1)[0]"}': '{"new": "split(\\"<think>\\", 1)[0]"}',
+            '```json\n{"old": "a</think>"}\n```': '```json\n{"old": "a</think>"}\n```',
+            'the template opened it</think>{"old": "a</think>"}': '{"old": "a</think>"}',
+            '{"a": 1}<think>cut off before the end': '{"a": 1}',
         }
         for raw, answer in cases.items():
             self.assertEqual(_strip_reasoning(raw), answer, raw)
