@@ -1,5 +1,6 @@
 """Intent inference: Tavily's docs turn an undeclared field into a checkable defect claim."""
 
+import json
 import tempfile
 import unittest
 from pathlib import Path
@@ -28,6 +29,8 @@ SPEC = (
     "kept for audit and must not affect routing."
 )
 QUOTE = "The submission time and the ticket id are kept for audit and must not affect routing."
+API_URL = "https://example.org/api"
+API_PAGE = f"page at {API_URL}"
 
 
 class FakeTavily:
@@ -80,8 +83,17 @@ class GatherTests(unittest.TestCase):
             first = gather(target, tavily.search, tavily.extract, runs)
             second = gather(target, tavily.search, tavily.extract, runs)
         self.assertEqual([e.url for e in first], [SPEC_URL, "https://example.org/api"])
+        self.assertEqual([e.declared for e in first], [False, True])
         self.assertEqual(first, second)
         self.assertEqual((len(tavily.searches), len(tavily.extracts)), (1, 1))
+
+    def test_a_cache_written_before_the_declared_mark_still_loads(self):
+        target = toy_with_two_undeclared_fields()
+        with tempfile.TemporaryDirectory() as runs:
+            old = [{"url": SPEC_URL, "title": "Triage spec", "content": SPEC}]
+            (Path(runs) / f"{target.name}.docs.json").write_text(json.dumps(old))
+            excerpts = gather(target, FakeTavily().search, FakeTavily().extract, runs)
+        self.assertEqual(excerpts, [Excerpt(SPEC_URL, "Triage spec", SPEC, declared=False)])
 
 
 class InferExpectsTests(unittest.TestCase):
@@ -116,6 +128,33 @@ class InferExpectsTests(unittest.TestCase):
         self.assertEqual(sorted(result), ["submitted_at", "ticket_id"])
         self.assertEqual(router.calls, [])
         self.assertEqual(len(self.tavily.searches), 1)
+
+    def test_the_targets_own_docs_are_quoted_before_a_search_hit(self):
+        self.target.docs["urls"] = [API_URL]
+        shown = []
+
+        def answer(fields, excerpts, record):
+            shown.append([e.url for e in excerpts])
+            first = excerpts[0]
+            return {f: Evidence(IRRELEVANT, first.content, first.url) for f in fields}
+
+        result, _ = self.infer(answer)
+        self.assertEqual(shown, [[API_URL]])
+        self.assertEqual({e.url for e in result.values()}, {API_URL})
+
+    def test_a_search_settles_only_what_the_own_docs_leave_open(self):
+        self.target.docs["urls"] = [API_URL]
+        asked = []
+
+        def answer(fields, excerpts, record):
+            asked.append((fields, [e.url for e in excerpts]))
+            if excerpts[0].url == API_URL:
+                return {"ticket_id": Evidence(IRRELEVANT, API_PAGE, API_URL)}
+            return super_reading_the_spec(fields, excerpts, record)
+
+        result, _ = self.infer(answer)
+        self.assertEqual(asked, [(["ticket_id", "submitted_at"], [API_URL]), (["submitted_at"], [SPEC_URL])])
+        self.assertEqual((result["ticket_id"].url, result["submitted_at"].url), (API_URL, SPEC_URL))
 
     def test_no_docs_means_no_calls(self):
         self.target.docs = None
