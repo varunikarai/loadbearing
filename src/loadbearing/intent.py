@@ -3,9 +3,11 @@
 Tavily finds and reads the upstream docs: a search for the target's
 `docs.query`, and an extract of any `docs.urls`. Super reads the excerpts and
 says, for each field nobody declared, whether it should change the output,
-backed by a sentence and its URL. A quote that is not actually in the excerpt
-it cites is thrown away, so every inferred intent can be checked by opening
-the link.
+backed by a sentence and its URL. The target's own pages are read first; the
+search results settle only the fields those leave open, so when the pipeline's
+own spec has an answer, that is what gets quoted. A quote that is not actually
+in the excerpt it cites is thrown away, so every inferred intent can be checked
+by opening the link.
 
 Both steps are cached under `runs/`, so a demo or a re-run never pays twice.
 """
@@ -81,17 +83,23 @@ def infer_expects(
     excerpts = gather(target, search, extract, cache_dir)
     if not excerpts:
         return {}
-    answers = router.infer_intent(fields, excerpts, target.record)
-    intents = {
-        field: evidence
-        for field, evidence in answers.items()
-        if field in fields and quoted(evidence, excerpts)
-    }
+    own = [e for e in excerpts if e.declared]
+    intents = _settle(router, fields, own, target.record)
+    left = [f for f in fields if f not in intents]
+    intents.update(_settle(router, left, [e for e in excerpts if not e.declared], target.record))
     cache.parent.mkdir(parents=True, exist_ok=True)
     cache.write_text(
         json.dumps({"fields": fields, "intents": {f: asdict(e) for f, e in intents.items()}}, indent=2)
     )
     return intents
+
+
+def _settle(router: Any, fields: list[str], excerpts: list[Excerpt], record: dict) -> dict[str, Evidence]:
+    """One Super call over one set of excerpts, keeping only answers quoted from that set."""
+    if not fields or not excerpts:
+        return {}
+    answers = router.infer_intent(fields, excerpts, record)
+    return {f: ev for f, ev in answers.items() if f in fields and quoted(ev, excerpts)}
 
 
 def quoted(evidence: Evidence, excerpts: list[Excerpt]) -> bool:
