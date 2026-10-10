@@ -99,7 +99,13 @@ class DemoServerTests(unittest.TestCase):
         status, body = self.get(base + "/t/support_answerer")
         self.assertEqual(status, 200)
         self.assertIn("Backend: sandbox", body)
-        self.assertIn("recorded on sandbox", self.get(base + "/")[1])
+        index = self.get(base + "/")[1]
+        self.assertIn("recorded on sandbox", index)
+        # A paid target offers its recorded run, never a button that would spend credits.
+        row = index.split('href="/t/support_answerer"', 1)[1].split("</tr>", 1)[0]
+        self.assertIn("View the recorded run", row)
+        self.assertIn("Nemotron · Tavily", row)
+        self.assertNotIn("Run probe", row)
 
     def test_several_target_folders_are_listed_in_sections(self):
         demo = Demo([EXAMPLES, EXAMPLES.parent / "bench" / "cases"], self._tmp.name, readonly=True)

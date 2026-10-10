@@ -184,13 +184,22 @@ def _index(demo: Demo) -> str:
                 status = '<span class="badge plain">clean</span>'
             where = f' <span class="badge plain">recorded on {escape(data["backend"])}</span>' if (
                 data and data["backend"] != demo.backend) else ""
-            button = _run_button(name, not demo.can_run(name))
+            paid = bool(load_target(demo.targets[name]).env)
+            tag = '<span class="tag">Nemotron · Tavily</span>' if paid else ""
+            if demo.can_run(name):
+                action = _run_button(name, False)
+            elif data is not None:
+                action = f'<a class="btn ghost" href="/t/{escape(name)}">View the recorded run</a>'
+            else:
+                action = ""
             rows.append(
-                f'<tr><td class="f"><a href="/t/{escape(name)}">{escape(name)}</a></td>'
-                f"<td>{status}{where}</td><td>{button}</td></tr>"
+                f'<tr><td class="f"><a href="/t/{escape(name)}">{escape(name)}</a>{tag}</td>'
+                f"<td>{status}{where}</td><td>{action}</td></tr>"
             )
         sections.append(f"<h2>{escape(label)} ({len(names)})</h2>"
-                        f'<div class="panel"><table><tbody>{"".join(rows)}</tbody></table></div>')
+                        '<div class="panel"><table class="idx"><colgroup><col style="width:44%">'
+                        '<col style="width:30%"><col style="width:26%"></colgroup>'
+                        f'<tbody>{"".join(rows)}</tbody></table></div>')
     body = (
         '<p class="lede">Pick a pipeline. Loadbearing checkpoints it once, forks it once per '
         "mutated input, runs every fork in parallel, and tells you which inputs it really reads.</p>"
@@ -209,16 +218,26 @@ def _run_button(name: str, readonly: bool) -> str:
         return ""
     return (
         f'<form method="post" action="/t/{escape(name)}/run" style="margin:0">'
-        '<button class="badge silent" style="border:0;cursor:pointer;font:inherit;'
-        'font-weight:900;padding:8px 16px">Run probe</button></form>'
+        '<button class="btn">Run probe</button></form>'
     )
+
+
+_INDEX_CSS = (
+    "a{color:inherit}.idx{table-layout:fixed}.idx td{vertical-align:middle}.idx td:last-child{text-align:right}"
+    ".idx form{display:inline}.tag{margin-left:10px;font-size:12px;font-weight:800;color:var(--dim);"
+    "border:1px solid var(--line);border-radius:999px;padding:2px 8px;white-space:nowrap}"
+    ".btn{display:inline-block;border:0;cursor:pointer;font:inherit;font-size:14px;font-weight:900;"
+    "padding:8px 16px;border-radius:999px;background:var(--moved);color:#0b0b0c;text-decoration:none;white-space:nowrap}"
+    ".btn.ghost{background:transparent;color:var(--text);border:1.5px solid var(--line)}"
+    ".btn:hover{filter:brightness(1.08)}"
+)
 
 
 def _page(title: str, body: str) -> str:
     return (
         "<!doctype html><html lang=en><head><meta charset=utf-8>"
         '<meta name=viewport content="width=device-width,initial-scale=1">'
-        f"<title>{escape(title)}</title><style>{CSS}a{{color:inherit}}</style></head><body><main>"
+        f"<title>{escape(title)}</title><style>{CSS}{_INDEX_CSS}</style></head><body><main>"
         '<div class="brand"><a href="/"><b>Loadbearing</b></a> · checkpoint once, fork per mutation</div>'
         f"<h1>{escape(title)}</h1>{body}</main></body></html>"
     )
