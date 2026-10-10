@@ -103,6 +103,16 @@ class LoopFlagTests(unittest.TestCase):
         self.assertEqual(body["reconciliation"], "Super: it never moved.")
         self.assertEqual(data["fixes"], [])
 
+    def test_explain_prints_super_and_ultra_under_each_defect(self):
+        _, text = self.run_cli("--explain")
+        self.assertIn("why body:\n  Super: Super: it never moved.\n  Ultra: Ultra: read under a misspelled key.", text)
+        self.assertIn("why submitted_at:", text)
+        self.assertNotIn("why subject:", text)  # a field that behaves needs no explaining
+
+    def test_without_explain_no_why_is_printed(self):
+        _, text = self.run_cli()
+        self.assertNotIn("why ", text)
+
     def test_intent_feeds_inferred_intents_to_the_probe_and_the_proof(self):
         from loadbearing import cli
         from loadbearing.verdict import Evidence
