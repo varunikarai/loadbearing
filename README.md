@@ -11,7 +11,7 @@ The problem statement is in [SPEC.md](SPEC.md).
 
 ## Status
 
-Built and tested offline unless it says live. Nothing has run against a live Nebius account yet.
+Built and tested offline unless it says live. Nemotron and Tavily have run live on Token Factory; the Sandboxes backend has not yet.
 
 - [x] Mutation engine: destroy (template-replace), drop, nudge
 - [x] Checkpoint-and-fork engine, timed: checkpoint, parallel wall time, and the same runs one after another
@@ -25,9 +25,9 @@ Built and tested offline unless it says live. Nothing has run against a live Neb
 - [x] Prior art: metamorphic testing, leave-one-feature-out, input erasure
 - [x] Benchmark: 54 pipelines with planted bugs, against a static check and Nemotron reading the code ([bench/](bench/))
 - [x] GitHub Action with a job summary
+- [x] Live: Nemotron Nano, Super and Ultra on Token Factory. Nano scored 18, 19 and 19 of 20 labelled diffs over three runs; Super and Ultra explain each defect and write the fix
+- [x] Live: Tavily inferring which fields should matter. On the support answerer it finds a RAG source saying answers come from the retrieved passages, which makes the unread `passages` field a defect; Ultra's one-line fix is proven, and the answer goes from "30 days, refund" to "14 days, warranty"
 - [ ] Sandboxes backend run against a live account (checked against the contree-sdk 0.3.6 source, not yet run)
-- [ ] Nemotron Nano, Super and Ultra verified live with real model IDs
-- [ ] Tavily inferring which fields should matter, from upstream docs
 - [ ] Hosted demo deployed at a public URL
 - [ ] Demo video
 
