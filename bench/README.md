@@ -48,8 +48,9 @@ not removed.
   whose name appears anywhere is a phantom sensitivity. Naive on purpose: it is
   the floor, not the competition.
 - **Nemotron reads the code** (`--llm`): the source and the declared intent go to
-  Nemotron Super, which lists the defects it sees. This is the baseline that
-  matters. Its numbers appear in RESULTS.md once it has been run with a key.
+  Nemotron 3 Super, which lists the defects it sees. This is the baseline that
+  matters. `--llm-runs 3` repeats it, because a model's answer varies between
+  runs; RESULTS.md shows all three.
 
 ## Scoring
 
@@ -79,5 +80,12 @@ reported too, and overstates the evidence for that reason.
   to stderr, so the static check flags it, in 11 cases each) and 12 from the
   overwritten operator, which no name check can see. The p-values describe these
   generated cases, not pipelines in general.
+- **A strong model reading the code does about as well here.** Over three runs
+  it got 49 to 51 cases right, against the probe's 50; the difference is not
+  significant. These pipelines are about twenty lines and each bug sits on one
+  readable line, which is the easiest case for reading. What differs is that the
+  model's calls change from run to run, and the probe's do not. Bugs that are not
+  on a readable line (a model that ignores context it was given, code the reader
+  cannot see) are not in this benchmark.
 - **No interactions.** Each mutation changes one field; a defect that needs two
   fields to change together is not tested here or by the probe.
