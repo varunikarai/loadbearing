@@ -5,9 +5,10 @@ passages, and say whether the item can still be returned and within how many
 days. Nothing about the request's id, user or arrival time should matter.
 
 The planted bug is the kind that ships: the retriever was changed to write
-`passages`, and this step still reads `context`. Nothing throws. The prompt
-just says there is no policy text, and the model answers from what most shops
-do, fluently and wrongly.
+`passages`, and this step still reads `context`. Nothing throws. The policy
+simply never reaches the prompt, and an agent told to be decisive answers from
+what most shops do: on Nemotron Nano, "Yes, you can still return the headphones
+for a refund within the 30-day..." when the policy says 14 days and no refund.
 
 Standard library only. Calls Nemotron on Nebius Token Factory at temperature 0.
 """
@@ -22,28 +23,26 @@ BASE_URL = os.environ.get("TOKEN_FACTORY_BASE_URL", "https://api.tokenfactory.ne
 MODEL = os.environ.get("NEMOTRON_NANO_MODEL", "")
 
 SYSTEM = (
-    "You answer customer support questions for an online shop, using only the policy text "
-    "you are given. Reply with one JSON object and nothing else: "
+    "You are a support agent for ShopCo, an online electronics store. Be decisive: customers "
+    "hate vague answers. Always tell them clearly whether they can return the item and the "
+    "return window. Reply with one JSON object and nothing else: "
     '{"answer": "<one or two sentences to the customer>", '
     '"can_return": <true, false, or null if unknown>, '
-    '"return_window_days": <the return window in days, or null if unknown>}'
+    '"return_window_days": <number, or null if unknown>}'
 )
 
 
 def build_prompt(request: dict) -> str:
     # The retriever puts what it found here.
     context = request.get("context", "")
-    return (
-        f"Policy text:\n{context or '(none)'}\n\n"
-        f"Customer question:\n{request.get('question', '')}"
-    )
+    return (f"{context}\n\n" if context else "") + f"Customer question: {request.get('question', '')}"
 
 
 def ask(prompt: str) -> str:
     body = {
         "model": MODEL,
         "temperature": 0,
-        "max_tokens": 400,
+        "max_tokens": 1000,  # room for the reasoning text before the JSON
         "messages": [{"role": "system", "content": SYSTEM}, {"role": "user", "content": prompt}],
     }
     req = urllib.request.Request(

@@ -96,6 +96,13 @@ Problem statement: [SPEC.md](SPEC.md). Setup, target format, layout: [README.md]
 
 Newest first.
 
+### 2026-10-10 (d)
+- **First live Token Factory calls** (Aeshvarya): Nano, Super and Ultra each answer on the default endpoint (`api.tokenfactory.nebius.com/v1/`), about 1 s each. The model IDs are `nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B`, `nvidia/nemotron-3-super-120b-a12b`, `nvidia/Nemotron-3-Ultra-550b-a55b`. The project ID starts `aiproject-`, not `project-`. Sandboxes needs a "Request beta access" click per account; the page says it is free during the beta.
+- **A3 live on the local backend:** the old prompt made Nano answer "not enough information", so there was no wrong answer to find. Changed to a decisive-agent prompt: the live baseline now says "Yes, you can still return them for a refund within the 30-day window"; `question` is load-bearing, the ids inert, 19 runs in 8.3 s.
+- **The whole loop live** (Super, Ultra, fix, proof; Tavily's intent supplied by hand until the Tavily key is in): Super and Ultra name the `context`/`passages` line, Ultra's fix is proven clean, and the answer after it is `can_return: false`, 14 days, "file a warranty claim for a repair or replacement". 29 s.
+- **Hand-off 15 to Varunika**, `nemotron.py`: `chat()` strips `<think>...</think>` from every reply, including a `write_fix` reply whose file content contains that pattern. On the support answerer, whose source strips think tags, Ultra's fix came back with that line rewritten and the final newline changed: two edits unrelated to the defect. Suggest stripping a reasoning trace only before the JSON object starts, never inside it.
+- **Hand-off 16 to Varunika**, `fix.py`: `validate` allowed those unrelated edits, because they were small. Worth a check that a fix changes only the lines Ultra's rationale is about, or a prompt line asking to keep every other line byte-identical.
+
 ### 2026-10-10 (c)
 - **Hand-offs 13 and 14 done** (Aeshvarya): the benchmark is scored per case too (50 of 54 against 26, exact McNemar on cases p = 1.9e-05) and both READMEs lead with it and name the two mechanisms; the read-only demo runs any free target (no keys, local, no model calls) and serves paid runs as recorded, with several target folders listed in sections.
 - Fixed a flaky test: the fake Token Factory's listen backlog of 5 refused connections under the probe's parallel runs. Passed 15 in a row.
