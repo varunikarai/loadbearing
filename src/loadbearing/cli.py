@@ -6,6 +6,7 @@ import argparse
 import json
 import os
 import sys
+import textwrap
 import traceback
 from pathlib import Path
 from typing import Optional
@@ -227,19 +228,40 @@ def _why(v) -> list[str]:
     """What --intent and --explain found for one defect: the cited intent, Super, Ultra."""
     lines = []
     if v.evidence is not None:
-        lines.append(f'  intent from {v.evidence.url}: "{v.evidence.quote}"')
+        lines += _plain(f'"{v.evidence.quote}" ({v.evidence.url})', "  intent: ")
     if v.reconciliation:
-        lines.append(f"  Super: {v.reconciliation.strip()}")
+        lines += _plain(v.reconciliation, "  Super:  ")
     if v.explanation:
-        lines.append("  Ultra: " + v.explanation.strip().replace("\n", "\n         "))
+        lines += _plain(v.explanation, "  Ultra:  ")
     return ["", f"why {v.field}:", *lines] if lines else []
+
+
+def _plain(text: str, label: str, width: int = 100) -> list[str]:
+    """A model's markdown as terminal text: wrapped prose, code lines kept as they are."""
+    pad = " " * len(label)
+    out: list[str] = []
+    in_code = False
+    for raw in text.strip().splitlines():
+        if raw.strip().startswith("```"):
+            in_code = not in_code
+            continue
+        if in_code:
+            out.append(pad + "    " + raw.rstrip())
+        elif raw.strip():
+            out += textwrap.wrap(raw.replace("**", "").strip(), width - len(pad)) or [""]
+            out = [line if not line or line.startswith(pad) else pad + line for line in out]
+        elif out and out[-1].strip():
+            out.append("")
+    while out and not out[-1].strip():
+        out.pop()
+    return [label + out[0][len(pad):], *out[1:]] if out else []
 
 
 def render_loop(loop: Loop, target) -> str:
     """The fix and its proof per defect, then whatever could not be fixed."""
     lines = []
     for fix in loop.fixes:
-        lines += ["", f"fix for {fix.field} ({fix.defect}): {fix.rationale}", fix.diff(target).rstrip()]
+        lines += ["", f"fix for {fix.field} ({fix.defect}):", *_plain(fix.rationale, "  Ultra:  "), fix.diff(target).rstrip()]
         proof = next((p for p in loop.proofs if p.fix is fix), None)
         if proof is None:
             continue

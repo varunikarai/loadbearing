@@ -80,7 +80,7 @@ class LoopFlagTests(unittest.TestCase):
     def test_prove_prints_the_fix_its_diff_and_the_proof(self):
         code, text = self.run_cli("--prove")
         self.assertEqual(code, 1)  # the pipeline as given still has defects
-        self.assertIn("fix for body (silent passthrough): Read the body under its real key.", text)
+        self.assertIn("fix for body (silent passthrough):\n  Ultra:  Read the body under its real key.", text)
         self.assertIn("+++ b/pipeline.py", text)
         self.assertIn("proof: body is now load-bearing, and no other field gained a defect.", text)
         self.assertIn("no fix for submitted_at:", text)
@@ -105,9 +105,18 @@ class LoopFlagTests(unittest.TestCase):
 
     def test_explain_prints_super_and_ultra_under_each_defect(self):
         _, text = self.run_cli("--explain")
-        self.assertIn("why body:\n  Super: Super: it never moved.\n  Ultra: Ultra: read under a misspelled key.", text)
+        self.assertIn("why body:\n  Super:  Super: it never moved.\n  Ultra:  Ultra: read under a misspelled key.", text)
         self.assertIn("why submitted_at:", text)
         self.assertNotIn("why subject:", text)  # a field that behaves needs no explaining
+
+    def test_model_markdown_prints_as_wrapped_text_with_code_kept(self):
+        from loadbearing.cli import _plain
+
+        lines = _plain("**Why:** " + "word " * 40 + "\n\n```python\nx = r.get('context', '')\n```", "  Ultra:  ")
+        self.assertTrue(lines[0].startswith("  Ultra:  Why: word"))
+        self.assertTrue(all(len(line) <= 100 for line in lines))
+        self.assertIn("              x = r.get('context', '')", lines)
+        self.assertFalse(any("**" in line or "```" in line for line in lines))
 
     def test_without_explain_no_why_is_printed(self):
         _, text = self.run_cli()
