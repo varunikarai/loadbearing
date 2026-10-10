@@ -216,9 +216,23 @@ def render(report: Report) -> str:
     if report.defects:
         found = ", ".join(f"{v.field} ({v.verdict})" for v in report.defects)
         lines.append(f"{len(report.defects)} defect(s): {found}")
+        for v in report.defects:
+            lines += _why(v)
     else:
         lines.append("No defects found.")
     return "\n".join(lines)
+
+
+def _why(v) -> list[str]:
+    """What --intent and --explain found for one defect: the cited intent, Super, Ultra."""
+    lines = []
+    if v.evidence is not None:
+        lines.append(f'  intent from {v.evidence.url}: "{v.evidence.quote}"')
+    if v.reconciliation:
+        lines.append(f"  Super: {v.reconciliation.strip()}")
+    if v.explanation:
+        lines.append("  Ultra: " + v.explanation.strip().replace("\n", "\n         "))
+    return ["", f"why {v.field}:", *lines] if lines else []
 
 
 def render_loop(loop: Loop, target) -> str:
