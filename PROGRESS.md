@@ -96,6 +96,10 @@ Problem statement: [SPEC.md](SPEC.md). Setup, target format, layout: [README.md]
 
 Newest first.
 
+### 2026-10-10 (e)
+- **A13 against Nemotron 3 Super reading the code** (Aeshvarya, three runs, about $0.30): 49, 51 and 49 of 54 cases right, against the probe's 50 on every run; not significant (p = 0.38). Its wrong cases change between runs at temperature 0, and every run it raised a false alarm on `shipping-clean`. Both READMEs now say plainly that on twenty-line pipelines with one-line bugs, reading does about as well; the stated difference is repeatability, the forks as evidence, and the proven fix.
+- **Proposal (Aeshvarya), not agreed:** a second benchmark track where the defect is not on a readable line: an LLM step that is given a field and ignores it, or reacts to a field that should not matter (a name, an id). Reading the code cannot see those; running can. It may need a value-swap mutation next to destroy, drop and nudge, which is `mutations.py` (Varunika's), so it is a question, not a claim.
+
 ### 2026-10-10 (d)
 - **First live Token Factory calls** (Aeshvarya): Nano, Super and Ultra each answer on the default endpoint (`api.tokenfactory.nebius.com/v1/`), about 1 s each. The model IDs are `nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B`, `nvidia/nemotron-3-super-120b-a12b`, `nvidia/Nemotron-3-Ultra-550b-a55b`. The project ID starts `aiproject-`, not `project-`. Sandboxes needs a "Request beta access" click per account; the page says it is free during the beta.
 - **A3 live on the local backend:** the old prompt made Nano answer "not enough information", so there was no wrong answer to find. Changed to a decisive-agent prompt: the live baseline now says "Yes, you can still return them for a refund within the 30-day window"; `question` is load-bearing, the ids inert, 19 runs in 8.3 s.
