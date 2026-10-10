@@ -29,6 +29,7 @@ class Excerpt:
     url: str
     title: str
     content: str
+    declared: bool = False  # one of the target's own docs.urls, not a search hit
 
 
 def undeclared_fields(target: Target) -> list[str]:
@@ -53,7 +54,7 @@ def gather(
             excerpts.append(Excerpt(r.get("url", ""), r.get("title", ""), text))
     if docs.get("urls"):
         for r in extract(docs["urls"]).get("results", []):
-            excerpts.append(Excerpt(r.get("url", ""), "", r.get("raw_content") or ""))
+            excerpts.append(Excerpt(r.get("url", ""), "", r.get("raw_content") or "", declared=True))
     excerpts = [e for e in excerpts if e.url and e.content]
     if excerpts:
         cache.parent.mkdir(parents=True, exist_ok=True)
