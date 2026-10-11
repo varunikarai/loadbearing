@@ -108,5 +108,27 @@ class HtmlReportV2Tests(unittest.TestCase):
         self.assertIn('class="warn"', render_html(dict(noisy, void=True)))
 
 
+
+class ProseTests(unittest.TestCase):
+    """Model prose arrives as markdown; it is shown formatted, and never as live HTML."""
+
+    def test_bold_code_and_fences_are_formatted(self):
+        from loadbearing.html_report import _prose
+
+        html = _prose("**Why:** `build_prompt` reads it.\n\n```python\nx = r.get('context')\n```")
+        self.assertIn("<b>Why:</b> <code>build_prompt</code>", html)
+        self.assertIn('<pre class="code">x = r.get(&#x27;context&#x27;)</pre>', html)
+        self.assertNotIn("```", html)
+        self.assertNotIn("**", html)
+
+    def test_markup_in_model_text_stays_escaped(self):
+        from loadbearing.html_report import _prose
+
+        html = _prose('**<img src=x onerror=alert(1)>** `<script>` ```\n<b>no</b>\n```')
+        self.assertNotIn("<img", html)
+        self.assertNotIn("<script>", html)
+        self.assertIn("&lt;b&gt;no&lt;/b&gt;", html)
+
+
 if __name__ == "__main__":
     unittest.main()
