@@ -34,8 +34,8 @@ CLASSIFY_SYSTEM = (
     "You compare two outputs of the same program. The only difference between the two "
     "runs is one mutated input field. Answer with exactly one word: 'meaningful' if the "
     "output changed in a way a user of this program would care about, or 'noise' if it "
-    "changed only in something incidental such as a timestamp, a request id, ordering, "
-    "or whitespace."
+    "changed only in something incidental such as a timestamp, a request id, how long the "
+    "run took (a latency or duration in ms or seconds), ordering, or whitespace."
 )
 
 RECONCILE_SYSTEM = (
