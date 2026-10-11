@@ -251,10 +251,16 @@ def _evidence(verdict: dict[str, Any], data: dict[str, Any]) -> str:
     forks = [f for f in data["forks"] if f["field"] == field]
     before = data["baseline"]["output"]
     original = _quoted(_lookup(data["record"], field))
+    # An inferred intent was never declared: its docs, quoted below, say what it should do.
+    source = (
+        "Not declared, but its docs say it is an input"
+        if verdict.get("intent_source") == "inferred"
+        else "Declared as an input"
+    )
     if verdict["verdict"] == SILENT_PASSTHROUGH:
         tried = ", ".join(f["kind"] for f in forks)
         text = (
-            f"Declared as an input that should change the output. It was {_past(tried)} "
+            f"{source} that should change the output. It was {_past(tried)} "
             f"in {len(forks)} separate forks, and the output never moved. "
             "The pipeline does not read it."
         )
@@ -265,7 +271,7 @@ def _evidence(verdict: dict[str, Any], data: dict[str, Any]) -> str:
         shown = next((f for f in moved if f["kind"] == "nudge"), moved[0])
         keys = ", ".join(shown["changed"]) or "the output"
         text = (
-            "Declared as an input that should not matter. "
+            f"{source} that should not matter. "
             f"{_describe(shown, original)}, and {keys} changed."
         )
         cls = "phantom"
