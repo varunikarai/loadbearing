@@ -96,6 +96,13 @@ Problem statement: [SPEC.md](SPEC.md). Setup, target format, layout: [README.md]
 
 Newest first.
 
+### 2026-10-11 (b)
+- **PR #1 reviewed and merged** (Varunika, `343ba8c`): exact-quote edits close hand-off 16 with no change to `fix.py`, since a line Ultra never quotes cannot come back altered. Follow-up in `nemotron.py` (`6a80d68`): a reply that already starts as a JSON answer keeps think tags quoted inside it; before, an edit quoting `rsplit("</think>")` was cut in half and the fix refused.
+- **Own docs first** (Varunika, `intent.py`, `053a100`): the recording quotes a search hit, while the target declares NVIDIA's RAG guides and the README says those are what Super quotes. Super now settles undeclared fields from the target's own `docs.urls` first; search results settle only what those leave open. RAG 101 carries "The LLMs then use the retrieved data to craft appropriate responses." word for word (checked 10-11).
+- **Hand-off 17 done** (Varunika, `65b09d9`): Nano's prompt names how long a run took as incidental, next to ids and timestamps. Needs a live re-score.
+- **Hand-off 18 to Aeshvarya**, recordings: delete `runs/support-answerer.docs.json` and `.intent.json`, re-record `--intent --prove` so the evidence is NVIDIA's page, then README lines 74 and 236 agree; re-run `scripts/eval_nano.py` for hand-off 17.
+- 169 tests pass; audit go on 258 commits.
+
 ### 2026-10-11
 - **Live keys and runs are Aeshvarya's from here** (agreed 10-11): Varunika needs no key, credits or Sandboxes access. CI, the Docker image and the hosted demo use no secrets, and every paid run is recorded into `demo/runs/`.
 - **The whole loop live with Tavily** (Aeshvarya): `--intent --prove` on the support answerer. `passages` was left out of `expects` (hand-off 9), Tavily and Super cite a RAG source saying answers are grounded in the retrieved passages, so the unread field is a defect. Ultra's fix is the one line `context` -> `passages`, the proof is clean, and the answer goes from "Yes... 30-day return window" to "No... the 14-day window has passed, but the warranty covers a repair or replacement". 19 runs in about 9 s on the local backend.
