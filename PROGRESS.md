@@ -42,7 +42,7 @@ Each one missing kills the entry.
 
 | Deliverable | Due | Status |
 |---|---|---|
-| Runs on Token Factory or AI Cloud, uses an NVIDIA open model | stage 1 pass/fail | Code written, not yet run live |
+| Runs on Token Factory or AI Cloud, uses an NVIDIA open model | stage 1 pass/fail | Met on Token Factory 10-10: Nano, Super and Ultra live, recorded in `demo/runs/`. Sandboxes not yet run |
 | Public repo, OSS licence visible at the top | 2026-10-18 (V6) | Apache 2.0 committed. Repo private until Varunika flips it after the audit: `gh repo edit varunikarai/loadbearing --visibility public --accept-visibility-change-consequences` |
 | README with setup and Nebius / Nemotron usage | 2026-10-18 (V8, A7), prior art 2026-10-20 (V7) | Technical sections drafted. Pitch and team section not written |
 | Hosted demo URL | live 2026-10-11, final 2026-10-17 (A6) | Server and Docker image built and checked locally. Host not chosen, not deployed |
