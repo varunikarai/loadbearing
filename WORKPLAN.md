@@ -17,9 +17,9 @@ Every task below is written so either builder can pick it up cold: why it exists
 | ID | Task | Type | Pts | Due | Status |
 |---|---|---|---|---|---|
 | V1 | Sandboxes live run | tech | 4 | Sat 10-10 | todo |
-| V2 | Nemotron layer verified | tech | 6 | Sun 10-11 | live 10-10: Nano 18, 19, 19 of 20 (bar 18); `--explain` live on the toy target; Sandboxes run after V1 |
+| V2 | Nemotron layer verified | tech | 6 | Sun 10-11 | live 10-10: Nano 18, 19, 19 of 20 (bar 18); `--explain` live on the toy target; timings named as noise 10-11 (hand-off 17), re-score pending; Sandboxes run after V1 |
 | V3 | Noise floor | tech | 3 | Sat 10-10 | done 10-07 |
-| V4 | Tavily intent inference | tech | 5 | Sat 10-17 | live 10-10 on the support answerer: `passages` inferred relevant from a quoted source |
+| V4 | Tavily intent inference | tech | 5 | Sat 10-17 | live 10-10 on the support answerer: `passages` inferred relevant from a quoted source; own docs quoted before search hits 10-11, re-record pending (hand-off 18) |
 | V5 | Fix writer | tech | 4 | contract Sat 10-10, done Sat 10-17 | live 10-10: Ultra's fix proven on the support answerer; edits, not whole files (PR #1) |
 | V6 | Pre-public audit and the public flip | tech | 2 | Sun 10-18 | `scripts/audit.py` built 10-09, go on all history; final run and flip Sun 10-18 |
 | V7 | Prior art and evidence | non-tech | 3 | Tue 10-20 | drafted 10-07; Varunika to open each source |
