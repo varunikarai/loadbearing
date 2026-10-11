@@ -96,6 +96,11 @@ Problem statement: [SPEC.md](SPEC.md). Setup, target format, layout: [README.md]
 
 Newest first.
 
+### 2026-10-11 (c)
+- **Pre-public check of the nine README screenshots** (Varunika, V6): no keys, paths, user names or addresses in any of them. The text audit cannot read images, so they were opened one by one.
+- **Hand-off 19 to Aeshvarya**, `html_report.py`, branch `varunika/h19-inferred-card` (not merged, his review): the evidence card always opened "Declared as an input that should change the output", so the README's own screenshot says `passages` was declared right above the quote that inferred it. Inferred fields now read "Not declared, but its docs say it is an input that should...". Tested; the screenshots need re-rendering with hand-off 18. Reviewed his other 10-11 code: model prose is escaped before any tag is added, so it cannot inject HTML.
+- **V12 re-score** (Varunika, estimate, out of 10): Technological Implementation 6 (from 4), Design 5 (from 4), Potential Impact 6 (from 5), Quality of the Idea 7; **24 of 40, from 20**. Top gap now: **Sandboxes**, which the track description names and nothing has touched live. Until it runs, the README's first line ("checkpoints a pipeline once in a Nebius Token Factory Sandbox") describes what the code does, not what any run has shown; if Sandboxes is not live by 2026-10-18, that line changes before the flip. Then the hosted URL and the video.
+
 ### 2026-10-11 (b)
 - **PR #1 reviewed and merged** (Varunika, `343ba8c`): exact-quote edits close hand-off 16 with no change to `fix.py`, since a line Ultra never quotes cannot come back altered. Follow-up in `nemotron.py` (`6a80d68`): a reply that already starts as a JSON answer keeps think tags quoted inside it; before, an edit quoting `rsplit("</think>")` was cut in half and the fix refused.
 - **Own docs first** (Varunika, `intent.py`, `053a100`): the recording quotes a search hit, while the target declares NVIDIA's RAG guides and the README says those are what Super quotes. Super now settles undeclared fields from the target's own `docs.urls` first; search results settle only what those leave open. RAG 101 carries "The LLMs then use the retrieved data to craft appropriate responses." word for word (checked 10-11).
