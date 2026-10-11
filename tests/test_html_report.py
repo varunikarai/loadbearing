@@ -47,6 +47,15 @@ class HtmlReportTests(unittest.TestCase):
         self.assertNotIn("<img src=x", page)
         self.assertIn("&lt;script&gt;", page)
 
+    def test_a_card_says_when_the_intent_came_from_docs_not_a_declaration(self):
+        inferred = dict(self.data)
+        inferred["verdicts"] = [
+            dict(v, intent_source="inferred") if v["field"] == "body" else v for v in self.data["verdicts"]
+        ]
+        page = render_html(inferred)
+        self.assertIn("Not declared, but its docs say it is an input that should change the output", page)
+        self.assertIn("Declared as an input that should not matter", page)
+
     def test_a_clean_run_says_so(self):
         clean = dict(self.data, defects=[])
         clean["verdicts"] = [dict(v, defect=False, verdict="inert") for v in self.data["verdicts"]]
