@@ -13,10 +13,10 @@ Where Loadbearing is, what happens next, and what has already happened. **Now**,
 
 ## Now
 
-_Updated 2026-10-11_
+_Updated 2026-10-13_
 
-- **State:** the whole loop has run live on Token Factory and Tavily, on the local backend: Nano scores 18, 19 and 19 of 20; on the support answerer Tavily and Super infer `passages` is relevant from a quoted source, Ultra's one-line fix is proven, and the run is recorded in `demo/runs/` for the hosted demo. Ultra fixes by exact-quote edits. Intent comes from the target's own docs first, search only for the gaps. The README leads with the product working. 169 tests pass on `main`; audit go. **Not yet live:** the Sandboxes backend (V1), the hosted demo (A6), any recording made on Sandboxes.
-- **Next action:** Aeshvarya, who holds the keys from 10-11: hand-off 18 (re-record with own docs first, re-score Nano); Sandboxes beta access, then V1's run, `loadbearing probe examples/ticket_triage/target.json --backend sandbox --nano` (pass = the same two defects, found on Nebius), then the support answerer on Sandboxes; A6 host account. Varunika: V9 palette (was due 10-10) and V10 outline (due 10-11), then V8 README narrative by 10-18.
+- **State:** the whole loop has run live on Token Factory and Tavily, on the local backend: Nano scores 18, 19 and 19 of 20; on the support answerer Tavily and Super infer `passages` is relevant from a quoted source, Ultra's one-line fix is proven, and the run is recorded in `demo/runs/` for the hosted demo. Ultra fixes by exact-quote edits. Intent comes from the target's own docs first, search only for the gaps. The README leads with the product working, and an inferred field's card says its intent came from docs. 170 tests pass on `main`; audit go. **Not yet live:** the Sandboxes backend (V1), the hosted demo (A6), any recording made on Sandboxes.
+- **Next action:** Aeshvarya, who holds the keys from 10-11: hand-off 18 (re-record with own docs first, re-render the screenshots, re-score Nano); Sandboxes beta access, then hand-off 20 and V1's run, `loadbearing probe examples/ticket_triage/target.json --backend sandbox --nano` (pass = the same two defects, found on Nebius), then the support answerer on Sandboxes; A6 host account (due live 10-11, not deployed). Varunika: V9 palette (was due 10-10) and V10 outline (was due 10-11) on Fri 10-16, then V8 README narrative by 10-18.
 - **Waiting on:** Aeshvarya confirming or countering the split in WORKPLAN.md (due 2026-10-09; both are working inside it); Sandboxes beta access.
 - **Deadline:** 2026-10-30 10:00 PT (22:30 IST). **Target submission: 2026-10-25.**
 
@@ -95,6 +95,12 @@ Problem statement: [SPEC.md](SPEC.md). Setup, target format, layout: [README.md]
 ## Log
 
 Newest first.
+
+### 2026-10-13
+- **Hand-off 19 merged** (`2e616e9`) under rule 4: no review in 24 hours counts as approval. An inferred field's evidence card now says its docs, not a declaration, set its intent. 170 tests pass.
+- **SPEC brought in line with own docs first** (Varunika, `3938792`): the pipeline's own `docs.urls` settle intent first, search results only the fields those leave open.
+- **Hand-off 20 to Aeshvarya**, `backends/contree.py`, before V1's first live run: `checkpoint()` calls `images.use(target.image)`. In contree-sdk 0.3.6, `use()` only builds a reference to the tag and never checks it, so on an account without `python:3.12-slim` the first run fails. `images.oci(target.image)` looks the tag up and imports it from docker.io when it is missing (`_pull_image_by_oci`). Worth switching before the run, or keeping the exact error text for V11 if it fails as predicted.
+- **Open on Aeshvarya's side since 10-11:** hand-off 18 (re-record citing NVIDIA's page, re-score Nano; the screenshots also need re-rendering for 19); A6 was due live 10-11 and is not deployed; Sandboxes beta access, which V1 and the 10-17 milestone (loop closed on Sandboxes) both need.
 
 ### 2026-10-11 (c)
 - **Pre-public check of the nine README screenshots** (Varunika, V6): no keys, paths, user names or addresses in any of them. The text audit cannot read images, so they were opened one by one.
