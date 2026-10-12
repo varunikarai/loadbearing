@@ -96,6 +96,12 @@ Problem statement: [SPEC.md](SPEC.md). Setup, target format, layout: [README.md]
 
 Newest first.
 
+### 2026-10-13
+- **Hand-off 19 merged** (`2e616e9`) under rule 4: no review in 24 hours counts as approval. An inferred field's evidence card now says its docs, not a declaration, set its intent. 170 tests pass.
+- **SPEC brought in line with own docs first** (Varunika, `3938792`): the pipeline's own `docs.urls` settle intent first, search results only the fields those leave open.
+- **Hand-off 20 to Aeshvarya**, `backends/contree.py`, before V1's first live run: `checkpoint()` calls `images.use(target.image)`. In contree-sdk 0.3.6, `use()` only builds a reference to the tag and never checks it, so on an account without `python:3.12-slim` the first run fails. `images.oci(target.image)` looks the tag up and imports it from docker.io when it is missing (`_pull_image_by_oci`). Worth switching before the run, or keeping the exact error text for V11 if it fails as predicted.
+- **Open on Aeshvarya's side since 10-11:** hand-off 18 (re-record citing NVIDIA's page, re-score Nano; the screenshots also need re-rendering for 19); A6 was due live 10-11 and is not deployed; Sandboxes beta access, which V1 and the 10-17 milestone (loop closed on Sandboxes) both need.
+
 ### 2026-10-11 (c)
 - **Pre-public check of the nine README screenshots** (Varunika, V6): no keys, paths, user names or addresses in any of them. The text audit cannot read images, so they were opened one by one.
 - **Hand-off 19 to Aeshvarya**, `html_report.py`, branch `varunika/h19-inferred-card` (not merged, his review): the evidence card always opened "Declared as an input that should change the output", so the README's own screenshot says `passages` was declared right above the quote that inferred it. Inferred fields now read "Not declared, but its docs say it is an input that should...". Tested; the screenshots need re-rendering with hand-off 18. Reviewed his other 10-11 code: model prose is escaped before any tag is added, so it cannot inject HTML.
