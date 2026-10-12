@@ -35,7 +35,7 @@ For any pipeline, we tell you which inputs actually change its behaviour, and we
 | Nemotron Nano | Classify each fork's diff | One cheap call per fork: is this change meaningful or noise? |
 | Nemotron Super | Reconcile across forks | States, for each defect, what its destroy, drop and nudge forks show together. The defect class itself comes from a fixed rule over the forks, never from a model, so no model can invent a defect. |
 | Nemotron Ultra | Explain the defect and write the fix | Long-horizon reasoning over the pipeline source: why does this path not read the field, and what is the smallest change that makes it? |
-| Tavily | Infer which fields should matter | Pulls the upstream spec or docs, and Super reads them to fill in `expects` for fields nobody declared, so an undeclared field can carry a defect claim. Each inferred intent carries a verbatim quote and its link, and a quote that is not in the page it cites is thrown away. That is what makes phantom sensitivity a finding rather than a guess. |
+| Tavily | Infer which fields should matter | Pulls the pipeline's own docs (`docs.urls`) and searches for more (`docs.query`). Super fills in `expects` for fields nobody declared from the pipeline's own pages first, and from the search results only where those pages say nothing, so an undeclared field can carry a defect claim. Each inferred intent carries a verbatim quote and its link, and a quote that is not in the page it cites is thrown away. That is what makes phantom sensitivity a finding rather than a guess. |
 
 ## LLM pipelines
 
