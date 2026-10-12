@@ -13,10 +13,10 @@ Where Loadbearing is, what happens next, and what has already happened. **Now**,
 
 ## Now
 
-_Updated 2026-10-11_
+_Updated 2026-10-13_
 
-- **State:** the whole loop has run live on Token Factory and Tavily, on the local backend: Nano scores 18, 19 and 19 of 20; on the support answerer Tavily and Super infer `passages` is relevant from a quoted source, Ultra's one-line fix is proven, and the run is recorded in `demo/runs/` for the hosted demo. Ultra fixes by exact-quote edits. Intent comes from the target's own docs first, search only for the gaps. The README leads with the product working. 169 tests pass on `main`; audit go. **Not yet live:** the Sandboxes backend (V1), the hosted demo (A6), any recording made on Sandboxes.
-- **Next action:** Aeshvarya, who holds the keys from 10-11: hand-off 18 (re-record with own docs first, re-score Nano); Sandboxes beta access, then V1's run, `loadbearing probe examples/ticket_triage/target.json --backend sandbox --nano` (pass = the same two defects, found on Nebius), then the support answerer on Sandboxes; A6 host account. Varunika: V9 palette (was due 10-10) and V10 outline (due 10-11), then V8 README narrative by 10-18.
+- **State:** the whole loop has run live on Token Factory and Tavily, on the local backend: Nano scores 18, 19 and 19 of 20; on the support answerer Tavily and Super infer `passages` is relevant from a quoted source, Ultra's one-line fix is proven, and the run is recorded in `demo/runs/` for the hosted demo. Ultra fixes by exact-quote edits. Intent comes from the target's own docs first, search only for the gaps. The README leads with the product working, and an inferred field's card says its intent came from docs. 170 tests pass on `main`; audit go. **Not yet live:** the Sandboxes backend (V1), the hosted demo (A6), any recording made on Sandboxes.
+- **Next action:** Aeshvarya, who holds the keys from 10-11: hand-off 18 (re-record with own docs first, re-render the screenshots, re-score Nano); Sandboxes beta access, then hand-off 20 and V1's run, `loadbearing probe examples/ticket_triage/target.json --backend sandbox --nano` (pass = the same two defects, found on Nebius), then the support answerer on Sandboxes; A6 host account (due live 10-11, not deployed). Varunika: V9 palette (was due 10-10) and V10 outline (was due 10-11) on Fri 10-16, then V8 README narrative by 10-18.
 - **Waiting on:** Aeshvarya confirming or countering the split in WORKPLAN.md (due 2026-10-09; both are working inside it); Sandboxes beta access.
 - **Deadline:** 2026-10-30 10:00 PT (22:30 IST). **Target submission: 2026-10-25.**
 
