@@ -30,10 +30,27 @@ class MutationTests(unittest.TestCase):
         for value in ([], {}, "", 0, 0.0, False, None, ["a"], {"k": 1}):
             self.assertNotEqual(destroy(value), value, repr(value))
 
+    def test_a_dotted_record_key_is_refused_before_any_mutation_is_planned(self):
+        with self.assertRaisesRegex(ValueError, "'http.method' contains a dot"):
+            plan({"http.method": "GET", "path": "/"})
+        with self.assertRaisesRegex(ValueError, "'http.status' under span.attrs contains a dot"):
+            plan({"span": {"attrs": {"http.status": 200}}})
+
     def test_drop_removes_only_that_field(self):
         out = Mutation(DROP, "customer.tier").apply(RECORD)
         self.assertNotIn("tier", out["customer"])
         self.assertEqual(out["customer"]["tags"], ["a"])
+
+    def test_nudge_keeps_a_timestamps_precision_and_format(self):
+        cases = {
+            "2026-10-07T14:03:11.000Z": "2026-10-07T14:03:12.000Z",
+            "2026-10-07T14:03:11.123456+00:00": "2026-10-07T14:03:12.123456+00:00",
+            "2026-10-07T14:03": "2026-10-07T14:04",
+            "2026-10-07 14:03:11": "2026-10-07 14:03:12",
+            "2026-10-07T14:03:11+05:30": "2026-10-07T14:03:12+05:30",
+        }
+        for before, after in cases.items():
+            self.assertEqual(nudge(before), after, before)
 
     def test_nudge_moves_a_timestamp_by_one_second_and_keeps_its_format(self):
         self.assertEqual(nudge("2026-09-30T09:14:07Z"), "2026-09-30T09:14:08Z")
