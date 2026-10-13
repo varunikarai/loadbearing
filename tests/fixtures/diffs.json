@@ -56,8 +56,8 @@
   {
     "label": "meaningful",
     "mutation": "destroy:tool_result.temp_c",
-    "baseline": "{\"reply\": \"It is 31\\u00b0C in Jodhpur right now.\"}",
-    "fork": "{\"reply\": \"It is 24\\u00b0C in Jodhpur right now.\"}",
+    "baseline": "{\"reply\": \"It is 31\\u00b0C in Seville right now.\"}",
+    "fork": "{\"reply\": \"It is 24\\u00b0C in Seville right now.\"}",
     "baseline_exit": 0,
     "fork_exit": 0,
     "note": "the reported value changes"
@@ -146,8 +146,8 @@
   {
     "label": "noise",
     "mutation": "nudge:session_id",
-    "baseline": "{\"reply\": \"It is 31\\u00b0C in Jodhpur.\", \"trace_id\": \"0af7651916cd43dd\"}",
-    "fork": "{\"reply\": \"It is 31\\u00b0C in Jodhpur.\", \"trace_id\": \"b7ad6b7169203331\"}",
+    "baseline": "{\"reply\": \"It is 31\\u00b0C in Seville.\", \"trace_id\": \"0af7651916cd43dd\"}",
+    "fork": "{\"reply\": \"It is 31\\u00b0C in Seville.\", \"trace_id\": \"b7ad6b7169203331\"}",
     "baseline_exit": 0,
     "fork_exit": 0,
     "note": "only a trace id"
