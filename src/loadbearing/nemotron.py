@@ -13,6 +13,8 @@ import os
 import urllib.request
 from typing import TYPE_CHECKING, Any
 
+from loadbearing.net import fetch_json
+
 if TYPE_CHECKING:
     from loadbearing.backends.base import RunResult
     from loadbearing.mutations import Mutation
@@ -103,8 +105,7 @@ class TokenFactory:
                 "Content-Type": "application/json",
             },
         )
-        with urllib.request.urlopen(req, timeout=120) as resp:
-            return json.load(resp)
+        return fetch_json(req, timeout=120)
 
 
 class NemotronRouter:

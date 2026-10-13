@@ -11,6 +11,8 @@ import os
 import urllib.request
 from typing import Any
 
+from loadbearing.net import fetch_json
+
 BASE_URL = "https://api.tavily.com/"
 
 
@@ -44,5 +46,4 @@ def _post(path: str, body: dict, api_key: str | None) -> dict[str, Any]:
         data=json.dumps(body).encode(),
         headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json"},
     )
-    with urllib.request.urlopen(req, timeout=60) as resp:
-        return json.load(resp)
+    return fetch_json(req, timeout=60)
