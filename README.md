@@ -238,9 +238,11 @@ A support answerer over retrieved policy text. The retriever writes `passages`, 
 `context`, so a customer 20 days into a 14-day return window is told they have 30 days for a full
 refund. Its target leaves `passages` undeclared on purpose: without `--intent` the probe only
 observes that the answer never moves when the passages are destroyed. With `--intent`, Tavily
-reads NVIDIA's own RAG guides, Super quotes the line saying the model answers from the retrieved
-data, and that observation becomes a cited silent passthrough. The proven fix makes the answer 14
-days and a warranty repair.
+reads the RAG guides the target names (NVIDIA's own) and searches for more; Super settles the
+field from the named guides first and from search results only if they say nothing, quotes the
+line saying the model answers from what it retrieved, and that observation becomes a cited silent
+passthrough. The proven fix makes the answer 14 days and a warranty repair. The recorded run
+predates the named-guides-first order, so its quote comes from a search result.
 
 ## In CI
 
