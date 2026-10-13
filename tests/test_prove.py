@@ -56,6 +56,17 @@ class ProveTests(unittest.TestCase):
         self.assertEqual(proof.new_defects, ["ticket_id"])
         self.assertFalse(proof.clean)
 
+    def test_a_fix_that_crashes_on_the_real_input_is_not_called_fixed(self):
+        # Reads the body, so destroying it moves the exit code; but the real ticket now crashes.
+        broken = _fix(self.target, self.source.replace(
+            "ticket.get('bdoy', '')",
+            "(ticket.get('body', '') if 'outage' not in ticket.get('body', '') else 1 / 0)",
+        ))
+        proof = prove(self.target, self.backend, broken, self.before, checkpoint=self.checkpoint)
+        self.assertNotEqual(proof.after.baseline.exit_code, 0)
+        self.assertFalse(proof.fixed)
+        self.assertFalse(proof.clean)
+
     def test_a_fix_that_does_nothing_is_not_called_fixed(self):
         proof = prove(self.target, self.backend, _fix(self.target, self.source), self.before, checkpoint=self.checkpoint)
         self.assertFalse(proof.fixed)
