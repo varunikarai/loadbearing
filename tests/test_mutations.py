@@ -26,6 +26,10 @@ class MutationTests(unittest.TestCase):
         self.assertIs(destroy(True), False)
         self.assertEqual(destroy(["a"]), [])
 
+    def test_destroy_always_changes_the_value_even_when_it_is_empty(self):
+        for value in ([], {}, "", 0, 0.0, False, None, ["a"], {"k": 1}):
+            self.assertNotEqual(destroy(value), value, repr(value))
+
     def test_drop_removes_only_that_field(self):
         out = Mutation(DROP, "customer.tier").apply(RECORD)
         self.assertNotIn("tier", out["customer"])
