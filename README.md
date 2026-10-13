@@ -341,11 +341,13 @@ A target is a JSON file next to the pipeline it describes.
 | `timeout` | Seconds a single run may take. Default 60 |
 | `baseline_runs` | How often the unmutated record runs, for the noise floor. 2 or more, default 2 |
 | `env` | Variable names passed from the host to baseline and fork runs only, never to setup |
-| `docs` | `{"query": ..., "urls": [...]}`: where Tavily looks for what the pipeline should read |
+| `docs` | `{"query": ..., "urls": [...]}`: where Tavily looks for what the pipeline should read. The `urls` are the pipeline's own docs and are read first; the `query` only settles what they leave open |
 | `sources` | Files a fix may rewrite. Default: `files` |
 
 Undeclared fields are still probed and reported, but never flagged as defects. Every key after
-`expects` is optional, so a target written for the first version still loads unchanged.
+`expects` is optional, so a target written for the first version still loads unchanged. Field
+paths use dots between levels (`customer.tier`), so a record key that itself contains a dot is
+refused before anything runs.
 
 </details>
 
