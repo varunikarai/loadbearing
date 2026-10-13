@@ -30,6 +30,12 @@ class MutationTests(unittest.TestCase):
         for value in ([], {}, "", 0, 0.0, False, None, ["a"], {"k": 1}):
             self.assertNotEqual(destroy(value), value, repr(value))
 
+    def test_a_dotted_record_key_is_refused_before_any_mutation_is_planned(self):
+        with self.assertRaisesRegex(ValueError, "'http.method' contains a dot"):
+            plan({"http.method": "GET", "path": "/"})
+        with self.assertRaisesRegex(ValueError, "'http.status' under span.attrs contains a dot"):
+            plan({"span": {"attrs": {"http.status": 200}}})
+
     def test_drop_removes_only_that_field(self):
         out = Mutation(DROP, "customer.tier").apply(RECORD)
         self.assertNotIn("tier", out["customer"])
