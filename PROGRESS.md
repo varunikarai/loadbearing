@@ -96,6 +96,10 @@ Problem statement: [SPEC.md](SPEC.md). Setup, target format, layout: [README.md]
 
 Newest first.
 
+### 2026-10-13 (b)
+- **Tavily caches keyed on the target's docs and a format version** (Varunika, `intent.py`, `20fe941`): both caches were keyed on the target's name (and the intent cache on its fields), so editing `docs.urls` kept serving the old pages, and a cache from before own-docs-first would have brought the search-hit quote straight back. A stale cache is now fetched again, not trusted. 173 tests pass.
+- **Hand-off 18 is simpler for it:** no need to delete anything under `runs/`; re-running `--intent --prove` on the support answerer refetches and re-asks on its own.
+
 ### 2026-10-13
 - **Hand-off 19 merged** (`2e616e9`) under rule 4: no review in 24 hours counts as approval. An inferred field's evidence card now says its docs, not a declaration, set its intent. 170 tests pass.
 - **SPEC brought in line with own docs first** (Varunika, `3938792`): the pipeline's own `docs.urls` settle intent first, search results only the fields those leave open.
