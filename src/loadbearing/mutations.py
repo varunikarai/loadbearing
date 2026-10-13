@@ -94,7 +94,8 @@ def leaf_paths(record: dict, prefix: str = "") -> Iterator[str]:
     for key, value in record.items():
         if "." in key:
             # A path cannot tell "a.b" the key from "b" inside "a"; fail before any run, not mid-probe.
-            raise ValueError(f"record key {prefix}{key!r} contains a dot, which field paths use between levels")
+            where = f" under {prefix[:-1]}" if prefix else ""
+            raise ValueError(f"record key {key!r}{where} contains a dot, which field paths use between levels")
         path = f"{prefix}{key}"
         if isinstance(value, dict) and value:
             yield from leaf_paths(value, path + ".")
