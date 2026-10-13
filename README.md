@@ -51,7 +51,7 @@ One command finds it, explains it, fixes it and proves the fix:
 <p align="center"><img alt="loadbearing probe --intent --prove in a terminal: passages is a silent passthrough" src="docs/img/terminal.png" width="880"></p>
 
 <details>
-<summary>The full terminal output of that run</summary>
+<summary>The full terminal output of that run, whose proof was not clean</summary>
 
 ```
 $ loadbearing probe examples/support_answerer/target.json --intent --prove
@@ -111,6 +111,11 @@ fix for passages (silent passthrough):
      return (f"{context}\n\n" if context else "") + f"Customer question: {request.get('question', '')}"
 proof: passages is now load-bearing, but the fix adds defects on received_at
 ```
+
+Two live runs at temperature 0 still differ. In this one Ultra wrote a fallback (`passages`,
+else `context`), and after it the output also moved when `received_at` was mutated, so the
+proof reported a new phantom sensitivity instead of calling the fix clean. In the recorded run
+shown in the report below, the one-line fix came back clean.
 
 </details>
 
