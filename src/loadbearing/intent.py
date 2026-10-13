@@ -9,7 +9,8 @@ own spec has an answer, that is what gets quoted. A quote that is not actually
 in the excerpt it cites is thrown away, so every inferred intent can be checked
 by opening the link.
 
-Both steps are cached under `runs/`, so a demo or a re-run never pays twice.
+Both steps are cached under `runs/`, so a demo or a re-run never pays twice. A
+cache made for other docs, or by an older version of this module, is not trusted.
 """
 
 from __future__ import annotations
@@ -24,6 +25,10 @@ from loadbearing import tavily
 from loadbearing.mutations import leaf_paths
 from loadbearing.target import Target
 from loadbearing.verdict import UNDECLARED, Evidence, intent_of
+
+
+# Bumped whenever what a cache entry means changes, so an older entry is fetched again, not trusted.
+CACHE_VERSION = 2
 
 
 @dataclass
@@ -46,8 +51,11 @@ def gather(
 ) -> list[Excerpt]:
     """The docs excerpts for a target, from cache when they have been fetched before."""
     cache = Path(cache_dir) / f"{target.name}.docs.json"
+    key = {"version": CACHE_VERSION, "docs": target.docs}
     if cache.is_file():
-        return [Excerpt(**e) for e in json.loads(cache.read_text())]
+        saved = json.loads(cache.read_text())
+        if isinstance(saved, dict) and saved.get("key") == key:
+            return [Excerpt(**e) for e in saved["excerpts"]]
     docs = target.docs or {}
     excerpts = []
     if docs.get("query"):
@@ -60,7 +68,7 @@ def gather(
     excerpts = [e for e in excerpts if e.url and e.content]
     if excerpts:
         cache.parent.mkdir(parents=True, exist_ok=True)
-        cache.write_text(json.dumps([asdict(e) for e in excerpts], indent=2))
+        cache.write_text(json.dumps({"key": key, "excerpts": [asdict(e) for e in excerpts]}, indent=2))
     return excerpts
 
 
@@ -76,9 +84,10 @@ def infer_expects(
     if not fields or not target.docs:
         return {}
     cache = Path(cache_dir) / f"{target.name}.intent.json"
+    key = {"version": CACHE_VERSION, "docs": target.docs, "fields": fields}
     if cache.is_file():
         saved = json.loads(cache.read_text())
-        if saved.get("fields") == fields:
+        if saved.get("key") == key:
             return {f: Evidence(**e) for f, e in saved["intents"].items()}
     excerpts = gather(target, search, extract, cache_dir)
     if not excerpts:
@@ -89,7 +98,7 @@ def infer_expects(
     intents.update(_settle(router, left, [e for e in excerpts if not e.declared], target.record))
     cache.parent.mkdir(parents=True, exist_ok=True)
     cache.write_text(
-        json.dumps({"fields": fields, "intents": {f: asdict(e) for f, e in intents.items()}}, indent=2)
+        json.dumps({"key": key, "intents": {f: asdict(e) for f, e in intents.items()}}, indent=2)
     )
     return intents
 

@@ -87,13 +87,25 @@ class GatherTests(unittest.TestCase):
         self.assertEqual(first, second)
         self.assertEqual((len(tavily.searches), len(tavily.extracts)), (1, 1))
 
-    def test_a_cache_written_before_the_declared_mark_still_loads(self):
+    def test_a_cache_written_before_the_declared_mark_is_fetched_again(self):
         target = toy_with_two_undeclared_fields()
+        tavily = FakeTavily()
         with tempfile.TemporaryDirectory() as runs:
-            old = [{"url": SPEC_URL, "title": "Triage spec", "content": SPEC}]
+            old = [{"url": "https://stale.example", "title": "", "content": "an old page"}]
             (Path(runs) / f"{target.name}.docs.json").write_text(json.dumps(old))
-            excerpts = gather(target, FakeTavily().search, FakeTavily().extract, runs)
-        self.assertEqual(excerpts, [Excerpt(SPEC_URL, "Triage spec", SPEC, declared=False)])
+            excerpts = gather(target, tavily.search, tavily.extract, runs)
+        self.assertEqual(len(tavily.searches), 1)
+        self.assertEqual([e.url for e in excerpts], [SPEC_URL])
+
+    def test_changing_the_targets_docs_fetches_them_again(self):
+        target = toy_with_two_undeclared_fields()
+        tavily = FakeTavily()
+        with tempfile.TemporaryDirectory() as runs:
+            gather(target, tavily.search, tavily.extract, runs)
+            target.docs["urls"] = [API_URL]
+            excerpts = gather(target, tavily.search, tavily.extract, runs)
+        self.assertEqual((len(tavily.searches), len(tavily.extracts)), (2, 1))
+        self.assertEqual([e.url for e in excerpts], [SPEC_URL, API_URL])
 
 
 class InferExpectsTests(unittest.TestCase):
@@ -128,6 +140,14 @@ class InferExpectsTests(unittest.TestCase):
         self.assertEqual(sorted(result), ["submitted_at", "ticket_id"])
         self.assertEqual(router.calls, [])
         self.assertEqual(len(self.tavily.searches), 1)
+
+    def test_an_answer_cached_before_own_docs_first_is_not_reused(self):
+        cache = Path(self.runs.name) / f"{self.target.name}.intent.json"
+        stale = {"intents": {"ticket_id": {"intent": IRRELEVANT, "quote": "old", "url": "https://stale.example"}}}
+        cache.write_text(json.dumps(dict(stale, fields=["ticket_id", "submitted_at"])))
+        result, router = self.infer(super_reading_the_spec)
+        self.assertEqual(len(router.calls), 1)
+        self.assertEqual({e.url for e in result.values()}, {SPEC_URL})
 
     def test_the_targets_own_docs_are_quoted_before_a_search_hit(self):
         self.target.docs["urls"] = [API_URL]
