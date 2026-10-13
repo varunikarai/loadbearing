@@ -9,7 +9,7 @@ description = "Find which inputs a pipeline is actually load-bearing on, by chec
 readme = "README.md"
 license = { text = "Apache-2.0" }
 requires-python = ">=3.10"
-authors = [{ name = "Varunika Rai" }]
+authors = [{ name = "Varunika Rai" }, { name = "Aeshvarya Awasthi" }]
 # The core (mutations, local backend, verdicts, Nemotron and Tavily clients)
 # is stdlib only, so the local slice runs with nothing installed.
 dependencies = []
