@@ -13,7 +13,7 @@
   <img alt="A Loadbearing report on a live RAG support bot: one checkpoint fans out into 14 forks, and the passages field is flagged as a silent passthrough" src="docs/img/report-hero-dark.png">
 </picture>
 
-<sub>The report from a live run on Nebius Token Factory with Nemotron 3. Every image on this page is Loadbearing's real output from live runs; the terminal is drawn from the captured text of one.</sub>
+<sub>The report from a live run: Nemotron 3 on Nebius Token Factory, the forks on the local backend. Every image on this page is Loadbearing's real output from live runs; the terminal is drawn from the captured text of one.</sub>
 
 </div>
 
