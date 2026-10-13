@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import copy
+import re
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from typing import Any, Iterator
@@ -76,7 +77,9 @@ def nudge(value: Any) -> Any:
     if isinstance(value, str):
         stamp = _parse_timestamp(value)
         if stamp is not None:
-            return _format_like(value, stamp + timedelta(seconds=1))
+            # One step of the timestamp's own precision, written back in its own format.
+            spec = _precision(value)
+            return _format_like(value, stamp + _STEP.get(spec, timedelta(seconds=1)), spec)
         return value + " "
     if isinstance(value, bool):
         raise TypeError("booleans have no nudge")
@@ -119,10 +122,24 @@ def _parse_timestamp(text: str) -> datetime | None:
         return None
 
 
-def _format_like(original: str, stamp: datetime) -> str:
-    out = stamp.isoformat()
+_TIME = re.compile(r"[T ]\d{2}(:\d{2})?(:\d{2})?(\.\d+)?")
+_STEP = {"hours": timedelta(hours=1), "minutes": timedelta(minutes=1)}
+
+
+def _precision(text: str) -> str:
+    """How finely a timestamp is written, as a datetime.isoformat timespec."""
+    match = _TIME.search(text, 10)
+    if not match or not match.group(1):
+        return "hours"
+    if not match.group(2):
+        return "minutes"
+    if not match.group(3):
+        return "seconds"
+    return "milliseconds" if len(match.group(3)) <= 4 else "microseconds"
+
+
+def _format_like(original: str, stamp: datetime, spec: str = "seconds") -> str:
+    out = stamp.isoformat(sep="T" if "T" in original else " ", timespec=spec)
     if original.endswith("Z"):
         out = out.replace("+00:00", "Z")
-    elif "T" not in original:
-        out = out.replace("T", " ", 1)
     return out
