@@ -367,7 +367,9 @@ src/loadbearing/
   backends/local.py  directory snapshot, for development with no account
   backends/contree.py  Nebius Token Factory Sandboxes
   nemotron.py        Token Factory client, Nano / Super / Ultra routing
-  tavily.py          Tavily search client
+  tavily.py          Tavily search and extract client
+  intent.py          what undeclared fields should do, quoted from the pipeline's docs
+  net.py             one JSON request, retried on a rate limit, a 5xx or a dropped connection
   fix.py             a fix, and the checks it passes before any fork applies it
   prove.py           re-probe a fix from the same checkpoint; the whole loop
   report.py          the versioned JSON report
