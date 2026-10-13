@@ -50,7 +50,10 @@ def plan(record: dict, kinds: tuple[str, ...] = KINDS) -> list[Mutation]:
 
 
 def destroy(value: Any) -> Any:
-    """Template-replace: keep the type (and the length, for text), remove the content."""
+    """Template-replace: keep the type (and the length, for text), remove the content.
+
+    An empty list or object has no content to remove, so it gets junk instead:
+    a destroy that changes nothing would let an untested field read as unread."""
     if isinstance(value, bool):
         return not value
     if isinstance(value, (int, float)):
@@ -58,9 +61,9 @@ def destroy(value: Any) -> Any:
     if isinstance(value, str):
         return "x" * max(len(value), 1)
     if isinstance(value, list):
-        return []
+        return [] if value else ["x"]
     if isinstance(value, dict):
-        return {}
+        return {} if value else {"x": "x"}
     return "x"
 
 
