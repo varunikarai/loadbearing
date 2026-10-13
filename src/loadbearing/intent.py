@@ -9,7 +9,8 @@ own spec has an answer, that is what gets quoted. A quote that is not actually
 in the excerpt it cites is thrown away, so every inferred intent can be checked
 by opening the link.
 
-Both steps are cached under `runs/`, so a demo or a re-run never pays twice.
+Both steps are cached under `runs/`, so a demo or a re-run never pays twice. A
+cache made for other docs, or by an older version of this module, is not trusted.
 """
 
 from __future__ import annotations
@@ -83,9 +84,10 @@ def infer_expects(
     if not fields or not target.docs:
         return {}
     cache = Path(cache_dir) / f"{target.name}.intent.json"
+    key = {"version": CACHE_VERSION, "docs": target.docs, "fields": fields}
     if cache.is_file():
         saved = json.loads(cache.read_text())
-        if saved.get("fields") == fields:
+        if saved.get("key") == key:
             return {f: Evidence(**e) for f, e in saved["intents"].items()}
     excerpts = gather(target, search, extract, cache_dir)
     if not excerpts:
@@ -96,7 +98,7 @@ def infer_expects(
     intents.update(_settle(router, left, [e for e in excerpts if not e.declared], target.record))
     cache.parent.mkdir(parents=True, exist_ok=True)
     cache.write_text(
-        json.dumps({"fields": fields, "intents": {f: asdict(e) for f, e in intents.items()}}, indent=2)
+        json.dumps({"key": key, "intents": {f: asdict(e) for f, e in intents.items()}}, indent=2)
     )
     return intents
 
