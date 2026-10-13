@@ -26,6 +26,10 @@ from loadbearing.target import Target
 from loadbearing.verdict import UNDECLARED, Evidence, intent_of
 
 
+# Bumped whenever what a cache entry means changes, so an older entry is fetched again, not trusted.
+CACHE_VERSION = 2
+
+
 @dataclass
 class Excerpt:
     url: str
@@ -46,8 +50,11 @@ def gather(
 ) -> list[Excerpt]:
     """The docs excerpts for a target, from cache when they have been fetched before."""
     cache = Path(cache_dir) / f"{target.name}.docs.json"
+    key = {"version": CACHE_VERSION, "docs": target.docs}
     if cache.is_file():
-        return [Excerpt(**e) for e in json.loads(cache.read_text())]
+        saved = json.loads(cache.read_text())
+        if isinstance(saved, dict) and saved.get("key") == key:
+            return [Excerpt(**e) for e in saved["excerpts"]]
     docs = target.docs or {}
     excerpts = []
     if docs.get("query"):
@@ -60,7 +67,7 @@ def gather(
     excerpts = [e for e in excerpts if e.url and e.content]
     if excerpts:
         cache.parent.mkdir(parents=True, exist_ok=True)
-        cache.write_text(json.dumps([asdict(e) for e in excerpts], indent=2))
+        cache.write_text(json.dumps({"key": key, "excerpts": [asdict(e) for e in excerpts]}, indent=2))
     return excerpts
 
 
