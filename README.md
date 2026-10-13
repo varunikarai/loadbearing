@@ -17,7 +17,7 @@
 
 </div>
 
-Loadbearing checkpoints a pipeline once in a Nebius Token Factory Sandbox, forks that checkpoint once per input mutation, runs every fork in parallel from the same snapshot, and reports two defect classes:
+Loadbearing checkpoints a pipeline once, in a Nebius Token Factory Sandbox or on your own machine, forks that checkpoint once per input mutation, runs every fork in parallel from the same snapshot, and reports two defect classes:
 
 - **Silent passthrough**: an input that should matter was destroyed, and the output did not move.
 - **Phantom sensitivity**: an input that should not matter was nudged, and the output moved.
