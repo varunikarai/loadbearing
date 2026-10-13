@@ -400,11 +400,12 @@ Built and tested offline unless it says live. Nemotron and Tavily have run live 
 - [x] Checkpoint-and-fork engine, timed: checkpoint, parallel wall time, and the same runs one after another
 - [x] Verdicts: silent passthrough and phantom sensitivity
 - [x] Noise floor: the baseline runs `baseline_runs` times, and keys that vary on their own are set aside
-- [x] Close the loop: Ultra writes the fix, validated before use; a fresh fork of the same checkpoint proves it
+- [x] Close the loop: Ultra writes the fix as exact-quote edits, validated before use; a fresh fork of the same checkpoint proves it, and a fix that crashes on the real input is never called proven
 - [x] An LLM demo target: a support answerer over retrieved policy, with a planted rename bug
 - [x] Report schema 2 and a self-contained HTML report: the fork tree, the evidence, the proven fix
 - [x] Demo server with cached runs and a read-only mode; Dockerfile; CI with a probe gate and a clean-clone check
 - [x] Secrets reach forks only, never a checkpoint
+- [x] A paid run survives a rate limit or a dropped connection (retried with backoff), and a fork that hangs is recorded, not fatal
 - [x] Prior art: metamorphic testing, leave-one-feature-out, input erasure
 - [x] Benchmark: 54 pipelines with planted bugs, against a static check and Nemotron reading the code ([bench/](bench/))
 - [x] GitHub Action with a job summary
