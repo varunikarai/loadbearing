@@ -35,6 +35,17 @@ class MutationTests(unittest.TestCase):
         self.assertNotIn("tier", out["customer"])
         self.assertEqual(out["customer"]["tags"], ["a"])
 
+    def test_nudge_keeps_a_timestamps_precision_and_format(self):
+        cases = {
+            "2026-10-07T14:03:11.000Z": "2026-10-07T14:03:12.000Z",
+            "2026-10-07T14:03:11.123456+00:00": "2026-10-07T14:03:12.123456+00:00",
+            "2026-10-07T14:03": "2026-10-07T14:04",
+            "2026-10-07 14:03:11": "2026-10-07 14:03:12",
+            "2026-10-07T14:03:11+05:30": "2026-10-07T14:03:12+05:30",
+        }
+        for before, after in cases.items():
+            self.assertEqual(nudge(before), after, before)
+
     def test_nudge_moves_a_timestamp_by_one_second_and_keeps_its_format(self):
         self.assertEqual(nudge("2026-09-30T09:14:07Z"), "2026-09-30T09:14:08Z")
         self.assertEqual(nudge("2026-09-30T09:14:59+00:00"), "2026-09-30T09:15:00+00:00")
