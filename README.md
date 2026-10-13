@@ -13,11 +13,11 @@
   <img alt="A Loadbearing report on a live RAG support bot: one checkpoint fans out into 14 forks, and the passages field is flagged as a silent passthrough" src="docs/img/report-hero-dark.png">
 </picture>
 
-<sub>The report from a live run on Nebius Token Factory with Nemotron 3. Every image on this page is Loadbearing's real output from live runs; the terminal is drawn from the captured text of one.</sub>
+<sub>The report from a live run: Nemotron 3 on Nebius Token Factory, the forks on the local backend. Every image on this page is Loadbearing's real output from live runs; the terminal is drawn from the captured text of one.</sub>
 
 </div>
 
-Loadbearing checkpoints a pipeline once in a Nebius Token Factory Sandbox, forks that checkpoint once per input mutation, runs every fork in parallel from the same snapshot, and reports two defect classes:
+Loadbearing checkpoints a pipeline once, in a Nebius Token Factory Sandbox or on your own machine, forks that checkpoint once per input mutation, runs every fork in parallel from the same snapshot, and reports two defect classes:
 
 - **Silent passthrough**: an input that should matter was destroyed, and the output did not move.
 - **Phantom sensitivity**: an input that should not matter was nudged, and the output moved.
