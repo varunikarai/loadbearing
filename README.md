@@ -223,9 +223,10 @@ loadbearing probe examples/ticket_triage/target.json --prove   # ...and a fresh 
 
 With `--prove`, the probe and every proof share one checkpoint, so a fix is the only thing that
 differs. Each proof says whether the defect is gone and whether any other field gained one. A
-fix is refused before it runs if it touches a file outside the target's `sources`, no longer
-compiles, changes nothing, or rewrites most of a file. The exit code still reflects the pipeline
-as given. `--baseline-runs N` overrides the target's noise floor.
+fix is refused before it runs if it quotes text that is not in its file exactly once, touches a
+file outside the target's `sources`, no longer compiles, changes nothing, or rewrites most of a
+file. A fix is never called proven if the patched pipeline crashes on the real input or leaves
+nothing stable to judge. The exit code still reflects the pipeline as given. `--baseline-runs N` overrides the target's noise floor.
 
 ### The LLM demo target
 
