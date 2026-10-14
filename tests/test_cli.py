@@ -61,6 +61,16 @@ class FailingBaselineTests(unittest.TestCase):
         self.assertIn("WARNING: the unmutated record exits 1:", out)
 
 
+class FlagRangeTests(unittest.TestCase):
+    def test_out_of_range_numbers_are_usage_errors(self):
+        for flag, value in (("--workers", "0"), ("--baseline-runs", "1"), ("--workers", "x")):
+            with self.subTest(flag=flag, value=value), contextlib.redirect_stderr(io.StringIO()) as err:
+                with self.assertRaises(SystemExit) as stop:
+                    main(["probe", EXAMPLE, flag, value])
+            self.assertEqual(stop.exception.code, 2)
+            self.assertIn(f"argument {flag}", err.getvalue())
+
+
 class ReservedFlagTests(unittest.TestCase):
     def test_each_reserved_flag_says_it_is_not_built_and_runs_nothing(self):
         flags = {"explain": ["--explain"],
