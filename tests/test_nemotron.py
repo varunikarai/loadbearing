@@ -71,6 +71,19 @@ class WriteFixTests(unittest.TestCase):
 
 
 
+class ClassifyTests(unittest.TestCase):
+    def test_the_first_word_decides_whatever_formatting_surrounds_it(self):
+        from loadbearing.backends.base import RunResult
+        from loadbearing.mutations import Mutation
+
+        run = RunResult("{}", "", 0)
+        cases = {"noise": "noise", "Noise.": "noise", "**noise**": "noise", "Answer: noise": "noise",
+                 "meaningful": "meaningful", "not noise": "meaningful", "": "meaningful"}
+        for reply, label in cases.items():
+            r, _ = router({"nano": reply})
+            self.assertEqual(r.classify_diff(Mutation("nudge", "id"), run, run), label, reply)
+
+
 class ReasoningTests(unittest.TestCase):
     def test_reasoning_never_reaches_the_answer(self):
         cases = {

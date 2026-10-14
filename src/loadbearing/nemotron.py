@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import urllib.request
 from typing import TYPE_CHECKING, Any
 
@@ -131,7 +132,9 @@ class NemotronRouter:
             f"Mutated output:\n{fork.stdout[:_CLIP]}"
         )
         answer = self._ask("nano", CLASSIFY_SYSTEM, prompt, max_tokens=512)
-        return "noise" if answer.lower().startswith("noise") else "meaningful"
+        # The first word decides, so "**noise**", "Noise." or "Answer: noise" all read as noise.
+        words = [w for w in re.findall(r"[a-z]+", answer.lower()) if w != "answer"]
+        return "noise" if words[:1] == ["noise"] else "meaningful"
 
     def reconcile(self, verdict: FieldVerdict) -> str:
         """Super. One defect statement per field, from every fork on that field."""
