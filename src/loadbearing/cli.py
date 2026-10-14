@@ -20,6 +20,21 @@ from loadbearing.prove import Loop, Pinned, close_loop
 from loadbearing.target import load_target
 
 
+def _at_least(low: int):
+    """An argparse type: an integer no smaller than `low`, refused with a usage line, not a traceback."""
+
+    def parse(text: str) -> int:
+        try:
+            value = int(text)
+        except ValueError:
+            raise argparse.ArgumentTypeError(f"{text!r} is not a whole number") from None
+        if value < low:
+            raise argparse.ArgumentTypeError(f"must be {low} or more, got {value}")
+        return value
+
+    return parse
+
+
 def main(argv: Optional[list[str]] = None) -> int:
     load_dotenv()
     parser = argparse.ArgumentParser(
@@ -32,13 +47,13 @@ def main(argv: Optional[list[str]] = None) -> int:
     p.add_argument("target", help="path to a target.json")
     p.add_argument("--backend", choices=("local", "sandbox"), default="local")
     p.add_argument("--nano", action="store_true", help="have Nemotron Nano judge each moved diff")
-    p.add_argument("--workers", type=int, default=8, help="forks run in parallel")
+    p.add_argument("--workers", type=_at_least(1), default=8, help="forks run in parallel")
     p.add_argument("--json", action="store_true", help="print the full report as JSON")
     p.add_argument("--out", metavar="FILE", help="also save the full report as JSON")
     p.add_argument("--html", metavar="FILE", help="also save the report as a self-contained web page")
     p.add_argument("--markdown", metavar="FILE", help="also append a Markdown summary (e.g. $GITHUB_STEP_SUMMARY)")
     # Contract C6: reserved now, wired as each function lands on main.
-    p.add_argument("--baseline-runs", type=int, metavar="N", help="override the target's baseline_runs")
+    p.add_argument("--baseline-runs", type=_at_least(2), metavar="N", help="override the target's baseline_runs")
     p.add_argument("--explain", action="store_true", help="Super reconciliation and Ultra explanation per field")
     p.add_argument("--intent", action="store_true", help="Tavily intent inference for undeclared fields")
     p.add_argument("--fix", action="store_true", help="write a fix per defect (implies --explain)")
