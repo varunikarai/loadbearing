@@ -96,6 +96,12 @@ Problem statement: [SPEC.md](SPEC.md). Setup, target format, layout: [README.md]
 
 Newest first.
 
+### 2026-10-14 (b)
+- **Confirm-moves reviewed** (Varunika, on Aeshvarya's `782fa63`): right aim, a single sampled answer should not make a phantom sensitivity. But it confirmed every moved fork, including fields that should matter, and kept only majority moves. A test with a pipeline that reads `body` but uses it only on some runs shows `main` reporting `body` as a **silent passthrough**: a defect made by noise. It also recorded `moves: 1` on forks that never moved.
+- **Hand-off 23 to Aeshvarya, branch `varunika/confirm-only-phantoms`** (for his review; it rewrites his `test_a_real_move_is_confirmed_on_every_run`): confirm only moves on fields that should not matter (declared or inferred), the only place a move is a defect claim; the `received_at` fluke is still caught. Forks that never moved record 0 moves. Three new tests: the weak reader stays load-bearing, a real phantom is confirmed on every run, unmoved forks record no moves. 186 tests pass. **Worth merging before the hand-off 18 re-record:** on the live answerer a proof needs `passages` to move after the fix, and a flaky move there would now count against it.
+- Process, once: the change altered the judging step and added `runs` and `moves` to the frozen report contract (C5) without a review. Additive, so nothing breaks; next time a line in PROGRESS.md first.
+- Correction to this entry: 186 tests is `main`; the hand-off 23 branch has 189.
+
 ### 2026-10-14
 - **Hand-offs 21 and 22 reviewed and merged by Aeshvarya** (`51e78fa`, `4af66f2`), before the 24-hour window closed. **Hand-off 20 done** (Aeshvarya, `97d34a0`): the Sandboxes checkpoint now starts from `images.oci()`, which finds the image or imports it, with a test. Checked by Varunika: matches the SDK source, 183 tests pass, audit go on 321 commits, CI green.
 - Still open before the 10-17 milestone: hand-off 18 (re-record, re-render, re-score), Sandboxes beta access and V1's run, A6 deployed.
