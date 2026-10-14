@@ -17,6 +17,8 @@ from pathlib import Path
 from loadbearing.backends.base import INPUT_NAME, RunResult, forwarded_env, scrubbed_env
 from loadbearing.target import Target
 
+TIMED_OUT = 124  # the exit code coreutils' `timeout` uses, so a hung run reads as one
+
 
 class LocalBackend:
     name = "local"
@@ -46,15 +48,20 @@ class LocalBackend:
         work = Path(tempfile.mkdtemp(prefix="fork-", dir=self._tmp.name))
         shutil.copytree(checkpoint, work, dirs_exist_ok=True)
         (work / INPUT_NAME).write_text(json.dumps(record))
-        proc = subprocess.run(
-            target.command,
-            env={**scrubbed_env(target), **forwarded_env(target)},
-            shell=True,
-            cwd=work,
-            capture_output=True,
-            text=True,
-            timeout=target.timeout,
-        )
+        try:
+            proc = subprocess.run(
+                target.command,
+                env={**scrubbed_env(target), **forwarded_env(target)},
+                shell=True,
+                cwd=work,
+                capture_output=True,
+                text=True,
+                timeout=target.timeout,
+            )
+        except subprocess.TimeoutExpired as exc:
+            # A fork that hangs reacted to its mutation; it must not take the whole probe down.
+            out, err = (_text(s) for s in (exc.stdout, exc.stderr))
+            return RunResult(out, f"{err}\ntimed out after {target.timeout:g}s", TIMED_OUT)
         return RunResult(proc.stdout, proc.stderr, proc.returncode)
 
     def apply(self, checkpoint: Path, files: dict[str, str]) -> Path:
@@ -71,3 +78,9 @@ class LocalBackend:
 
     def close(self) -> None:
         self._tmp.cleanup()
+
+
+def _text(value: bytes | str | None) -> str:
+    if isinstance(value, bytes):
+        return value.decode("utf-8", "replace")
+    return value or ""

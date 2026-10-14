@@ -2,7 +2,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from loadbearing.backends.local import LocalBackend
+from loadbearing.backends.local import TIMED_OUT, LocalBackend
 from loadbearing.target import load_target
 
 EXAMPLE = Path(__file__).resolve().parent.parent / "examples" / "ticket_triage" / "target.json"
@@ -32,6 +32,13 @@ class LocalBackendTests(unittest.TestCase):
         original = self.backend.checkpoint(self.target)
         with self.assertRaises(ValueError):
             self.backend.apply(original, {"../escape.py": "x"})
+
+    def test_a_run_past_the_timeout_comes_back_as_a_result_not_an_exception(self):
+        self.target.command = 'python3 -c "import time; print(1, flush=True); time.sleep(5)"'
+        self.target.timeout = 0.5
+        result = self.backend.run(self.backend.checkpoint(self.target), self.target, self.target.record)
+        self.assertEqual(result.exit_code, TIMED_OUT)
+        self.assertIn("timed out after 0.5s", result.stderr)
 
 
 if __name__ == "__main__":

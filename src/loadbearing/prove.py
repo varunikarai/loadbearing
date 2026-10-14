@@ -87,7 +87,11 @@ def prove(
     )
 
     verdict = next((v for v in after.verdicts if v.field == fix.field), None)
-    fixed = verdict is not None and verdict.verdict != fix.defect
+    # A fix proves nothing if the patched pipeline no longer handles the real input as it
+    # did (a crash there makes every other fork look like a reaction), or if nothing in its
+    # output was stable enough to judge (then no field can move, and every phantom "goes").
+    healthy = after.baseline.exit_code == before.baseline.exit_code and not after.void
+    fixed = healthy and verdict is not None and verdict.verdict != fix.defect
     was = {v.field for v in before.defects}
     new_defects = [v.field for v in after.defects if v.field not in was]
     return Proof(fix=fix, after=after, fixed=fixed, new_defects=new_defects)
