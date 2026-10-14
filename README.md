@@ -51,7 +51,7 @@ One command finds it, explains it, fixes it and proves the fix:
 <p align="center"><img alt="loadbearing probe --intent --prove in a terminal: passages is a silent passthrough" src="docs/img/terminal.png" width="880"></p>
 
 <details>
-<summary>The full terminal output of that run</summary>
+<summary>The full terminal output of that run, whose proof was not clean</summary>
 
 ```
 $ loadbearing probe examples/support_answerer/target.json --intent --prove
@@ -111,6 +111,11 @@ fix for passages (silent passthrough):
      return (f"{context}\n\n" if context else "") + f"Customer question: {request.get('question', '')}"
 proof: passages is now load-bearing, but the fix adds defects on received_at
 ```
+
+Two live runs at temperature 0 still differ. In this one Ultra wrote a fallback (`passages`,
+else `context`), and after it the output also moved when `received_at` was mutated, so the
+proof reported a new phantom sensitivity instead of calling the fix clean. In the recorded run
+shown in the report below, the one-line fix came back clean.
 
 </details>
 
@@ -218,9 +223,10 @@ loadbearing probe examples/ticket_triage/target.json --prove   # ...and a fresh 
 
 With `--prove`, the probe and every proof share one checkpoint, so a fix is the only thing that
 differs. Each proof says whether the defect is gone and whether any other field gained one. A
-fix is refused before it runs if it touches a file outside the target's `sources`, no longer
-compiles, changes nothing, or rewrites most of a file. The exit code still reflects the pipeline
-as given. `--baseline-runs N` overrides the target's noise floor.
+fix is refused before it runs if it quotes text that is not in its file exactly once, touches a
+file outside the target's `sources`, no longer compiles, changes nothing, or rewrites most of a
+file. A fix is never called proven if the patched pipeline crashes on the real input or leaves
+nothing stable to judge. The exit code still reflects the pipeline as given. `--baseline-runs N` overrides the target's noise floor.
 
 ### The LLM demo target
 
@@ -233,9 +239,11 @@ A support answerer over retrieved policy text. The retriever writes `passages`, 
 `context`, so a customer 20 days into a 14-day return window is told they have 30 days for a full
 refund. Its target leaves `passages` undeclared on purpose: without `--intent` the probe only
 observes that the answer never moves when the passages are destroyed. With `--intent`, Tavily
-reads NVIDIA's own RAG guides, Super quotes the line saying the model answers from the retrieved
-data, and that observation becomes a cited silent passthrough. The proven fix makes the answer 14
-days and a warranty repair.
+reads the RAG guides the target names (NVIDIA's own) and searches for more; Super settles the
+field from the named guides first and from search results only if they say nothing, quotes the
+line saying the model answers from what it retrieved, and that observation becomes a cited silent
+passthrough. The proven fix makes the answer 14 days and a warranty repair. The recorded run
+predates the named-guides-first order, so its quote comes from a search result.
 
 ## In CI
 
@@ -333,11 +341,13 @@ A target is a JSON file next to the pipeline it describes.
 | `timeout` | Seconds a single run may take. Default 60 |
 | `baseline_runs` | How often the unmutated record runs, for the noise floor. 2 or more, default 2 |
 | `env` | Variable names passed from the host to baseline and fork runs only, never to setup |
-| `docs` | `{"query": ..., "urls": [...]}`: where Tavily looks for what the pipeline should read |
+| `docs` | `{"query": ..., "urls": [...]}`: where Tavily looks for what the pipeline should read. The `urls` are the pipeline's own docs and are read first; the `query` only settles what they leave open |
 | `sources` | Files a fix may rewrite. Default: `files` |
 
 Undeclared fields are still probed and reported, but never flagged as defects. Every key after
-`expects` is optional, so a target written for the first version still loads unchanged.
+`expects` is optional, so a target written for the first version still loads unchanged. Field
+paths use dots between levels (`customer.tier`), so a record key that itself contains a dot is
+refused before anything runs.
 
 </details>
 
@@ -357,7 +367,9 @@ src/loadbearing/
   backends/local.py  directory snapshot, for development with no account
   backends/contree.py  Nebius Token Factory Sandboxes
   nemotron.py        Token Factory client, Nano / Super / Ultra routing
-  tavily.py          Tavily search client
+  tavily.py          Tavily search and extract client
+  intent.py          what undeclared fields should do, quoted from the pipeline's docs
+  net.py             one JSON request, retried on a rate limit, a 5xx or a dropped connection
   fix.py             a fix, and the checks it passes before any fork applies it
   prove.py           re-probe a fix from the same checkpoint; the whole loop
   report.py          the versioned JSON report
@@ -388,11 +400,12 @@ Built and tested offline unless it says live. Nemotron and Tavily have run live 
 - [x] Checkpoint-and-fork engine, timed: checkpoint, parallel wall time, and the same runs one after another
 - [x] Verdicts: silent passthrough and phantom sensitivity
 - [x] Noise floor: the baseline runs `baseline_runs` times, and keys that vary on their own are set aside
-- [x] Close the loop: Ultra writes the fix, validated before use; a fresh fork of the same checkpoint proves it
+- [x] Close the loop: Ultra writes the fix as exact-quote edits, validated before use; a fresh fork of the same checkpoint proves it, and a fix that crashes on the real input is never called proven
 - [x] An LLM demo target: a support answerer over retrieved policy, with a planted rename bug
 - [x] Report schema 2 and a self-contained HTML report: the fork tree, the evidence, the proven fix
 - [x] Demo server with cached runs and a read-only mode; Dockerfile; CI with a probe gate and a clean-clone check
 - [x] Secrets reach forks only, never a checkpoint
+- [x] A paid run survives a rate limit or a dropped connection (retried with backoff), and a fork that hangs is recorded, not fatal
 - [x] Prior art: metamorphic testing, leave-one-feature-out, input erasure
 - [x] Benchmark: 54 pipelines with planted bugs, against a static check and Nemotron reading the code ([bench/](bench/))
 - [x] GitHub Action with a job summary
