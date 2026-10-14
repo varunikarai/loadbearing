@@ -42,7 +42,7 @@ customer something the policy does not say:
 
 | | Before | After Ultra's fix, proven in a fresh fork |
 |---|---|---|
-| `answer` | "Yes, you can still return the headphones for a refund because you’re within the 30‑day return window." | "No, you cannot get a refund because the 14‑day return window has passed, but the defective headphones are covered by the 12‑month warranty, which will provide a repair or replacement." |
+| `answer` | "Yes, you can return the headphones for a refund within the 30‑day return window." | "You cannot return the headphones for a refund because the 14‑day return window has passed, but you can file a warranty claim for a repair or replacement." |
 | `can_return` | `true` | `false` |
 | `return_window_days` | `30` | `14` |
 
@@ -51,13 +51,14 @@ One command finds it, explains it, fixes it and proves the fix:
 <p align="center"><img alt="loadbearing probe --intent --prove in a terminal: passages is a silent passthrough" src="docs/img/terminal.png" width="880"></p>
 
 <details>
-<summary>The full terminal output of that run, whose proof was not clean</summary>
+<summary>The full terminal output of that run</summary>
 
 ```
 $ loadbearing probe examples/support_answerer/target.json --intent --prove
 support-answerer: 14 forks from one checkpoint (local)
-checkpoint 0.01s, then 19 runs in 8.21s wall (59.01s one after another, 7.2x parallel)
+checkpoint 0.01s, then 23 runs in 22.89s wall (127.80s one after another, 5.6x parallel)
 noise floor: 5 baseline runs; varies on its own, not judged: answer
+confirmed: 2 moved fork(s) re-run, counted only if most runs moved
 
 field        intent      destroy  drop   nudge  verdict
 request_id   irrelevant  same     same   same   inert
@@ -69,37 +70,35 @@ passages     relevant    same     same   -      SILENT PASSTHROUGH
 1 defect(s): passages (silent passthrough)
 
 why passages:
-  intent: "Instead of relying solely on static training data, a RAG system retrieves relevant
-          documents, metadata, and context from a curated knowledge base before generating each
-          response." (https://atlan.com/know/what-is-rag)
-  Super:  This is a silent passthrough: the field *passages* is marked as relevant (supposed to
-          matter), yet both destroying and dropping it left the pipeline’s output unchanged
-          (destroy = false, drop = false). The lack of any output change despite modifications to a
-          field that should influence the result indicates the field is being ignored rather than
-          actively affecting the computation.
-  Ultra:  Code path responsible:
-          `pipeline.py` → `build_prompt()` → line 33
+  intent: "Retrieval-augmented generation is a technique for enhancing the accuracy and reliability
+          of generative AI models with information from specific and relevant data sources."
+          (https://blogs.nvidia.com/blog/what-is-retrieval-augmented-generation/)
+  Super:  This is a silent passthrough: the field *passages* is marked as relevant (it should
+          matter), yet destroying or dropping it produces no change in the output (both “destroy”
+          and “drop” are false). The lack of any output movement despite the field’s supposed
+          relevance indicates the pipeline is not reading this field.
+  Ultra:  Code path: `build_prompt` function (line 32 in the provided source).
+
+          Why it fails: The retriever now stores the retrieved policy text under the key
+          `"passages"`, but `build_prompt` still reads `request.get("context", "")`. Because the key
+          is missing, `context` becomes an empty string, so the policy passages are never inserted
+          into the prompt. The LLM then answers from its general training data instead of the actual
+          policy, producing the wrong return window (30 days vs. 14 days) and a refund promise that
+          the policy forbids. No error is thrown—the field is silently ignored.
 
           Quoted line:
-                  context = request.get("context", "")
+              context = request.get("context", "")
 
-          Why it doesn’t read the field:
-          The retriever now writes the retrieved policy text into the `passages` field of the
-          request dictionary. This line still reads the old `context` field, which is absent, so
-          `context` becomes an empty string. The policy passages never reach the prompt, causing the
-          LLM to answer from generic knowledge instead of the actual policy.
-
-          Smallest fix:
-          Change the key from `"context"` to `"passages"` (or fall back to `"context"` for
-          compatibility).
-
-                  context = request.get("passages", request.get("context", ""))
+          Smallest fix: Change the key from `"context"` to `"passages"` (one‑line change).
+              context = request.get("passages", "")
+          (Optionally rename the variable to `passages` for clarity, but the key change alone
+          restores the intended behavior.)
 
 fix for passages (silent passthrough):
-  Ultra:  The retriever now stores retrieved policy text in the 'passages' field, but build_prompt()
-          still reads the old 'context' field, causing the policy passages to never reach the
-          prompt. The fix changes the key lookup to first try 'passages' and fall back to 'context'
-          for backward compatibility.
+  Ultra:  The retriever now stores retrieved policy text under the key 'passages', but build_prompt
+          still reads 'context', causing the policy to be silently omitted from the prompt. Changing
+          the key from 'context' to 'passages' restores the intended retrieval-augmented generation
+          behavior with a one-line fix.
 --- a/pipeline.py
 +++ b/pipeline.py
 @@ -34,7 +34,7 @@
@@ -107,21 +106,21 @@ fix for passages (silent passthrough):
  def build_prompt(request: dict) -> str:
      # The retriever puts what it found here.
 -    context = request.get("context", "")
-+    context = request.get("passages", request.get("context", ""))
++    context = request.get("passages", "")
      return (f"{context}\n\n" if context else "") + f"Customer question: {request.get('question', '')}"
-proof: passages is now load-bearing, but the fix adds defects on received_at
+proof: passages is now load-bearing, and no other field gained a defect.
 ```
 
-Two live runs at temperature 0 still differ. In this one Ultra wrote a fallback (`passages`,
-else `context`), and after it the output also moved when `received_at` was mutated, so the
-proof reported a new phantom sensitivity instead of calling the fix clean. In the recorded run
-shown in the report below, the one-line fix came back clean.
+The bot samples its answers, so two runs can differ by chance. The noise floor showed `answer`
+varies on its own, so each fork that moved ran three times and counted only if most of its runs
+moved. In an earlier run this kept one chance answer, on a `received_at` fork (moved 1 of 3),
+from being reported as a phantom sensitivity.
 
 </details>
 
-**The evidence.** `passages` was never declared as an input that matters. Tavily found a source
-saying a RAG system answers from what it retrieves, Super quoted it, and that turned "the output
-never moved" into a cited defect. Ultra then named the line.
+**The evidence.** `passages` was never declared as an input that matters. Tavily read the guide
+the target names, NVIDIA's own page on retrieval-augmented generation; Super quoted it, and that
+turned "the output never moved" into a cited defect. Ultra then named the line.
 
 <p align="center">
 <picture>
@@ -158,7 +157,7 @@ flowchart LR
 
 1. **Checkpoint once.** The pipeline's setup runs once and is snapshotted, so every fork starts from the same state.
 2. **Fork per mutation.** Each input field is destroyed, dropped and nudged, one at a time, each in its own fork, all in parallel.
-3. **Compare against a noise floor.** The unmodified input runs several times first; output keys that change on their own (an LLM's wording) are set aside, so only real movement counts.
+3. **Compare against a noise floor.** The unmodified input runs several times first; output keys that change on their own (an LLM's wording) are set aside. On a pipeline that is not deterministic, a fork that moved runs twice more and counts only if most of its runs moved, so one chance answer is not a defect.
 4. **Decide by rule.** A field that should matter and never moves is a *silent passthrough*; a field that should not matter and moves is a *phantom sensitivity*. With `--nano`, Nano decides whether a change is meaningful or noise; whether that makes a defect is a rule, never a model's call.
 5. **Fix and prove.** Ultra writes the smallest edit; the probe reruns from the same checkpoint, so the fix is the only thing that differs.
 
@@ -242,8 +241,7 @@ observes that the answer never moves when the passages are destroyed. With `--in
 reads the RAG guides the target names (NVIDIA's own) and searches for more; Super settles the
 field from the named guides first and from search results only if they say nothing, quotes the
 line saying the model answers from what it retrieved, and that observation becomes a cited silent
-passthrough. The proven fix makes the answer 14 days and a warranty repair. The recorded run
-predates the named-guides-first order, so its quote comes from a search result.
+passthrough. The proven fix makes the answer 14 days and a warranty repair.
 
 ## In CI
 
@@ -400,6 +398,7 @@ Built and tested offline unless it says live. Nemotron and Tavily have run live 
 - [x] Checkpoint-and-fork engine, timed: checkpoint, parallel wall time, and the same runs one after another
 - [x] Verdicts: silent passthrough and phantom sensitivity
 - [x] Noise floor: the baseline runs `baseline_runs` times, and keys that vary on their own are set aside
+- [x] Confirmed moves: on a pipeline that is not deterministic, a fork that moved is re-run, and counts only if most of its runs moved
 - [x] Close the loop: Ultra writes the fix as exact-quote edits, validated before use; a fresh fork of the same checkpoint proves it, and a fix that crashes on the real input is never called proven
 - [x] An LLM demo target: a support answerer over retrieved policy, with a planted rename bug
 - [x] Report schema 2 and a self-contained HTML report: the fork tree, the evidence, the proven fix
@@ -409,7 +408,7 @@ Built and tested offline unless it says live. Nemotron and Tavily have run live 
 - [x] Prior art: metamorphic testing, leave-one-feature-out, input erasure
 - [x] Benchmark: 54 pipelines with planted bugs, against a static check and Nemotron reading the code ([bench/](bench/))
 - [x] GitHub Action with a job summary
-- [x] Live: Nemotron Nano, Super and Ultra on Token Factory. Nano scored 18, 19 and 19 of 20 labelled diffs over three runs; Super and Ultra explain each defect and write the fix
+- [x] Live: Nemotron Nano, Super and Ultra on Token Factory. Nano scored 19 of 20 labelled diffs on each of three runs; Super and Ultra explain each defect and write the fix
 - [x] Live: Tavily inferring which fields should matter. On the support answerer it finds a RAG source saying answers come from the retrieved passages, which makes the unread `passages` field a defect; Ultra's one-line fix is proven, and the answer goes from "30 days, refund" to "14 days, warranty"
 - [ ] Sandboxes backend run against a live account (checked against the contree-sdk 0.3.6 source, not yet run)
 - [ ] Hosted demo deployed at a public URL
