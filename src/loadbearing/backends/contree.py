@@ -41,7 +41,9 @@ class ContreeBackend:
 
     def checkpoint(self, target: Target) -> Any:
         forwarded_env(target)  # a missing variable fails here, before any paid run
-        image = self._sdk.images.use(target.image)
+        # oci() finds the tag on the account or imports it from its registry; use() would only
+        # name it, and the first run would fail on an account that never pulled the image.
+        image = self._sdk.images.oci(target.image)
         if target.files:
             image = image.apply_files(
                 {f"{WORKDIR}/{rel}": (target.root / rel).read_bytes() for rel in target.files}
