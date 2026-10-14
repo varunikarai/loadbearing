@@ -16,7 +16,7 @@ Where Loadbearing is, what happens next, and what has already happened. **Now**,
 _Updated 2026-10-14_
 
 - **State:** the whole loop has run live on Token Factory and Tavily, on the local backend: Nano scores 18, 19 and 19 of 20; on the support answerer Tavily and Super infer `passages` is relevant from a quoted source, Ultra's one-line fix is proven, and the run is recorded in `demo/runs/` for the hosted demo. Ultra fixes by exact-quote edits. Intent comes from the target's own docs first, search only for the gaps. The README leads with the product working, and an inferred field's card says its intent came from docs. 183 tests pass on `main`; the current tree is clean for the audit. **Not yet live:** the Sandboxes backend (V1), the hosted demo (A6), any recording made on Sandboxes.
-- **Next action:** Aeshvarya, who holds the keys from 10-11: hand-off 18 (re-record with own docs first, re-render the screenshots, re-score Nano); Sandboxes beta access, then V1's run (hand-off 20 is in, so the image step is covered), `loadbearing probe examples/ticket_triage/target.json --backend sandbox --nano` (pass = the same two defects, found on Nebius), then the support answerer on Sandboxes; A6 host account (due live 10-11, not deployed). Varunika: V9 palette (was due 10-10) and V10 outline (was due 10-11) on Fri 10-16, then V8 README narrative by 10-18.
+- **Next action:** Aeshvarya, who holds the keys from 10-11: review hand-off 23; Sandboxes beta access, then V1's run (hand-off 20 is in, so the image step is covered), `loadbearing probe examples/ticket_triage/target.json --backend sandbox --nano` (pass = the same two defects, found on Nebius), then the support answerer on Sandboxes; A6 host account (due live 10-11, not deployed). Varunika: V9 palette (was due 10-10) and V10 outline (was due 10-11) on Fri 10-16, then V8 README narrative by 10-18.
 - **Waiting on:** Aeshvarya confirming or countering the split in WORKPLAN.md (due 2026-10-09; both are working inside it); Sandboxes beta access.
 - **Deadline:** 2026-10-30 10:00 PT (22:30 IST). **Target submission: 2026-10-25.**
 
@@ -95,6 +95,10 @@ Problem statement: [SPEC.md](SPEC.md). Setup, target format, layout: [README.md]
 ## Log
 
 Newest first.
+
+### 2026-10-14 (c)
+- **Hand-off 18 done** (Aeshvarya, `692c147`): the support answerer re-recorded with own docs first. The cited intent for `passages` is now NVIDIA's own page (checked by Varunika: the quote is on blogs.nvidia.com word for word), the fix is one line, the proof is clean, and the README's screenshots and terminal output come from this run (all seven re-rendered images opened: nothing private in any).
+- **Hand-off 23 brought up to date** (Varunika, `varunika/confirm-only-phantoms`): merged with his 16:32 work, kept his new terminal-and-page test, and the report now says only moves on fields that should not matter are re-run. 190 tests on the branch. The recorded run stays a true capture of the version that made it: its "2 moved fork(s) re-run" are the two `question` forks, which a run after 23 would not re-run.
 
 ### 2026-10-14 (b)
 - **Confirm-moves reviewed** (Varunika, on Aeshvarya's `782fa63`): right aim, a single sampled answer should not make a phantom sensitivity. But it confirmed every moved fork, including fields that should matter, and kept only majority moves. A test with a pipeline that reads `body` but uses it only on some runs shows `main` reporting `body` as a **silent passthrough**: a defect made by noise. It also recorded `moves: 1` on forks that never moved.
