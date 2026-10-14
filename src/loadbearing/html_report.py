@@ -359,7 +359,8 @@ def _confirm_note(data: dict[str, Any]) -> str:
         return ""
     runs = rerun[0]["runs"]
     flukes = [f for f in rerun if not f["moved"]]
-    text = f" Every fork that moved ran {runs} times, and counts only if most of its runs moved"
+    text = (f" Every fork that moved on a field that should not matter ran {runs} times, and counts only"
+            " if most of its runs moved")
     if flukes:
         names = ", ".join(f'<b>{escape(f["label"])}</b> ({f["moves"]} of {f["runs"]})' for f in flukes)
         text += f"; {names} moved too rarely and {'was' if len(flukes) == 1 else 'were'} not counted"
