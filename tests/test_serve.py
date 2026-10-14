@@ -5,7 +5,7 @@ import urllib.error
 import urllib.request
 from pathlib import Path
 
-from loadbearing.serve import Demo, serve
+from loadbearing.serve import Demo, serve, wsgi_app
 
 EXAMPLES = Path(__file__).resolve().parent.parent / "examples"
 
@@ -120,6 +120,47 @@ class DemoServerTests(unittest.TestCase):
 
     def test_health_check(self):
         self.assertEqual(self.get(self.start() + "/healthz"), (200, "ok"))
+
+
+
+class WsgiTests(unittest.TestCase):
+    """The same demo as a WSGI app, for hosts that run Python as functions."""
+
+    def setUp(self):
+        import tempfile
+
+        self._tmp = tempfile.TemporaryDirectory()
+        self.app = wsgi_app(Demo(EXAMPLES, self._tmp.name, readonly=True))
+
+    def tearDown(self):
+        self._tmp.cleanup()
+
+    def call(self, method, path):
+        seen = {}
+
+        def start_response(status, headers):
+            seen["status"], seen["headers"] = status, dict(headers)
+
+        body = b"".join(self.app({"REQUEST_METHOD": method, "PATH_INFO": path}, start_response))
+        return seen["status"], seen["headers"], body.decode()
+
+    def test_the_index_and_health_check(self):
+        self.assertEqual(self.call("GET", "/healthz")[0], "200 OK")
+        status, headers, body = self.call("GET", "/")
+        self.assertEqual(status, "200 OK")
+        self.assertIn("ticket_triage", body)
+        self.assertEqual(headers["Content-Length"], str(len(body.encode())))
+
+    def test_a_free_run_answers_with_its_report_not_a_redirect(self):
+        status, _, body = self.call("POST", "/t/ticket_triage/run")
+        self.assertEqual(status, "200 OK")
+        self.assertIn("body · silent passthrough", body)
+
+    def test_a_paid_target_is_refused(self):
+        self.assertEqual(self.call("POST", "/t/support_answerer/run")[0], "403 Forbidden")
+
+    def test_other_methods_are_refused(self):
+        self.assertEqual(self.call("DELETE", "/")[0], "405 Method Not Allowed")
 
 
 if __name__ == "__main__":

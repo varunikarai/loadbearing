@@ -89,62 +89,94 @@ class Demo:
             return report_json.save(result, self.cache / f"{name}.{self.backend}.json")
 
 
+Response = tuple[int, list[tuple[str, str]], bytes]
+
+_HTML = "text/html; charset=utf-8"
+
+
+def respond(demo: Demo, method: str, path: str, redirect: bool = True) -> Response:
+    """One request, as (status, headers, body). The HTTP server and the WSGI app both use it.
+
+    `redirect=False` answers a run with its report instead of a redirect to it: on a
+    serverless host the next request may reach an instance that never saw the run."""
+    path = path.split("?", 1)[0].rstrip("/") or "/"
+    if method == "GET":
+        if path == "/":
+            return _ok(_index(demo))
+        if path == "/healthz":
+            return _ok("ok", "text/plain")
+        name, kind = _route(path)
+        if name not in demo.targets:
+            return _ok(_page("Not found", "<p>No such target.</p>"), status=HTTPStatus.NOT_FOUND)
+        data = demo.cached(name)
+        if kind == "json":
+            if data is None:
+                return _ok('{"error": "not run yet"}', "application/json", HTTPStatus.NOT_FOUND)
+            return _ok(json.dumps(data, indent=2), "application/json")
+        if data is None:
+            return _ok(_not_run(name, not demo.can_run(name)))
+        return _ok(render_html(data))
+    if method == "POST":
+        name, kind = _route(path)
+        if kind != "run" or name not in demo.targets:
+            return _ok(_page("Not found", "<p>No such target.</p>"), status=HTTPStatus.NOT_FOUND)
+        if not demo.can_run(name):
+            return _ok(
+                _page("Recorded run only", "<p>This target calls paid services (Nebius Sandboxes "
+                      "or Nemotron), so this demo shows its recorded run. The free targets can be "
+                      "run from the index.</p>"),
+                status=HTTPStatus.FORBIDDEN,
+            )
+        try:
+            data = demo.run(name)
+        except Exception as exc:  # the visitor sees why, the server keeps serving
+            return _ok(_page("The probe failed", f"<pre>{escape(str(exc))}</pre>"),
+                       status=HTTPStatus.INTERNAL_SERVER_ERROR)
+        if not redirect:
+            return _ok(render_html(data))
+        return HTTPStatus.SEE_OTHER, [("Location", f"/t/{name}"), ("Content-Length", "0")], b""
+    return _ok(_page("Not allowed", "<p>GET or POST only.</p>"), status=HTTPStatus.METHOD_NOT_ALLOWED)
+
+
+def _ok(body: str, kind: str = _HTML, status: int = HTTPStatus.OK) -> Response:
+    raw = body.encode()
+    return int(status), [("Content-Type", kind), ("Content-Length", str(len(raw)))], raw
+
+
 def make_handler(demo: Demo) -> type[BaseHTTPRequestHandler]:
     class Handler(BaseHTTPRequestHandler):
         server_version = "loadbearing"
 
         def do_GET(self) -> None:
-            path = self.path.split("?", 1)[0].rstrip("/") or "/"
-            if path == "/":
-                return self._send(HTTPStatus.OK, _index(demo))
-            if path == "/healthz":
-                return self._send(HTTPStatus.OK, "ok", "text/plain")
-            name, kind = _route(path)
-            if name not in demo.targets:
-                return self._send(HTTPStatus.NOT_FOUND, _page("Not found", "<p>No such target.</p>"))
-            data = demo.cached(name)
-            if kind == "json":
-                if data is None:
-                    return self._send(HTTPStatus.NOT_FOUND, '{"error": "not run yet"}', "application/json")
-                return self._send(HTTPStatus.OK, json.dumps(data, indent=2), "application/json")
-            if data is None:
-                return self._send(HTTPStatus.OK, _not_run(name, not demo.can_run(name)))
-            return self._send(HTTPStatus.OK, render_html(data))
+            self._send(*respond(demo, "GET", self.path))
 
         def do_POST(self) -> None:
-            name, kind = _route(self.path.rstrip("/"))
-            if kind != "run" or name not in demo.targets:
-                return self._send(HTTPStatus.NOT_FOUND, _page("Not found", "<p>No such target.</p>"))
-            if not demo.can_run(name):
-                return self._send(
-                    HTTPStatus.FORBIDDEN,
-                    _page("Recorded run only", "<p>This target calls paid services (Nebius Sandboxes "
-                          "or Nemotron), so this demo shows its recorded run. The free targets can be "
-                          "run from the index.</p>"),
-                )
-            try:
-                demo.run(name)
-            except Exception as exc:  # the visitor sees why, the server keeps serving
-                return self._send(
-                    HTTPStatus.INTERNAL_SERVER_ERROR,
-                    _page("The probe failed", f"<pre>{escape(str(exc))}</pre>"),
-                )
-            self.send_response(HTTPStatus.SEE_OTHER)
-            self.send_header("Location", f"/t/{name}")
-            self.end_headers()
+            self._send(*respond(demo, "POST", self.path))
 
-        def _send(self, status: int, body: str, kind: str = "text/html; charset=utf-8") -> None:
-            raw = body.encode()
+        def _send(self, status: int, headers: list[tuple[str, str]], body: bytes) -> None:
             self.send_response(status)
-            self.send_header("Content-Type", kind)
-            self.send_header("Content-Length", str(len(raw)))
+            for key, value in headers:
+                self.send_header(key, value)
             self.end_headers()
-            self.wfile.write(raw)
+            self.wfile.write(body)
 
         def log_message(self, fmt: str, *args) -> None:
             pass  # quiet by default; a hosting platform logs requests anyway
 
     return Handler
+
+
+def wsgi_app(demo: Demo) -> Callable:
+    """The demo as a WSGI app, for hosts that run Python as functions rather than a server."""
+
+    def app(environ: dict, start_response: Callable) -> list[bytes]:
+        status, headers, body = respond(
+            demo, environ.get("REQUEST_METHOD", "GET"), environ.get("PATH_INFO") or "/", redirect=False
+        )
+        start_response(f"{status} {HTTPStatus(status).phrase}", headers)
+        return [body]
+
+    return app
 
 
 class _Server(ThreadingHTTPServer):
