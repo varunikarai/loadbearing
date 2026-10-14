@@ -145,6 +145,10 @@ def _probe(args: argparse.Namespace) -> int:
         print(render(report))
         if loop is not None:
             print(render_loop(loop, target))
+    # A pipeline that crashes on its own input, printing nothing, has nothing to judge:
+    # that is a failure, never a finding, so it exits 2 rather than 1.
+    if _crashed(report.baseline):
+        return 2
     # Non-zero on any defect in the pipeline as given, so this can gate CI.
     return 1 if report.defects else 0
 
@@ -193,11 +197,24 @@ def _models(show_all: bool) -> int:
     return 0
 
 
+def _crashed(baseline) -> bool:
+    return baseline.exit_code != 0 and not baseline.stdout.strip()
+
+
 def render(report: Report) -> str:
     lines = [f"{report.target}: {len(report.forks)} forks from one checkpoint ({report.backend})"]
     lines.append(timing_line(report))
     if report.void:
         lines.append("WARNING: every output key varies on its own, so no verdict below is sound.")
+    if report.baseline.exit_code != 0:
+        silent = " and prints nothing" if _crashed(report.baseline) else ""
+        lines.append(
+            f"WARNING: the unmutated record exits {report.baseline.exit_code}{silent}: the pipeline "
+            "fails on its own input, so check it before trusting any verdict below."
+        )
+        last = report.baseline.stderr.strip().splitlines()[-1:]
+        if last:
+            lines.append(f"  its stderr ends: {last[0][:200]}")
     elif report.unstable_keys:
         # An LLM target is expected to land here: the noise floor removed these, the rest is judged.
         lines.append(
