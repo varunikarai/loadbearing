@@ -58,6 +58,19 @@ class TargetV2Tests(unittest.TestCase):
             with self.subTest(keys=keys), self.assertRaisesRegex(RuntimeError, word):
                 load_target(self.write(**keys))
 
+    def test_an_expects_name_that_is_not_in_the_record_is_refused(self):
+        (self.root / "record.json").write_text('{"body": "outage", "customer": {"tier": "pro"}}')
+        with self.assertRaisesRegex(RuntimeError, "expects.relevant names 'boddy'"):
+            load_target(self.write(expects={"relevant": ["boddy"]}))
+        # A parent path covers what is nested under it.
+        load_target(self.write(expects={"relevant": ["body", "customer"], "irrelevant": ["customer.tier"]}))
+
+    def test_a_record_that_is_not_an_object_or_has_a_dotted_key_is_refused(self):
+        for record, word in (("[1, 2]", "JSON object"), ('{"http.method": "GET"}', "contains a dot")):
+            (self.root / "record.json").write_text(record)
+            with self.subTest(record=record), self.assertRaisesRegex(RuntimeError, word):
+                load_target(self.write())
+
 
 if __name__ == "__main__":
     unittest.main()
