@@ -85,7 +85,7 @@ def _probe_dict(report: Report) -> dict[str, Any]:
             "checkpoint_seconds": report.checkpoint_seconds,
             "fork_wall_seconds": report.fork_wall_seconds,
             "fork_total_seconds": report.fork_total_seconds,
-            "runs": len(report.forks) + report.baseline_runs,
+            "runs": sum(f.runs for f in report.forks) + report.baseline_runs,
         },
         "record": report.record,
         "baseline": _run(report.baseline),
@@ -134,6 +134,8 @@ def _fork(fork: Fork, record: dict) -> dict[str, Any]:
         "moved": fork.moved,
         "changed": fork.diff.changed,
         "classifier": fork.label,
+        "runs": fork.runs,  # more than 1 when a move on a noisy pipeline was re-run to confirm it
+        "moves": fork.moves,
         **_run(fork.result),
     }
 

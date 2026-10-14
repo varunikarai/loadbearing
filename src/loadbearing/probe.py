@@ -19,6 +19,11 @@ from loadbearing.verdict import INFERRED, UNDECLARED, Evidence, FieldVerdict, in
 # return "meaningful" or "noise". Nemotron Nano fills this role.
 Classifier = Callable[[Mutation, RunResult, RunResult], str]
 
+# On a pipeline the noise floor shows is not deterministic, a fork that moved runs this many
+# more times, and counts as moved only if most of its runs moved. One sampling fluke on a
+# field that should not matter is then not reported as a phantom sensitivity.
+CONFIRM_RUNS = 2
+
 
 @dataclass
 class Fork:
@@ -26,11 +31,13 @@ class Fork:
     result: RunResult
     diff: Diff
     label: Optional[str] = None  # the classifier's call on a moved diff
+    runs: int = 1  # how often this mutation ran: more than once when a move was confirmed
+    moves: int = 1  # how many of those runs moved
 
     @property
     def moved(self) -> bool:
         # The classifier can only veto a move it was shown, never invent one.
-        return self.diff.moved and self.label != "noise"
+        return self.diff.moved and self.label != "noise" and 2 * self.moves > self.runs
 
 
 @dataclass
@@ -93,12 +100,13 @@ def probe(
     records = [target.record] * runs + [m.apply(target.record) for m in mutations]
     with ThreadPoolExecutor(max_workers=workers) as pool:
         results = list(pool.map(run, records))
+        baselines, rest = results[:runs], results[runs:]
+        first = baselines[0]
+        unstable = noise.unstable_keys(baselines)
+        forks = [Fork(m, r, compare(first, r, ignore=unstable)) for m, r in zip(mutations, rest)]
+        if unstable:
+            results += _confirm([f for f in forks if f.diff.moved], target, first, unstable, run, pool)
     forked = time.perf_counter()
-    baselines, rest = results[:runs], results[runs:]
-    first = baselines[0]
-    unstable = noise.unstable_keys(baselines)
-
-    forks = [Fork(m, r, compare(first, r, ignore=unstable)) for m, r in zip(mutations, rest)]
     if classify is not None:
         for fork in forks:
             if fork.diff.moved:
@@ -130,6 +138,16 @@ def probe(
         baseline_runs=runs,
         unstable_keys=unstable,
     )
+
+
+def _confirm(moved: list[Fork], target: Target, first: RunResult, unstable: list[str], run, pool) -> list[RunResult]:
+    """Run each moved fork CONFIRM_RUNS more times and count how often it moves again."""
+    again = list(pool.map(run, [f.mutation.apply(target.record) for f in moved for _ in range(CONFIRM_RUNS)]))
+    for i, fork in enumerate(moved):
+        reruns = again[i * CONFIRM_RUNS : (i + 1) * CONFIRM_RUNS]
+        fork.runs += len(reruns)
+        fork.moves += sum(compare(first, r, ignore=unstable).moved for r in reruns)
+    return again
 
 
 def explain_defects(verdicts: list[FieldVerdict], target: Target, router: Any) -> None:
