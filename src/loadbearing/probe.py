@@ -103,7 +103,10 @@ def probe(
         baselines, rest = results[:runs], results[runs:]
         first = baselines[0]
         unstable = noise.unstable_keys(baselines)
-        forks = [Fork(m, r, compare(first, r, ignore=unstable)) for m, r in zip(mutations, rest)]
+        forks = []
+        for m, r in zip(mutations, rest):
+            diff = compare(first, r, ignore=unstable)
+            forks.append(Fork(m, r, diff, moves=int(diff.moved)))
         if unstable:
             results += _confirm([f for f in forks if f.diff.moved], target, first, unstable, run, pool)
     forked = time.perf_counter()
