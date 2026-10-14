@@ -204,6 +204,13 @@ def render(report: Report) -> str:
             f"noise floor: {report.baseline_runs} baseline runs; varies on its own, not judged: "
             + ", ".join(report.unstable_keys)
         )
+        rerun = [f for f in report.forks if f.runs > 1]
+        if rerun:
+            flukes = [f"{f.mutation.label} ({f.moves} of {f.runs})" for f in rerun if not f.moved]
+            lines.append(
+                f"confirmed: {len(rerun)} moved fork(s) re-run, counted only if most runs moved"
+                + (f"; not counted: {', '.join(flukes)}" if flukes else "")
+            )
 
     rows = [("field", "intent", *KINDS, "verdict")]
     for v in report.verdicts:

@@ -50,6 +50,17 @@ class ConfirmTests(unittest.TestCase):
         fluked = [f for f in report.forks if f.mutation.field == "ticket_id" and f.runs > 1]
         self.assertEqual([(f.runs, f.moves) for f in fluked], [(1 + CONFIRM_RUNS, 1)])
 
+    def test_the_terminal_and_the_page_say_which_move_was_not_counted(self):
+        from loadbearing import report as report_json
+        from loadbearing.cli import render
+        from loadbearing.html_report import render_html
+
+        report = probe(noisy_target(), FlukyBackend())
+        fluke = next(f for f in report.forks if f.runs > 1 and not f.moved).mutation.label
+        self.assertIn(f"not counted: {fluke} (1 of 3)", render(report))
+        page = render_html(report_json.to_dict(report))
+        self.assertIn(f"<b>{fluke}</b> (1 of 3) moved too rarely and was not counted", page)
+
     def test_a_real_move_is_confirmed_on_every_run(self):
         report = probe(noisy_target(), FlukyBackend(fluke=False))
         body = [f for f in report.forks if f.mutation.field == "body" and f.diff.moved]

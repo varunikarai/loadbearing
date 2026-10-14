@@ -348,8 +348,22 @@ def _noise_note(data: dict[str, Any]) -> str:
         f'<p class="note">Noise floor: the unmodified input ran <b>{data.get("baseline_runs", 2)}</b> times. '
         f'<b>{escape(", ".join(keys))}</b> changed with no mutation at all, so '
         f'{"it is" if len(keys) == 1 else "they are"} left out of every comparison. '
-        "Everything else is judged.</p>"
+        "Everything else is judged." + _confirm_note(data) + "</p>"
     )
+
+
+def _confirm_note(data: dict[str, Any]) -> str:
+    """The forks re-run to confirm a move, and any that moved too rarely to count."""
+    rerun = [f for f in data["forks"] if f.get("runs", 1) > 1]
+    if not rerun:
+        return ""
+    runs = rerun[0]["runs"]
+    flukes = [f for f in rerun if not f["moved"]]
+    text = f" Every fork that moved ran {runs} times, and counts only if most of its runs moved"
+    if flukes:
+        names = ", ".join(f'<b>{escape(f["label"])}</b> ({f["moves"]} of {f["runs"]})' for f in flukes)
+        text += f"; {names} moved too rarely and {'was' if len(flukes) == 1 else 'were'} not counted"
+    return text + "."
 
 
 def _fix_card(fix: dict[str, Any], data: dict[str, Any]) -> str:
