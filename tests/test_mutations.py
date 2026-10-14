@@ -27,7 +27,7 @@ class MutationTests(unittest.TestCase):
         self.assertEqual(destroy(["a"]), [])
 
     def test_destroy_always_changes_the_value_even_when_it_is_empty(self):
-        for value in ([], {}, "", 0, 0.0, False, None, ["a"], {"k": 1}):
+        for value in ([], {}, "", 0, 0.0, False, None, ["a"], {"k": 1}, "x", "xxx"):
             self.assertNotEqual(destroy(value), value, repr(value))
 
     def test_a_dotted_record_key_is_refused_before_any_mutation_is_planned(self):
