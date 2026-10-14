@@ -1,7 +1,7 @@
 """The Sandboxes backend against a fake contree-sdk, so the calls are checked offline.
 
 The fake mirrors the real signatures of contree-sdk 0.3.6: ContreeSync() with no
-arguments, images.use(ref), image.apply_files(dict), image.run(shell=, cwd=,
+arguments, images.oci(ref), image.apply_files(dict), image.run(shell=, cwd=,
 files=, env=, timeout=, disposable=) returning an image whose .wait() runs it.
 """
 
@@ -44,7 +44,12 @@ class FakeSdk:
         if args or kwargs:
             raise TypeError("the real ContreeSync() is built from the environment, with no client")
         self.runs = []
-        self.images = types.SimpleNamespace(use=lambda ref: FakeImage(self, ref))
+        self.pulled = []
+        self.images = types.SimpleNamespace(oci=self._oci)
+
+    def _oci(self, ref):
+        self.pulled.append(ref)
+        return FakeImage(self, ref)
 
 
 class ContreeBackendTests(unittest.TestCase):
@@ -70,6 +75,10 @@ class ContreeBackendTests(unittest.TestCase):
         self.assertEqual(ckpt.request["cwd"], "/work")
         self.assertIn("/work/pipeline.py", ckpt.files)
         self.assertEqual(ckpt.files["/work/pipeline.py"], (self.target.root / "pipeline.py").read_bytes())
+
+    def test_the_image_is_looked_up_or_imported_not_just_named(self):
+        self.backend.checkpoint(self.target)
+        self.assertEqual(self.backend._sdk.pulled, [self.target.image])
 
     def test_a_fork_is_disposable_and_gets_only_its_own_record(self):
         ckpt = self.backend.checkpoint(self.target)
