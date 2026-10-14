@@ -13,10 +13,10 @@ Where Loadbearing is, what happens next, and what has already happened. **Now**,
 
 ## Now
 
-_Updated 2026-10-13_
+_Updated 2026-10-14_
 
-- **State:** the whole loop has run live on Token Factory and Tavily, on the local backend: Nano scores 18, 19 and 19 of 20; on the support answerer Tavily and Super infer `passages` is relevant from a quoted source, Ultra's one-line fix is proven, and the run is recorded in `demo/runs/` for the hosted demo. Ultra fixes by exact-quote edits. Intent comes from the target's own docs first, search only for the gaps. The README leads with the product working, and an inferred field's card says its intent came from docs. 180 tests pass on `main`; the current tree is clean for the audit. **Not yet live:** the Sandboxes backend (V1), the hosted demo (A6), any recording made on Sandboxes.
-- **Next action:** Aeshvarya, who holds the keys from 10-11: hand-off 18 (re-record with own docs first, re-render the screenshots, re-score Nano); review hand-offs 21 and 22 (merge from 10-14 17:20 otherwise); Sandboxes beta access, then hand-off 20 and V1's run, `loadbearing probe examples/ticket_triage/target.json --backend sandbox --nano` (pass = the same two defects, found on Nebius), then the support answerer on Sandboxes; A6 host account (due live 10-11, not deployed). Varunika: V9 palette (was due 10-10) and V10 outline (was due 10-11) on Fri 10-16, then V8 README narrative by 10-18.
+- **State:** the whole loop has run live on Token Factory and Tavily, on the local backend: Nano scores 18, 19 and 19 of 20; on the support answerer Tavily and Super infer `passages` is relevant from a quoted source, Ultra's one-line fix is proven, and the run is recorded in `demo/runs/` for the hosted demo. Ultra fixes by exact-quote edits. Intent comes from the target's own docs first, search only for the gaps. The README leads with the product working, and an inferred field's card says its intent came from docs. 183 tests pass on `main`; the current tree is clean for the audit. **Not yet live:** the Sandboxes backend (V1), the hosted demo (A6), any recording made on Sandboxes.
+- **Next action:** Aeshvarya, who holds the keys from 10-11: hand-off 18 (re-record with own docs first, re-render the screenshots, re-score Nano); Sandboxes beta access, then V1's run (hand-off 20 is in, so the image step is covered), `loadbearing probe examples/ticket_triage/target.json --backend sandbox --nano` (pass = the same two defects, found on Nebius), then the support answerer on Sandboxes; A6 host account (due live 10-11, not deployed). Varunika: V9 palette (was due 10-10) and V10 outline (was due 10-11) on Fri 10-16, then V8 README narrative by 10-18.
 - **Waiting on:** Aeshvarya confirming or countering the split in WORKPLAN.md (due 2026-10-09; both are working inside it); Sandboxes beta access.
 - **Deadline:** 2026-10-30 10:00 PT (22:30 IST). **Target submission: 2026-10-25.**
 
@@ -95,6 +95,10 @@ Problem statement: [SPEC.md](SPEC.md). Setup, target format, layout: [README.md]
 ## Log
 
 Newest first.
+
+### 2026-10-14
+- **Hand-offs 21 and 22 reviewed and merged by Aeshvarya** (`51e78fa`, `4af66f2`), before the 24-hour window closed. **Hand-off 20 done** (Aeshvarya, `97d34a0`): the Sandboxes checkpoint now starts from `images.oci()`, which finds the image or imports it, with a test. Checked by Varunika: matches the SDK source, 183 tests pass, audit go on 321 commits, CI green.
+- Still open before the 10-17 milestone: hand-off 18 (re-record, re-render, re-score), Sandboxes beta access and V1's run, A6 deployed.
 
 ### 2026-10-13 (c)
 - **Bugs fixed in Varunika's files, merged:** destroying an empty list or object returned it unchanged, so a relevant field with an empty baseline value could be reported as a silent passthrough without ever being tested (`197eacc`); a timestamp nudge dropped `.000` or added seconds, changing the format along with the time (`37b2368`); a record key containing a dot crashed the probe mid-run with a `KeyError`, and is now refused before any run (`37b2368`); Token Factory and Tavily calls now retry a 429, a 5xx or a dropped connection with backoff, so one rate limit no longer throws away a paid run (`net.py`, `210b81e`).
