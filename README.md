@@ -114,7 +114,8 @@ proof: passages is now load-bearing, and no other field gained a defect.
 The bot samples its answers, so two runs can differ by chance. The noise floor showed `answer`
 varies on its own, so each fork that moved ran three times and counted only if most of its runs
 moved. In an earlier run this kept one chance answer, on a `received_at` fork (moved 1 of 3),
-from being reported as a phantom sensitivity.
+from being reported as a phantom sensitivity. Since then only moves on fields that should not
+matter are re-run: those are the ones a chance answer could turn into a false defect.
 
 </details>
 
@@ -157,7 +158,7 @@ flowchart LR
 
 1. **Checkpoint once.** The pipeline's setup runs once and is snapshotted, so every fork starts from the same state.
 2. **Fork per mutation.** Each input field is destroyed, dropped and nudged, one at a time, each in its own fork, all in parallel.
-3. **Compare against a noise floor.** The unmodified input runs several times first; output keys that change on their own (an LLM's wording) are set aside. On a pipeline that is not deterministic, a fork that moved runs twice more and counts only if most of its runs moved, so one chance answer is not a defect.
+3. **Compare against a noise floor.** The unmodified input runs several times first; output keys that change on their own (an LLM's wording) are set aside. On a pipeline that is not deterministic, a fork that moved on a field that should not matter runs twice more and counts only if most of its runs moved, so one chance answer is never reported as a defect.
 4. **Decide by rule.** A field that should matter and never moves is a *silent passthrough*; a field that should not matter and moves is a *phantom sensitivity*. With `--nano`, Nano decides whether a change is meaningful or noise; whether that makes a defect is a rule, never a model's call.
 5. **Fix and prove.** Ultra writes the smallest edit; the probe reruns from the same checkpoint, so the fix is the only thing that differs.
 
@@ -398,7 +399,7 @@ Built and tested offline unless it says live. Nemotron and Tavily have run live 
 - [x] Checkpoint-and-fork engine, timed: checkpoint, parallel wall time, and the same runs one after another
 - [x] Verdicts: silent passthrough and phantom sensitivity
 - [x] Noise floor: the baseline runs `baseline_runs` times, and keys that vary on their own are set aside
-- [x] Confirmed moves: on a pipeline that is not deterministic, a fork that moved is re-run, and counts only if most of its runs moved
+- [x] Confirmed moves: on a pipeline that is not deterministic, a fork that moved on a field that should not matter is re-run, and counts only if most of its runs moved
 - [x] Close the loop: Ultra writes the fix as exact-quote edits, validated before use; a fresh fork of the same checkpoint proves it, and a fix that crashes on the real input is never called proven
 - [x] An LLM demo target: a support answerer over retrieved policy, with a planted rename bug
 - [x] Report schema 2 and a self-contained HTML report: the fork tree, the evidence, the proven fix
