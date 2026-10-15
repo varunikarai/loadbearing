@@ -13,15 +13,17 @@ from loadbearing.compare import Diff, compare
 from loadbearing.fix import read_sources
 from loadbearing.mutations import Mutation, plan
 from loadbearing.target import Target
-from loadbearing.verdict import INFERRED, UNDECLARED, Evidence, FieldVerdict, intent_of, judge
+from loadbearing.verdict import INFERRED, IRRELEVANT, UNDECLARED, Evidence, FieldVerdict, intent_of, judge
 
 # Given (mutation, baseline, fork) for a fork whose output moved,
 # return "meaningful" or "noise". Nemotron Nano fills this role.
 Classifier = Callable[[Mutation, RunResult, RunResult], str]
 
-# On a pipeline the noise floor shows is not deterministic, a fork that moved runs this many
-# more times, and counts as moved only if most of its runs moved. One sampling fluke on a
-# field that should not matter is then not reported as a phantom sensitivity.
+# On a pipeline the noise floor shows is not deterministic, a fork that moved on a field that
+# should not matter runs this many more times, and counts as moved only if most of its runs
+# moved. One sampling fluke is then not reported as a phantom sensitivity. Only those forks:
+# on a field that should matter a move is not a defect claim, and demanding a majority there
+# would turn a real but unreliable reading into a silent passthrough.
 CONFIRM_RUNS = 2
 
 
@@ -103,9 +105,16 @@ def probe(
         baselines, rest = results[:runs], results[runs:]
         first = baselines[0]
         unstable = noise.unstable_keys(baselines)
-        forks = [Fork(m, r, compare(first, r, ignore=unstable)) for m, r in zip(mutations, rest)]
+        forks = []
+        for m, r in zip(mutations, rest):
+            diff = compare(first, r, ignore=unstable)
+            forks.append(Fork(m, r, diff, moves=int(diff.moved)))
         if unstable:
-            results += _confirm([f for f in forks if f.diff.moved], target, first, unstable, run, pool)
+            suspect = [
+                f for f in forks
+                if f.diff.moved and _intent(f.mutation.field, target, inferred)[0] == IRRELEVANT
+            ]
+            results += _confirm(suspect, target, first, unstable, run, pool)
     forked = time.perf_counter()
     if classify is not None:
         for fork in forks:
@@ -115,9 +124,8 @@ def probe(
     verdicts = []
     for field in dict.fromkeys(m.field for m in mutations):
         moved = {f.mutation.kind: f.moved for f in forks if f.mutation.field == field}
-        intent = intent_of(field, target.expects)
-        evidence = (inferred or {}).get(field) if intent == UNDECLARED else None
-        verdict = judge(field, evidence.intent if evidence else intent, moved)
+        intent, evidence = _intent(field, target, inferred)
+        verdict = judge(field, intent, moved)
         if evidence:
             verdict.intent_source, verdict.evidence = INFERRED, evidence
         verdicts.append(verdict)
@@ -138,6 +146,13 @@ def probe(
         baseline_runs=runs,
         unstable_keys=unstable,
     )
+
+
+def _intent(field: str, target: Target, inferred: Optional[dict[str, Evidence]]) -> tuple[str, Optional[Evidence]]:
+    """What a field is judged against: its declared intent, else one inferred from the docs."""
+    intent = intent_of(field, target.expects)
+    evidence = (inferred or {}).get(field) if intent == UNDECLARED else None
+    return (evidence.intent if evidence else intent), evidence
 
 
 def _confirm(moved: list[Fork], target: Target, first: RunResult, unstable: list[str], run, pool) -> list[RunResult]:
