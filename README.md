@@ -300,7 +300,8 @@ It lists every `<dir>/<name>/target.json`, one section per `--targets` folder, r
 one when asked, and caches the result in `runs/`, so a page view never costs a run. With
 `--readonly`, anything free still runs (a target with no keys, on the local backend, with no
 model calls), and anything that would spend credits on Sandboxes or Nemotron is shown as its
-recorded run instead. The Dockerfile runs it on any container host that sets `$PORT`.
+recorded run instead. The Dockerfile runs it on any container host that sets `$PORT`, and
+`api/index.py` runs the same pages as a Vercel function; [demo/README.md](demo/README.md) has both.
 
 ## Benchmark
 
