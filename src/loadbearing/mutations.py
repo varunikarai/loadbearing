@@ -60,7 +60,8 @@ def destroy(value: Any) -> Any:
     if isinstance(value, (int, float)):
         return type(value)(0) if value else type(value)(1)
     if isinstance(value, str):
-        return "x" * max(len(value), 1)
+        filler = "y" if value and set(value) == {"x"} else "x"  # "xxx" destroyed must still change
+        return filler * max(len(value), 1)
     if isinstance(value, list):
         return [] if value else ["x"]
     if isinstance(value, dict):
