@@ -38,7 +38,8 @@ CLASSIFY_SYSTEM = (
     "runs is one mutated input field. Answer with exactly one word: 'meaningful' if the "
     "output changed in a way a user of this program would care about, or 'noise' if it "
     "changed only in something incidental such as a timestamp, a request id, how long the "
-    "run took (a latency or duration in ms or seconds), ordering, or whitespace."
+    "run took (a latency or duration in ms or seconds), ordering, whitespace, or punctuation "
+    "that leaves the meaning the same."
 )
 
 RECONCILE_SYSTEM = (
