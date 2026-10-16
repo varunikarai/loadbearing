@@ -96,6 +96,10 @@ Problem statement: [SPEC.md](SPEC.md). Setup, target format, layout: [README.md]
 
 Newest first.
 
+### 2026-10-17
+- **New front page live** (Aeshvarya, `3eb67d4`): the index is now a page anyone can follow, built from the recorded support answerer run. It shows the customer's question, the policy, the wrong answer and the answer after the proven fix; then the Air Canada case, how it works with the real fork tree, the two kinds of bug, and every target as a card that says in plain words what was planted. A run on a card checks the result against the planted bug, and "Run all 54" runs the whole benchmark in the browser. Checked on the live site in Chrome: 50 of 54 exactly right in 13.8 s, the same four misses as `bench/results.json`, no errors. A paid run is still refused 403, and every run page links back to the front page.
+- On a phone the fork tree scrolls sideways and opens on the field names. README screenshots re-taken from the live site. 202 tests pass.
+
 ### 2026-10-16 (b)
 - **A6 live: https://loadbearing-demo.vercel.app** (Aeshvarya). Vercel project linked to the fork, so every sync of `main` redeploys it (the first one did, Ready in 15 s). Checked logged out: the index lists both sections (2 + 54), a free run of the toy target finds both defects in about 1 s, the support answerer's recorded run shows NVIDIA's quote and Ultra's proven fix, and `POST /t/support_answerer/run` is refused 403. No key is set on the host. `DEMO_URL` is set; keep-warm ran green against it.
 - The first deploy answered 404 everywhere: Vercel now hands a Python app the rewritten path, so the catch-all rewrite sent every request to `/api/index`. Removed it; Python apps are served on every path.
