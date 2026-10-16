@@ -469,6 +469,10 @@
     "Nemotron reads the code (nvidia/nemotron-3-super-120b-a12b)": 49,
     "Static name check (reads it)": 26
   },
+  "cases_right_repeats": {
+    "Nemotron reads the code, run 2": 51,
+    "Nemotron reads the code, run 3": 49
+  },
   "mcnemar": {
     "Nemotron reads the code (nvidia/nemotron-3-super-120b-a12b)": [
       5,
