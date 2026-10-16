@@ -96,6 +96,12 @@ Problem statement: [SPEC.md](SPEC.md). Setup, target format, layout: [README.md]
 
 Newest first.
 
+### 2026-10-17 (b)
+- **Front page reviewed** (Varunika, on `3eb67d4`): every number on it checked against `bench/results.json` and the recorded run; the toy and benchmark cards say truly what is planted. **Hand-off 25 to Aeshvarya, `varunika/h25-front-page-facts`** (his files, for review): the model's bar showed its first run only, 49 of 54, but it scored 49, 51 and 49 over three runs, and run 2 beat our 50. The README already says "49 to 51", so the bar now spans every run (`cases_right_repeats` stored in `results.json`, re-rendered from the saved calls with `--from-json`, nothing re-run; a test counts it from the calls and truth files). Also: the hero cut the policy at 150 characters, before the warranty clause the fixed answer cites. 209 tests on the branch, CI green. If merged, the two front-page screenshots show the old cut and want re-taking.
+- **Hand-off 24 merged** (`45722e9`) under rule 4, about 54 hours without review: bad input is refused or warned about, never misread. 208 tests on `main`, CI green.
+- **One wording point on the front page, his call:** "No error. Every test passed." The support answerer has no tests, so a judge who opens `examples/support_answerer/` finds none. "No error. Nothing crashed." says the same thing and is true.
+- **V6 dry run for the flip on 2026-10-18:** the audit says go on 391 commits; with the private words added, the only hit is the old fixture version already known. Both re-taken screenshots opened: nothing private. The Air Canada link was not checked from here (the site refuses scripted requests); it is in V7's list to open.
+
 ### 2026-10-17
 - **New front page live** (Aeshvarya, `3eb67d4`): the index is now a page anyone can follow, built from the recorded support answerer run. It shows the customer's question, the policy, the wrong answer and the answer after the proven fix; then the Air Canada case, how it works with the real fork tree, the two kinds of bug, and every target as a card that says in plain words what was planted. A run on a card checks the result against the planted bug, and "Run all 54" runs the whole benchmark in the browser. Checked on the live site in Chrome: 50 of 54 exactly right in 13.8 s, the same four misses as `bench/results.json`, no errors. A paid run is still refused 403, and every run page links back to the front page.
 - On a phone the fork tree scrolls sideways and opens on the field names. README screenshots re-taken from the live site. 202 tests pass.
