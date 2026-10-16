@@ -8,6 +8,7 @@ COPY pyproject.toml README.md LICENSE ./
 COPY src ./src
 COPY examples ./examples
 COPY bench/cases ./bench/cases
+COPY bench/results.json ./bench/results.json
 COPY demo/runs ./runs
 RUN pip install --no-cache-dir . && useradd --create-home demo && chown -R demo runs
 USER demo

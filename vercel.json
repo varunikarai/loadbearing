@@ -1,7 +1,7 @@
 {
   "functions": {
     "api/index.py": {
-      "includeFiles": "{src/**,examples/**,bench/cases/**,demo/runs/**}",
+      "includeFiles": "{src/**,examples/**,bench/cases/**,bench/results.json,demo/runs/**}",
       "maxDuration": 60
     }
   }
