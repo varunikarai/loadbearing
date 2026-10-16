@@ -102,7 +102,7 @@ class DemoServerTests(unittest.TestCase):
         index = self.get(base + "/")[1]
         self.assertIn("recorded on sandbox", index)
         # A paid target offers its recorded run, never a button that would spend credits.
-        row = index.split('href="/t/support_answerer"', 1)[1].split("</tr>", 1)[0]
+        row = index.split('data-name="support_answerer"', 1)[1].split("</article>", 1)[0]
         self.assertIn("View the recorded run", row)
         self.assertIn("Nemotron · Tavily", row)
         self.assertNotIn("Run probe", row)

@@ -99,7 +99,8 @@ def respond(demo: Demo, method: str, path: str, redirect: bool = True) -> Respon
 
     `redirect=False` answers a run with its report instead of a redirect to it: on a
     serverless host the next request may reach an instance that never saw the run."""
-    path = path.split("?", 1)[0].rstrip("/") or "/"
+    path, _, query = path.partition("?")
+    path = path.rstrip("/") or "/"
     if method == "GET":
         if path == "/":
             return _ok(_index(demo))
@@ -115,7 +116,7 @@ def respond(demo: Demo, method: str, path: str, redirect: bool = True) -> Respon
             return _ok(json.dumps(data, indent=2), "application/json")
         if data is None:
             return _ok(_not_run(name, not demo.can_run(name)))
-        return _ok(render_html(data))
+        return _ok(_with_back(render_html(data)))
     if method == "POST":
         name, kind = _route(path)
         if kind != "run" or name not in demo.targets:
@@ -132,10 +133,19 @@ def respond(demo: Demo, method: str, path: str, redirect: bool = True) -> Respon
         except Exception as exc:  # the visitor sees why, the server keeps serving
             return _ok(_page("The probe failed", f"<pre>{escape(str(exc))}</pre>"),
                        status=HTTPStatus.INTERNAL_SERVER_ERROR)
+        if "format=json" in query.split("&"):
+            return _ok(json.dumps(data), "application/json")
         if not redirect:
-            return _ok(render_html(data))
+            return _ok(_with_back(render_html(data)))
         return HTTPStatus.SEE_OTHER, [("Location", f"/t/{name}"), ("Content-Length", "0")], b""
     return _ok(_page("Not allowed", "<p>GET or POST only.</p>"), status=HTTPStatus.METHOD_NOT_ALLOWED)
+
+
+def _with_back(page: str) -> str:
+    """A served report links back to the demo; a saved one stays self-contained."""
+    back = ('<a href="/" style="display:inline-block;margin:0 0 18px;font-weight:800;font-size:14px;'
+            'color:var(--dim);text-decoration:none">← Back to the demo</a>')
+    return page.replace("<main>", "<main>" + back, 1)
 
 
 def _ok(body: str, kind: str = _HTML, status: int = HTTPStatus.OK) -> Response:
@@ -170,9 +180,10 @@ def wsgi_app(demo: Demo) -> Callable:
     """The demo as a WSGI app, for hosts that run Python as functions rather than a server."""
 
     def app(environ: dict, start_response: Callable) -> list[bytes]:
-        status, headers, body = respond(
-            demo, environ.get("REQUEST_METHOD", "GET"), environ.get("PATH_INFO") or "/", redirect=False
-        )
+        path = environ.get("PATH_INFO") or "/"
+        if environ.get("QUERY_STRING"):
+            path += "?" + environ["QUERY_STRING"]
+        status, headers, body = respond(demo, environ.get("REQUEST_METHOD", "GET"), path, redirect=False)
         start_response(f"{status} {HTTPStatus(status).phrase}", headers)
         return [body]
 
@@ -202,42 +213,9 @@ def _route(path: str) -> tuple[str, str]:
 
 
 def _index(demo: Demo) -> str:
-    sections = []
-    for label, names in demo.groups:
-        rows = []
-        for name in names:
-            data = demo.cached(name)
-            if data is None:
-                status = '<span class="badge plain">not run yet</span>'
-            elif data["defects"]:
-                n = len(data["defects"])
-                status = f'<span class="badge silent">{n} defect{"s" if n != 1 else ""}</span>'
-            else:
-                status = '<span class="badge plain">clean</span>'
-            where = f' <span class="badge plain">recorded on {escape(data["backend"])}</span>' if (
-                data and data["backend"] != demo.backend) else ""
-            paid = bool(load_target(demo.targets[name]).env)
-            tag = '<span class="tag">Nemotron · Tavily</span>' if paid else ""
-            if demo.can_run(name):
-                action = _run_button(name, False)
-            elif data is not None:
-                action = f'<a class="btn ghost" href="/t/{escape(name)}">View the recorded run</a>'
-            else:
-                action = ""
-            rows.append(
-                f'<tr><td class="f"><a href="/t/{escape(name)}">{escape(name)}</a>{tag}</td>'
-                f"<td>{status}{where}</td><td>{action}</td></tr>"
-            )
-        sections.append(f"<h2>{escape(label)} ({len(names)})</h2>"
-                        '<div class="panel"><table class="idx"><colgroup><col style="width:44%">'
-                        '<col style="width:30%"><col style="width:26%"></colgroup>'
-                        f'<tbody>{"".join(rows)}</tbody></table></div>')
-    body = (
-        '<p class="lede">Pick a pipeline. Loadbearing checkpoints it once, forks it once per '
-        "mutated input, runs every fork in parallel, and tells you which inputs it really reads.</p>"
-        + "".join(sections)
-    )
-    return _page("Loadbearing", body)
+    from loadbearing.site import render_index
+
+    return render_index(demo)
 
 
 def _not_run(name: str, readonly: bool) -> str:
