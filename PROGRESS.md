@@ -15,8 +15,8 @@ Where Loadbearing is, what happens next, and what has already happened. **Now**,
 
 _Updated 2026-10-16_
 
-- **State:** the whole loop has run live on Token Factory and Tavily, on the local backend: Nano scores 18, 19 and 19 of 20; on the support answerer Tavily and Super infer `passages` is relevant from a quoted source, Ultra's one-line fix is proven, and the run is recorded in `demo/runs/` for the hosted demo. Ultra fixes by exact-quote edits. Intent comes from the target's own docs first, search only for the gaps. The README leads with the product working, and an inferred field's card says its intent came from docs. 183 tests pass on `main`; the current tree is clean for the audit. **Not yet live:** the Sandboxes backend (V1), the hosted demo (A6), any recording made on Sandboxes.
-- **Next action:** Aeshvarya, who holds the keys from 10-11: review hand-off 23; import the fork on Vercel (A6), then set `DEMO_URL`; Sandboxes beta access, then V1's run (hand-off 20 is in, so the image step is covered), `loadbearing probe examples/ticket_triage/target.json --backend sandbox --nano` (pass = the same two defects, found on Nebius), then the support answerer on Sandboxes. Varunika: V9 palette (was due 10-10) and V10 outline (was due 10-11) on Fri 10-16, then V8 README narrative by 10-18.
+- **State:** the whole loop has run live on Token Factory and Tavily, on the local backend: Nano scores 18, 19 and 19 of 20; on the support answerer Tavily and Super infer `passages` is relevant from a quoted source, Ultra's one-line fix is proven, and the run is recorded in `demo/runs/` for the hosted demo. Ultra fixes by exact-quote edits. Intent comes from the target's own docs first, search only for the gaps. The README leads with the product working, and an inferred field's card says its intent came from docs. 183 tests pass on `main`; the current tree is clean for the audit. **Live:** the hosted demo, https://loadbearing-demo.vercel.app (A6). **Not yet live:** the Sandboxes backend (V1, beta not enabled: 403), any recording made on Sandboxes.
+- **Next action:** Aeshvarya, who holds the keys from 10-11: review hand-off 23; Sandboxes beta access, then V1's run (hand-off 20 is in, so the image step is covered), `loadbearing probe examples/ticket_triage/target.json --backend sandbox --nano` (pass = the same two defects, found on Nebius), then the support answerer on Sandboxes. Varunika: V9 palette (was due 10-10) and V10 outline (was due 10-11) on Fri 10-16, then V8 README narrative by 10-18.
 - **Waiting on:** Aeshvarya confirming or countering the split in WORKPLAN.md (due 2026-10-09; both are working inside it); Sandboxes beta access.
 - **Deadline:** 2026-10-30 10:00 PT (22:30 IST). **Target submission: 2026-10-25.**
 
@@ -95,6 +95,10 @@ Problem statement: [SPEC.md](SPEC.md). Setup, target format, layout: [README.md]
 ## Log
 
 Newest first.
+
+### 2026-10-16 (b)
+- **A6 live: https://loadbearing-demo.vercel.app** (Aeshvarya). Vercel project linked to the fork, so every sync of `main` redeploys it (the first one did, Ready in 15 s). Checked logged out: the index lists both sections (2 + 54), a free run of the toy target finds both defects in about 1 s, the support answerer's recorded run shows NVIDIA's quote and Ultra's proven fix, and `POST /t/support_answerer/run` is refused 403. No key is set on the host. `DEMO_URL` is set; keep-warm ran green against it.
+- The first deploy answered 404 everywhere: Vercel now hands a Python app the rewritten path, so the catch-all rewrite sent every request to `/api/index`. Removed it; Python apps are served on every path.
 
 ### 2026-10-16
 - **Hand-off 23 reviewed and merged** (Aeshvarya): only moves on fields that should not matter are re-run. Agreed: a move on a field that should matter is not a defect claim. The one cost, for the recording: a chance move on a `passages` fork would hide the silent passthrough in that run, so if the table does not say SILENT PASSTHROUGH, re-run rather than edit anything. README brought in line (three lines).
