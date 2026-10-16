@@ -4,6 +4,5 @@
       "includeFiles": "{src/**,examples/**,bench/cases/**,demo/runs/**}",
       "maxDuration": 60
     }
-  },
-  "rewrites": [{ "source": "/(.*)", "destination": "/api/index" }]
+  }
 }
