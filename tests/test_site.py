@@ -32,6 +32,15 @@ class FrontPageTests(unittest.TestCase):
         self.assertIn(escape(before), self.page)
         self.assertIn(escape(after), self.page)
 
+    def test_the_hero_replays_every_copy_of_the_recorded_run_and_its_fix(self):
+        data = json.loads((RUNS / "support_answerer.local.json").read_text())
+        replay = json.loads(self.page.split('id="replay-data">', 1)[1].split("</script>", 1)[0])
+        self.assertEqual([(f["field"], f["kind"], f["moved"]) for f in replay["forks"]],
+                         [(f["field"], f["kind"], f["moved"]) for f in data["forks"]])
+        self.assertEqual([f["name"] for f in replay["fields"] if f["defect"]], ["passages"])
+        self.assertIn('request.get("passages", "")', " ".join(replay["fix"]["add"]))
+        self.assertEqual(replay["after"]["verdicts"]["passages"], "load-bearing")
+
     def test_the_benchmark_numbers_come_from_results_json(self):
         results = json.loads((ROOT / "bench" / "results.json").read_text())
         ours = next(v for k, v in results["cases_right"].items() if k.startswith("Loadbearing"))
