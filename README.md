@@ -4,7 +4,7 @@
 
 **Find out which inputs a pipeline is actually load-bearing on, by running it.**
 
-<a href="https://github.com/varunikarai/loadbearing/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/varunikarai/loadbearing/actions/workflows/ci.yml/badge.svg"></a> <a href="LICENSE"><img alt="Apache 2.0" src="https://img.shields.io/badge/license-Apache%202.0-0b0b0c"></a> <img alt="Python 3.10+" src="https://img.shields.io/badge/python-3.10%2B-0b0b0c?logo=python&logoColor=white"> <img alt="NVIDIA Nemotron 3" src="https://img.shields.io/badge/NVIDIA-Nemotron%203%20Nano%20%C2%B7%20Super%20%C2%B7%20Ultra-76B900?logo=nvidia&logoColor=white"> <img alt="Nebius Token Factory" src="https://img.shields.io/badge/Nebius-Token%20Factory-c8ff3d?labelColor=0b0b0c">
+<a href="https://github.com/varunikarai/loadbearing/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/varunikarai/loadbearing/actions/workflows/ci.yml/badge.svg"></a> <a href="LICENSE"><img alt="Apache 2.0" src="https://img.shields.io/badge/license-Apache%202.0-0b0b0c"></a> <img alt="Python 3.10+" src="https://img.shields.io/badge/python-3.10%2B-0b0b0c?logo=python&logoColor=white"> <img alt="NVIDIA Nemotron 3" src="https://img.shields.io/badge/NVIDIA-Nemotron%203%20Nano%20%C2%B7%20Super%20%C2%B7%20Ultra-76B900?logo=nvidia&logoColor=white"> <img alt="Nebius Token Factory" src="https://img.shields.io/badge/Nebius-Token%20Factory-c8ff3d?labelColor=0b0b0c"> <a href="https://loadbearing-demo.vercel.app"><img alt="Live demo" src="https://img.shields.io/badge/live%20demo-loadbearing--demo.vercel.app-ff4d4d?labelColor=0b0b0c"></a>
 
 <br><br>
 
@@ -283,6 +283,8 @@ with the changed keys marked. It fetches nothing, so a saved copy always opens.
 
 ## The demo server
 
+**Live at [loadbearing-demo.vercel.app](https://loadbearing-demo.vercel.app).** Run any free target yourself, including all 54 benchmark cases; the support answerer shows its recorded live run, since running it would spend credits.
+
 <p align="center">
 <picture>
   <source media="(prefers-color-scheme: light)" srcset="docs/img/demo-index-light.png">
@@ -413,7 +415,7 @@ Built and tested offline unless it says live. Nemotron and Tavily have run live 
 - [x] Live: Nemotron Nano, Super and Ultra on Token Factory. Nano scored 19 of 20 labelled diffs on each of three runs; Super and Ultra explain each defect and write the fix
 - [x] Live: Tavily inferring which fields should matter. On the support answerer it finds a RAG source saying answers come from the retrieved passages, which makes the unread `passages` field a defect; Ultra's one-line fix is proven, and the answer goes from "30 days, refund" to "14 days, warranty"
 - [ ] Sandboxes backend run against a live account (checked against the contree-sdk 0.3.6 source, not yet run)
-- [ ] Hosted demo deployed at a public URL
+- [x] Hosted demo at [loadbearing-demo.vercel.app](https://loadbearing-demo.vercel.app): free targets run on request, paid runs are shown as recorded
 - [ ] Demo video
 
 ## Prior art
