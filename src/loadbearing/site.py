@@ -560,8 +560,9 @@ border:1px solid var(--line);overflow:hidden}.score.on .score-bar{display:flex}
 .bar{display:grid;grid-template-columns:260px 1fr 120px;gap:18px;align-items:center;background:var(--panel);
 border:1px solid var(--line);border-radius:16px;padding:16px 20px}
 .bar-label b{display:block;font-size:17px}.bar-label span{font-size:13.5px;color:var(--dim)}
-.track{height:14px;border-radius:999px;background:var(--bg2);overflow:hidden;border:1px solid var(--line)}
-.fill{height:100%;border-radius:999px;background:var(--dim)}.bar.us .fill{background:var(--lime)}
+.track{position:relative;height:14px;border-radius:999px;background:var(--bg2);overflow:hidden;border:1px solid var(--line)}
+.fill{position:absolute;inset:0 auto 0 0;border-radius:999px;background:var(--dim)}.bar.us .fill{background:var(--lime)}
+.fill.spread{opacity:.4}
 .bar.us{border-color:color-mix(in srgb,var(--lime) 45%,var(--line))}
 .bar-num{text-align:right;font-size:30px;font-weight:900;letter-spacing:-.03em;line-height:1}
 .bar-num small{font-size:15px;color:var(--dim)}.bar-num span{display:block;font-size:12.5px;color:var(--dim);font-weight:700;margin-top:4px}
