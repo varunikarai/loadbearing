@@ -179,9 +179,10 @@ def _write(cases, results, seconds, repeats) -> int:
     tests = {other: mcnemar(results[lb], results[other], cases) for other in others}
     case_tests = {other: mcnemar_cases(results[lb], results[other], cases) for other in others}
     cases_right = {name: sum(case_right(r[c.name], c) for c in cases) for name, r in results.items()}
+    repeats_right = {name: sum(case_right(r[c.name], c) for c in cases) for name, r in repeats.items()}
     (HERE / "results.json").write_text(json.dumps(
         {"cases": len(cases), "scores": scores, "mcnemar": tests, "mcnemar_cases": case_tests,
-         "cases_right": cases_right, "repeats": repeats,
+         "cases_right": cases_right, "cases_right_repeats": repeats_right, "repeats": repeats,
          "calls": results, "seconds": seconds}, indent=2, sort_keys=True) + "\n")
     (HERE / "RESULTS.md").write_text(render(cases, results, scores, tests, seconds, case_tests, cases_right, repeats))
     print((HERE / "RESULTS.md").read_text())
