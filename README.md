@@ -283,12 +283,12 @@ with the changed keys marked. It fetches nothing, so a saved copy always opens.
 
 ## The demo server
 
-**Live at [loadbearing-demo.vercel.app](https://loadbearing-demo.vercel.app).** Run any free target yourself, including all 54 benchmark cases; the support answerer shows its recorded live run, since running it would spend credits.
+**Live at [loadbearing-demo.vercel.app](https://loadbearing-demo.vercel.app).** The front page explains the idea in plain words, then lets you run any free target yourself: one card at a time, or all 54 benchmark cases at once, each checked against the bug planted in it. The support answerer shows its recorded live run, since running it would spend credits.
 
 <p align="center">
 <picture>
   <source media="(prefers-color-scheme: light)" srcset="docs/img/demo-index-light.png">
-  <img alt="The demo server index: free targets can be run by anyone, paid ones show their recorded live run" src="docs/img/demo-index-dark.png" width="880">
+  <img alt="The demo front page: the support bot's wrong answer next to its answer after the proven fix, from the recorded live run" src="docs/img/demo-index-dark.png" width="880">
 </picture>
 </p>
 
