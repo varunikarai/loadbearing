@@ -33,6 +33,11 @@ class LocalBackendTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.backend.apply(original, {"../escape.py": "x"})
 
+    def test_output_that_is_not_utf8_is_read_not_fatal(self):
+        self.target.command = """python3 -c "import sys; sys.stdout.buffer.write(b'\\xff ok')\""""
+        result = self.backend.run(self.backend.checkpoint(self.target), self.target, self.target.record)
+        self.assertEqual((result.exit_code, result.stdout), (0, "\ufffd ok"))
+
     def test_a_run_past_the_timeout_comes_back_as_a_result_not_an_exception(self):
         self.target.command = 'python3 -c "import time; print(1, flush=True); time.sleep(5)"'
         self.target.timeout = 0.5

@@ -7,6 +7,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Optional
 
+from loadbearing.mutations import leaf_paths
+
 
 @dataclass
 class Target:
@@ -58,6 +60,17 @@ def load_target(path: str | Path) -> Target:
 
 def _check(target: Target, path: Path) -> None:
     """Fail at load time with the key's name, not mid-probe with a stack trace."""
+    if not isinstance(target.record, dict):
+        raise RuntimeError(f"{path}: the record must be a JSON object of field names to values")
+    try:
+        fields = list(leaf_paths(target.record))
+    except ValueError as exc:  # a key with a dot in it
+        raise RuntimeError(f"{path}: {exc}") from None
+    for intent, declared in target.expects.items():
+        for name in declared:
+            # A typo here would leave the real field undeclared, so it could never be flagged.
+            if not any(f == name or f.startswith(name + ".") for f in fields):
+                raise RuntimeError(f"{path}: expects.{intent} names {name!r}, which is not a field of the record")
     runs = target.baseline_runs
     if isinstance(runs, bool) or not isinstance(runs, int) or runs < 2:
         raise RuntimeError(f"{path}: baseline_runs must be an integer, 2 or more")

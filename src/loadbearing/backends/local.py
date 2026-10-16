@@ -56,6 +56,8 @@ class LocalBackend:
                 cwd=work,
                 capture_output=True,
                 text=True,
+                encoding="utf-8",
+                errors="replace",  # a pipeline that prints invalid bytes still gets compared
                 timeout=target.timeout,
             )
         except subprocess.TimeoutExpired as exc:

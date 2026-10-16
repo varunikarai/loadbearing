@@ -110,6 +110,11 @@ Newest first.
 - **Hosting docs:** `demo/README.md` says how to host on Vercel (one import, no settings) or Render (`DEMO_URL` for the keep-warm ping).
 - 196 tests pass.
 
+### 2026-10-14 (d)
+- **Bug hunt** (Varunika): `plan()` fuzzed over 3,000 random records, odd targets run through the probe and both renderers, odd flags through the CLI. Fixed and merged in her files: destroying a string of only x's left it unchanged, the only no-op the fuzz found (`2194d5d`); Nano's verdict was read from its first characters, so `**noise**` or `Answer: noise` counted as meaningful (`e25226f`).
+- **Hand-off 24 to Aeshvarya, this branch, `varunika/h24-input-checks`** (his files, for review; each with a test): a record that is a JSON array crashed with `AttributeError`, now refused at load; **a typo in `expects` was silently ignored**, leaving the real field undeclared so it could never be flagged, now refused at load with the name; output with invalid UTF-8 crashed the probe, now decoded with replacement; **a pipeline that crashes on its own record was reported as silent passthroughs with exit 1**, now a warning and exit 2 when it printed nothing (one that exits non-zero with output, like a validator, is still judged, with the warning; the CI summary carries it); `--workers 0` and `--baseline-runs 1` now give a usage line instead of a traceback. 198 tests on this branch.
+- Left as designed: a missing target file still exits 2 with a traceback, which `test_a_missing_target_file_exits_2` asks for.
+
 ### 2026-10-14 (c)
 - **Hand-off 18 done** (Aeshvarya, `692c147`): the support answerer re-recorded with own docs first. The cited intent for `passages` is now NVIDIA's own page (checked by Varunika: the quote is on blogs.nvidia.com word for word), the fix is one line, the proof is clean, and the README's screenshots and terminal output come from this run (all seven re-rendered images opened: nothing private in any).
 - **Hand-off 23 brought up to date** (Varunika, `varunika/confirm-only-phantoms`): merged with his 16:32 work, kept his new terminal-and-page test, and the report now says only moves on fields that should not matter are re-run. 190 tests on the branch. The recorded run stays a true capture of the version that made it: its "2 moved fork(s) re-run" are the two `question` forks, which a run after 23 would not re-run.

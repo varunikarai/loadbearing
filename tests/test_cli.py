@@ -33,6 +33,44 @@ class CrashExitTests(unittest.TestCase):
             self.assertEqual(self.run_quietly(["probe", str(Path(tmp, "target.json"))])[0], 2)
 
 
+class FailingBaselineTests(unittest.TestCase):
+    """A pipeline that fails on its own input is a failure to report, not a finding."""
+
+    def probe(self, script):
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as tmp:
+            Path(tmp, "r.json").write_text('{"a": 1}')
+            Path(tmp, "p.py").write_text(script)
+            Path(tmp, "target.json").write_text(json.dumps({
+                "record": "r.json", "files": ["p.py"], "command": "python3 p.py input.json",
+                "expects": {"relevant": ["a"]}, "baseline_runs": 2}))
+            with contextlib.redirect_stdout(io.StringIO()) as out, contextlib.redirect_stderr(io.StringIO()):
+                code = main(["probe", str(Path(tmp, "target.json"))])
+        return code, out.getvalue()
+
+    def test_a_silent_crash_exits_2_with_a_warning_not_1_with_a_defect(self):
+        code, out = self.probe("import sys\nprint('boom', file=sys.stderr)\nsys.exit(3)\n")
+        self.assertEqual(code, 2)
+        self.assertIn("the unmutated record exits 3 and prints nothing", out)
+        self.assertIn("its stderr ends: boom", out)
+
+    def test_a_pipeline_that_exits_non_zero_with_output_is_still_judged(self):
+        code, out = self.probe("import json, sys\nprint(json.dumps(json.load(open(sys.argv[1]))))\nsys.exit(1)\n")
+        self.assertEqual(code, 0)
+        self.assertIn("WARNING: the unmutated record exits 1:", out)
+
+
+class FlagRangeTests(unittest.TestCase):
+    def test_out_of_range_numbers_are_usage_errors(self):
+        for flag, value in (("--workers", "0"), ("--baseline-runs", "1"), ("--workers", "x")):
+            with self.subTest(flag=flag, value=value), contextlib.redirect_stderr(io.StringIO()) as err:
+                with self.assertRaises(SystemExit) as stop:
+                    main(["probe", EXAMPLE, flag, value])
+            self.assertEqual(stop.exception.code, 2)
+            self.assertIn(f"argument {flag}", err.getvalue())
+
+
 class ReservedFlagTests(unittest.TestCase):
     def test_each_reserved_flag_says_it_is_not_built_and_runs_nothing(self):
         flags = {"explain": ["--explain"],

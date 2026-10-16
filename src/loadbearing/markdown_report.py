@@ -24,6 +24,9 @@ def render_markdown(data: dict[str, Any]) -> str:
     lines = [head, ""]
     if data.get("void"):
         lines += ["> **Void:** every output key varied on its own, so no verdict below is sound.", ""]
+    code = data["baseline"]["exit_code"]
+    if code != 0:
+        lines += [f"> **Warning:** the unmutated record exits {code}: the pipeline fails on its own input.", ""]
     t = data["timing"]
     lines += [
         f"{len(data['forks'])} forks from one checkpoint on `{data['backend']}`: {t['runs']} runs in "
