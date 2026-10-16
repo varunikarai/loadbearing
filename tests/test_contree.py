@@ -6,9 +6,11 @@ files=, env=, timeout=, disposable=) returning an image whose .wait() runs it.
 """
 
 import json
+import os
 import sys
 import types
 import unittest
+from unittest import mock
 from pathlib import Path
 
 from loadbearing.target import load_target
@@ -79,6 +81,18 @@ class ContreeBackendTests(unittest.TestCase):
     def test_the_image_is_looked_up_or_imported_not_just_named(self):
         self.backend.checkpoint(self.target)
         self.assertEqual(self.backend._sdk.pulled, [self.target.image])
+
+    def test_a_403_on_the_first_call_says_sandboxes_is_not_enabled(self):
+        class ForbiddenError(Exception):
+            pass
+
+        def refuse(ref):
+            raise ForbiddenError("You do not have permission to perform this action")
+
+        self.backend._sdk.images.oci = refuse
+        with mock.patch.dict(os.environ, {"NEBIUS_PROJECT_ID": "aiproject-test"}):
+            with self.assertRaisesRegex(RuntimeError, "not enabled for this project.*aiproject-test"):
+                self.backend.checkpoint(self.target)
 
     def test_a_fork_is_disposable_and_gets_only_its_own_record(self):
         ckpt = self.backend.checkpoint(self.target)
