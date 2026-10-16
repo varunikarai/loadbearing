@@ -13,7 +13,7 @@ Where Loadbearing is, what happens next, and what has already happened. **Now**,
 
 ## Now
 
-_Updated 2026-10-14_
+_Updated 2026-10-16_
 
 - **State:** the whole loop has run live on Token Factory and Tavily, on the local backend: Nano scores 18, 19 and 19 of 20; on the support answerer Tavily and Super infer `passages` is relevant from a quoted source, Ultra's one-line fix is proven, and the run is recorded in `demo/runs/` for the hosted demo. Ultra fixes by exact-quote edits. Intent comes from the target's own docs first, search only for the gaps. The README leads with the product working, and an inferred field's card says its intent came from docs. 183 tests pass on `main`; the current tree is clean for the audit. **Not yet live:** the Sandboxes backend (V1), the hosted demo (A6), any recording made on Sandboxes.
 - **Next action:** Aeshvarya, who holds the keys from 10-11: review hand-off 23; import the fork on Vercel (A6), then set `DEMO_URL`; Sandboxes beta access, then V1's run (hand-off 20 is in, so the image step is covered), `loadbearing probe examples/ticket_triage/target.json --backend sandbox --nano` (pass = the same two defects, found on Nebius), then the support answerer on Sandboxes. Varunika: V9 palette (was due 10-10) and V10 outline (was due 10-11) on Fri 10-16, then V8 README narrative by 10-18.
@@ -95,6 +95,12 @@ Problem statement: [SPEC.md](SPEC.md). Setup, target format, layout: [README.md]
 ## Log
 
 Newest first.
+
+### 2026-10-16
+- **Hand-off 23 reviewed and merged** (Aeshvarya): only moves on fields that should not matter are re-run. Agreed: a move on a field that should matter is not a defect claim. The one cost, for the recording: a chance move on a `passages` fork would hide the silent passthrough in that run, so if the table does not say SILENT PASSTHROUGH, re-run rather than edit anything. README brought in line (three lines).
+- **V1, first live attempt:** `loadbearing probe examples/ticket_triage/target.json --backend sandbox` reaches Token Factory, authenticates, and gets `403 Forbidden` on its first call (`/sandboxes/v1/inspect/?tag=python:3.12-slim`): the beta is not enabled for the project yet (form sent 10-10, no reply). The SDK only says "You do not have permission"; the backend now says Sandboxes is likely not enabled and names the project ID. For V11: the 403 never mentions the beta.
+- **Hosting docs:** `demo/README.md` says how to host on Vercel (one import, no settings) or Render (`DEMO_URL` for the keep-warm ping).
+- 196 tests pass.
 
 ### 2026-10-14 (c)
 - **Hand-off 18 done** (Aeshvarya, `692c147`): the support answerer re-recorded with own docs first. The cited intent for `passages` is now NVIDIA's own page (checked by Varunika: the quote is on blogs.nvidia.com word for word), the fix is one line, the proof is clean, and the README's screenshots and terminal output come from this run (all seven re-rendered images opened: nothing private in any).
