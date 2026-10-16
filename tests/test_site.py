@@ -37,6 +37,23 @@ class FrontPageTests(unittest.TestCase):
         ours = next(v for k, v in results["cases_right"].items() if k.startswith("Loadbearing"))
         self.assertIn(f'{ours}<small>/{results["cases"]}</small>', self.page)
 
+    def test_the_model_is_shown_over_every_run_it_made_not_its_first(self):
+        results = json.loads((ROOT / "bench" / "results.json").read_text())
+        first = next(k for k in results["calls"] if k.startswith("Nemotron"))
+        runs = [results["calls"][first], *results["repeats"].values()]
+        cases = [p.parent for p in (ROOT / "bench" / "cases").glob("*/truth.json")]
+
+        def right(calls, case):
+            expects = json.loads((case / "target.json").read_text())["expects"]
+            truth = json.loads((case / "truth.json").read_text())["defects"]
+            got = calls.get(case.name, {})
+            return all(got.get(f, "") == truth.get(f, "") for f in expects["relevant"] + expects["irrelevant"])
+
+        scores = [sum(right(calls, case) for case in cases) for calls in runs]
+        self.assertGreater(len(set(scores)), 1)  # the case this guards: the runs disagree
+        self.assertIn(f'{min(scores)}–{max(scores)}<small>/{results["cases"]}</small>', self.page)
+        self.assertIn(f"{len(runs)} runs", self.page)
+
     def test_every_benchmark_case_is_a_card_carrying_its_planted_truth(self):
         cases = sorted(p.parent.name for p in (ROOT / "bench" / "cases").glob("*/target.json"))
         for name in cases:
