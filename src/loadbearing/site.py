@@ -172,7 +172,7 @@ def _how(data: Optional[dict]) -> str:
         '<section id="how"><div class="wrap">'
         '<p class="eyebrow">How it works</p><h2>Break it on purpose. Watch what changes.</h2>'
         f'<ol class="steps">{items}</ol>'
-        + (f'<figure class="fig">{tree}<figcaption>The real run: one snapshot, {forks} copies. Lime lines '
+        + (f'<figure class="fig">{tree}<figcaption><span class="swipe">Swipe sideways to see the whole tree. </span>The real run: one snapshot, {forks} copies. Lime lines '
            "changed the answer. The policy's copies (red) never did.</figcaption></figure>" if tree else "")
         + "</div></section>"
     )
@@ -507,7 +507,9 @@ border-radius:22px;padding:22px;box-shadow:0 30px 80px rgba(0,0,0,.35)}
 color:var(--ink);font-weight:900;margin-bottom:16px}
 .steps h3{margin-bottom:8px}.steps p{margin:0;color:var(--dim);font-size:15.5px}
 .steps b{color:var(--text)}
-.fig{margin:0;background:var(--panel);border:1px solid var(--line);border-radius:22px;padding:18px 18px 12px;overflow-x:auto}
+.fig{margin:0;background:var(--panel);border:1px solid var(--line);border-radius:22px;padding:18px 18px 12px;overflow:hidden}
+.tree{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.swipe{display:none}
 .fig figcaption{color:var(--dim);font-size:14px;font-weight:600;padding:8px 6px 4px}
 .tree svg{display:block;width:100%;height:auto;min-width:560px}.tree svg text{font-family:inherit}
 .bugs{display:grid;grid-template-columns:1fr 1fr;gap:16px}
@@ -578,13 +580,14 @@ border:1px solid var(--line);border-radius:16px;padding:16px 20px}
 .steps{grid-template-columns:1fr 1fr}.stack{grid-template-columns:1fr 1fr}
 .bar{grid-template-columns:1fr auto}.track{grid-column:1/-1;order:3}section{padding:72px 0}
 .nav nav a:not(:last-child){display:none}}
-@media (max-width:560px){.steps,.stack{grid-template-columns:1fr}.hero{padding-top:48px}}
+@media (max-width:560px){.steps,.stack{grid-template-columns:1fr}.hero{padding-top:48px}.swipe{display:inline}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}
 .reveal{opacity:1;transform:none}html{scroll-behavior:auto}}
 """
 
 JS = """
 (() => {
+  document.querySelectorAll('.tree').forEach(t => { t.scrollLeft = t.scrollWidth; });
   const io = 'IntersectionObserver' in window && !matchMedia('(prefers-reduced-motion: reduce)').matches
     ? new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), {rootMargin: '0px 0px -8% 0px'})
     : null;
