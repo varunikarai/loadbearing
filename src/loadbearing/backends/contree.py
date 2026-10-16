@@ -16,6 +16,7 @@ live account.
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 from typing import Any
 
@@ -43,7 +44,16 @@ class ContreeBackend:
         forwarded_env(target)  # a missing variable fails here, before any paid run
         # oci() finds the tag on the account or imports it from its registry; use() would only
         # name it, and the first run would fail on an account that never pulled the image.
-        image = self._sdk.images.oci(target.image)
+        try:
+            image = self._sdk.images.oci(target.image)
+        except Exception as exc:
+            if type(exc).__name__ == "ForbiddenError":  # the SDK's 403, the first call a fresh account makes
+                raise RuntimeError(
+                    "Nebius Sandboxes refused the first request (403 Forbidden). The key works, so "
+                    "Sandboxes is most likely not enabled for this project yet: it is a beta, requested "
+                    f"per project ID ({os.environ.get('NEBIUS_PROJECT_ID') or 'NEBIUS_PROJECT_ID is unset'})."
+                ) from exc
+            raise
         if target.files:
             image = image.apply_files(
                 {f"{WORKDIR}/{rel}": (target.root / rel).read_bytes() for rel in target.files}
