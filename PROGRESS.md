@@ -96,6 +96,13 @@ Problem statement: [SPEC.md](SPEC.md). Setup, target format, layout: [README.md]
 
 Newest first.
 
+### 2026-10-19
+- **Front page v2 reviewed** (Varunika, on `099d8b2`): the replay matches the recorded run (the same 14 copies in the same order before and after the fix, the verdicts and the one-line diff as recorded, the answer rightly labelled Nano); checked on desktop and phone. v2 brought back both hand-off 25 problems, so **hand-off 25 is rebuilt on v2 as `varunika/h25-on-v2`**, replacing `varunika/h25-front-page-facts`, which no longer merges: the model's bar spans its three runs, 49 to 51, without the count-up (it would turn the range into one number), and the chat shows the whole policy. 210 tests, CI green. Merges under rule 4 from 2026-10-20 00:15.
+- **Prior art corrected** (Varunika, `d312c14`): point 2 said every run starts from a Sandboxes checkpoint; the recorded runs used the local backend, so it now names both. Links: 8 of 10 open from a script; the tribunal's decision page and the Saltelli DOI refuse scripts and are left for V7 to open by hand.
+- **V6 is late:** the repo was due public 2026-10-18 and is still private. Dry run again: go on 404 commits apart from the known old fixture version, licence detected as Apache-2.0, v2's screenshots opened and clean.
+- Open on the front page, his call: "Every test passed" (the demo target has no tests), and "23 s for all of them" sits under "14 copies" but times all 23 runs.
+- Two entries were both headed 2026-10-17 (b); the later one is now (c).
+
 ### 2026-10-17 (c)
 - **Front page v2 live** (Aeshvarya, `099d8b2`): the hero is now a replay of the recorded support answerer run, read from its JSON. Each of the 14 copies breaks one input and the answer moves or not; `passages` is caught as ignored while the bot says 30 days; Ultra's one-line diff appears; the proof run re-fills every copy and the answer turns to the 14-day policy. Also: a scroll-led "How it works" whose fork tree moves from snapshot to the after-fix tree, animated explainers for the two bugs, a scoreboard ring for "Run all 54", and a terminal that runs the toy probe on the server when it comes into view. Nothing is fetched (24 KB gzipped); reduced motion shows the final state.
 - Checked on the live site in Chrome: no page errors, "Run all" 50 of 54 in 14.4 s (the same four misses), the terminal's live run found both defects, a paid run is still refused 403. Light mode and phone checked. 203 tests pass (new: the replay carries every copy of the recorded run and its fix).
