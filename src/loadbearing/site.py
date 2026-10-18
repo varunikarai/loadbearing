@@ -239,7 +239,7 @@ def _chat(data: dict) -> str:
         '<div class="chat spot" aria-label="The same question, before and after the fix">'
         '<div class="chat-top"><span class="av">S</span><b>ShopCo support</b><span>AI assistant</span></div>'
         f'<div class="msg user"><span class="who">Customer</span>{escape(question)}</div>'
-        + (f'<div class="policy"><span class="who">Policy the bot was handed</span>{escape(_short(policy, 150))}</div>'
+        + (f'<div class="policy"><span class="who">Policy the bot was handed</span>{escape(_short(policy, 220))}</div>'
            if policy else "")
         + f'<div class="msg bot bad"><span class="who">Bot, as shipped <i>wrong</i></span>{escape(before)}</div>'
         + (f'<div class="msg bot good"><span class="who">Bot, after the proven fix <i>right</i></span>{escape(after)}</div>'
