@@ -328,8 +328,9 @@ background-size:250% 100%!important;animation:scan 1s linear infinite}
 .bar{display:grid;grid-template-columns:270px 1fr 130px;gap:22px;align-items:center;background:var(--panel);
 border:1px solid var(--line);border-radius:20px;padding:20px 24px}
 .bar-label b{display:block;font-size:18px}.bar-label span{font-size:13.5px;color:var(--dim)}
-.track{height:16px;border-radius:999px;background:var(--bg2);overflow:hidden;border:1px solid var(--line)}
-.fill{height:100%;width:var(--w);border-radius:999px;background:var(--faint);transition:width 1.6s var(--ease)}
+.track{position:relative;height:16px;border-radius:999px;background:var(--bg2);overflow:hidden;border:1px solid var(--line)}
+.fill{position:relative;height:100%;width:var(--w);border-radius:999px;background:var(--faint);transition:width 1.6s var(--ease)}
+.fill.spread{position:absolute;inset:0 auto 0 0;height:auto;opacity:.4}
 .js .bars:not(.in) .fill{width:0}
 .bar.us .fill{background:linear-gradient(90deg,color-mix(in srgb,var(--lime) 60%,transparent),var(--lime));box-shadow:0 0 20px var(--glow)}
 .bar.us{border-color:color-mix(in srgb,var(--lime) 50%,var(--line));box-shadow:0 0 60px -24px var(--glow)}
