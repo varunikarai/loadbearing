@@ -15,7 +15,7 @@ Loadbearing builds on well-established ideas. This page names them, says exactly
 ## What the combination adds
 
 1. **A verdict per field, tied to intent.** Intent is declared in the target, or inferred from the pipeline's own docs with a verbatim quote and its link.
-2. **Byte-identical forks.** Every run starts from one Nebius Token Factory Sandboxes checkpoint, so the mutated field is the only difference between runs.
+2. **Byte-identical forks.** Every run starts from one checkpoint, a Nebius Token Factory Sandboxes snapshot or, on the local backend, a copied directory, so the mutated field is the only difference between runs.
 3. **A noise floor.** LLM output varies on its own; keys that move with no mutation are measured and left out, instead of voiding the report.
 4. **A proven fix.** The fix for a defect is applied in a fresh fork of the same checkpoint and the probe is re-run, so "the defect is gone and nothing else broke" is shown, not claimed.
 
