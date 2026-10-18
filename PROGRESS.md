@@ -96,7 +96,7 @@ Problem statement: [SPEC.md](SPEC.md). Setup, target format, layout: [README.md]
 
 Newest first.
 
-### 2026-10-17 (b)
+### 2026-10-17 (c)
 - **Front page v2 live** (Aeshvarya, `099d8b2`): the hero is now a replay of the recorded support answerer run, read from its JSON. Each of the 14 copies breaks one input and the answer moves or not; `passages` is caught as ignored while the bot says 30 days; Ultra's one-line diff appears; the proof run re-fills every copy and the answer turns to the 14-day policy. Also: a scroll-led "How it works" whose fork tree moves from snapshot to the after-fix tree, animated explainers for the two bugs, a scoreboard ring for "Run all 54", and a terminal that runs the toy probe on the server when it comes into view. Nothing is fetched (24 KB gzipped); reduced motion shows the final state.
 - Checked on the live site in Chrome: no page errors, "Run all" 50 of 54 in 14.4 s (the same four misses), the terminal's live run found both defects, a paid run is still refused 403. Light mode and phone checked. 203 tests pass (new: the replay carries every copy of the recorded run and its fix).
 
