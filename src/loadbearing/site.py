@@ -239,7 +239,7 @@ def _chat(data: dict) -> str:
         '<div class="chat spot" aria-label="The same question, before and after the fix">'
         '<div class="chat-top"><span class="av">S</span><b>ShopCo support</b><span>AI assistant</span></div>'
         f'<div class="msg user"><span class="who">Customer</span>{escape(question)}</div>'
-        + (f'<div class="policy"><span class="who">Policy the bot was handed</span>{escape(_short(policy, 150))}</div>'
+        + (f'<div class="policy"><span class="who">Policy the bot was handed</span>{escape(_short(policy, 220))}</div>'
            if policy else "")
         + f'<div class="msg bot bad"><span class="who">Bot, as shipped <i>wrong</i></span>{escape(before)}</div>'
         + (f'<div class="msg bot good"><span class="who">Bot, after the proven fix <i>right</i></span>{escape(after)}</div>'
@@ -466,22 +466,30 @@ def _benchmark() -> str:
     ours = next((v for k, v in right.items() if k.startswith("Loadbearing")), None)
     static = next((v for k, v in right.items() if k.startswith("Static")), None)
     model_key = next((k for k in right if k.startswith("Nemotron")), None)
+    # The model was run more than once and scored differently; show every run, not the first.
+    model = [right[model_key], *results.get("cases_right_repeats", {}).values()] if model_key else []
     rows = []
-    for label, key, value, note in [
-        ("Loadbearing", "Loadbearing", ours, "runs the pipeline · same answer every run"),
-        ("Nemotron 3 Super", model_key or "", right.get(model_key) if model_key else None,
-         "reads the code · a different set wrong on each run"),
-        ("Static name check", "Static", static, "reads the code for field names"),
+    for label, key, values, note in [
+        ("Loadbearing", "Loadbearing", [ours] if ours is not None else [],
+         "runs the pipeline · same answer every run"),
+        ("Nemotron 3 Super", model_key or "", model,
+         f"reads the code · {len(model)} runs, a different set wrong on each" if len(model) > 1
+         else "reads the code"),
+        ("Static name check", "Static", [static] if static is not None else [], "reads the code for field names"),
     ]:
-        if value is None:
+        if not values:
             continue
+        lo, hi = min(values), max(values)
         secs = next((s for k, s in seconds.items() if k.startswith(key)), None)
-        pct = 100 * value / total if total else 0
+        pct = (lambda v: 100 * v / total) if total else (lambda v: 0)
+        spread = f'<div class="fill spread" style="--w:{pct(hi):.1f}%"></div>' if hi > lo else ""
+        # A range is shown as it is: the count-up would turn "49–51" into one number.
+        num = f'<div class="bar-num" data-count="{lo}">{lo}' if lo == hi else f'<div class="bar-num">{lo}–{hi}'
         rows.append(
             f'<div class="bar spot{" us" if label == "Loadbearing" else ""}"><div class="bar-label">'
             f"<b>{label}</b><span>{note}</span></div>"
-            f'<div class="track"><div class="fill" style="--w:{pct:.1f}%"></div></div>'
-            f'<div class="bar-num" data-count="{value}">{value}<small>/{total}</small>'
+            f'<div class="track">{spread}<div class="fill" style="--w:{pct(lo):.1f}%"></div></div>'
+            f"{num}<small>/{total}</small>"
             + (f'<em>{_secs(secs)}</em>' if secs is not None else "") + "</div></div>"
         )
     return (
