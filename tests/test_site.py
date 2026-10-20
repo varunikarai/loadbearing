@@ -41,6 +41,11 @@ class FrontPageTests(unittest.TestCase):
         self.assertIn('request.get("passages", "")', " ".join(replay["fix"]["add"]))
         self.assertEqual(replay["after"]["verdicts"]["passages"], "load-bearing")
 
+    def test_the_run_time_names_every_run_it_covers(self):
+        data = json.loads((RUNS / "support_answerer.local.json").read_text())
+        self.assertIn(f'for all {data["timing"]["runs"]} runs on Nemotron', self.page)
+        self.assertNotIn("Every test passed", self.page)  # the demo target has no tests
+
     def test_the_benchmark_numbers_come_from_results_json(self):
         results = json.loads((ROOT / "bench" / "results.json").read_text())
         ours = next(v for k, v in results["cases_right"].items() if k.startswith("Loadbearing"))
