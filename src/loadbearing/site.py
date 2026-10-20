@@ -210,9 +210,11 @@ def _stats(data: Optional[dict]) -> str:
     if data:
         r = _replay(data)
         items.append((str(len(data["forks"])), "", "copies of one real run, each with one input broken"))
-        secs = (data.get("timing") or {}).get("fork_wall_seconds")
-        if secs:
-            items.append((f"{secs:.0f}", " s", "for all of them on Nemotron, side by side"))
+        timing = data.get("timing") or {}
+        secs, runs = timing.get("fork_wall_seconds"), timing.get("runs")
+        if secs and runs:
+            # The clock covers every run, the re-checks and baselines too, not the copies alone.
+            items.append((f"{secs:.0f}", " s", f"for all {runs} runs on Nemotron, side by side"))
         if r.get("fix"):
             n = len(r["fix"]["add"])
             items.append((str(n), f" line{'s' if n != 1 else ''}", "in the fix Nemotron 3 Ultra wrote, then proved"))
@@ -254,7 +256,7 @@ def _story(data: Optional[dict]) -> str:
     return (
         '<section class="story-s"><div class="wrap story">'
         '<div class="story-copy"><p class="eyebrow">The bug nobody sees</p>'
-        '<h2>No error. Every test passed. The bot was confidently wrong.</h2>'
+        '<h2>No error. No crash. The bot was confidently wrong.</h2>'
         "<p>The retriever found the right policy: 14 days, then warranty only. The code that builds "
         "the prompt looked for it under an old name, got nothing, and the model filled the gap from "
         "memory with a 30-day window that does not exist.</p>"
