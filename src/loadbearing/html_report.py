@@ -317,8 +317,11 @@ def _prose(text: str) -> str:
     """A model's prose as HTML: paragraphs, fenced code, `code`, **bold** and *italics*.
 
     Everything is escaped first, so the only tags that can appear are the ones made here."""
+    text = text.strip()
+    if text.count("```") % 2:  # cut off inside a code block, at the model's length limit
+        text += "\n```"
     out = []
-    for i, part in enumerate(_FENCE.split(escape(text.strip()))):
+    for i, part in enumerate(_FENCE.split(escape(text))):
         if i % 2:  # inside a fence
             out.append(f'<pre class="code">{part.strip(chr(10))}</pre>')
             continue

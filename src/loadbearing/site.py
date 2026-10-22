@@ -89,7 +89,7 @@ def render_index(demo: Any) -> str:
         _two_bugs(),
         _try(demo),
         _benchmark(),
-        _stack(),
+        _stack(hero),
         _use(starter),
         _cta(cases),
         _footer(),
@@ -181,7 +181,9 @@ def _machine(data: dict) -> str:
         '<div class="machine-wrap"><div class="machine" id="machine">'
         '<div class="m-bar"><span class="dots"><i></i><i></i><i></i></span>'
         f'<span class="m-title">loadbearing probe <b>{escape(data.get("target", HERO))}</b></span>'
-        '<span class="m-live"><i></i>Replay of the recorded live run</span></div>'
+        '<span class="m-live"><i></i>Replay of the recorded live run'
+        + (" · Nebius Sandboxes" if data.get("backend") == "sandbox" else "")
+        + "</span></div>"
         '<div class="m-body">'
         '<div class="m-in"><p class="m-h">The input<span>one real customer request</span></p>'
         f'<ul class="rows">{"".join(rows)}</ul></div>'
@@ -214,7 +216,8 @@ def _stats(data: Optional[dict]) -> str:
         secs, runs = timing.get("fork_wall_seconds"), timing.get("runs")
         if secs and runs:
             # The clock covers every run, the re-checks and baselines too, not the copies alone.
-            items.append((f"{secs:.0f}", " s", f"for all {runs} runs on Nemotron, side by side"))
+            where = "Nebius Sandboxes" if data.get("backend") == "sandbox" else "Nemotron"
+            items.append((f"{secs:.0f}", " s", f"for all {runs} runs on {where}, side by side"))
         if r.get("fix"):
             n = len(r["fix"]["add"])
             items.append((str(n), f" line{'s' if n != 1 else ''}", "in the fix Nemotron 3 Ultra wrote, then proved"))
@@ -383,7 +386,9 @@ def _card(demo: Any, name: str, featured: bool = False) -> str:
         status = '<span class="muted">not run yet</span>'
     else:
         status = _status(data, truth)
-        if data.get("backend") != demo.backend:
+        if data.get("backend") == "sandbox":
+            status += '<p class="muted">recorded live on Nebius Sandboxes</p>'
+        elif data.get("backend") != demo.backend:
             status += f'<p class="muted">recorded on {escape(data.get("backend", ""))}</p>'
         elif paid:
             status += '<p class="muted">recorded live on Nebius Token Factory</p>'
@@ -507,11 +512,13 @@ def _benchmark() -> str:
     )
 
 
-def _stack() -> str:
+def _stack(hero: Optional[dict]) -> str:
+    # Say Sandboxes ran only when the run this page replays was recorded there.
+    where = ("the run this page replays was recorded there, live." if hero and hero.get("backend") == "sandbox"
+             else "the backend is built and tested.")
     tf = (
         '<div class="tile big spot"><span class="t-k">Runs everything</span><h3>Nebius Token Factory</h3>'
-        "<p>Serves all three Nemotron models. Its Sandboxes hold the snapshot and the copies: the backend "
-        "is built and tested, and its live run is waiting on beta access.</p>"
+        f"<p>Serves all three Nemotron models. Its Sandboxes hold the snapshot and every copy: {where}</p>"
         '<div class="forkviz" aria-hidden="true"><b>snapshot</b>'
         + "".join(f'<i style="--d:{i}"></i>' for i in range(14))
         + "</div></div>"

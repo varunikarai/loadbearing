@@ -1,7 +1,7 @@
 {
   "schema": 2,
   "target": "support-answerer",
-  "backend": "local",
+  "backend": "sandbox",
   "deterministic": false,
   "void": false,
   "baseline_runs": 5,
@@ -9,10 +9,10 @@
     "answer"
   ],
   "timing": {
-    "checkpoint_seconds": 0.011060542004997842,
-    "fork_wall_seconds": 22.88531008300197,
-    "fork_total_seconds": 127.7963356259861,
-    "runs": 23
+    "checkpoint_seconds": 4.683077708003111,
+    "fork_wall_seconds": 39.16407179203816,
+    "fork_total_seconds": 258.7084250409389,
+    "runs": 21
   },
   "record": {
     "request_id": "req_7Hq2Lw",
@@ -33,11 +33,11 @@
   "baseline": {
     "exit_code": 0,
     "output": {
-      "answer": "Yes, you can return the headphones for a refund within the 30\u2011day return window.",
+      "answer": "Yes, you can return the headphones for a full refund within the 30\u2011day return window.",
       "can_return": true,
       "return_window_days": 30
     },
-    "seconds": 3.3064403339958517
+    "seconds": 15.724519875016995
   },
   "forks": [
     {
@@ -49,14 +49,14 @@
       "changed": [],
       "classifier": null,
       "runs": 1,
-      "moves": 1,
+      "moves": 0,
       "exit_code": 0,
       "output": {
-        "answer": "Yes, you can still return them for a refund within the 30\u2011day window.",
+        "answer": "Yes, you can still return the headphones for a refund since you\u2019re within the 30\u2011day return window.",
         "can_return": true,
         "return_window_days": 30
       },
-      "seconds": 7.941248957999051
+      "seconds": 16.2504536670167
     },
     {
       "label": "drop:request_id",
@@ -67,14 +67,14 @@
       "changed": [],
       "classifier": null,
       "runs": 1,
-      "moves": 1,
+      "moves": 0,
       "exit_code": 0,
       "output": {
         "answer": "Yes, you can return the headphones within the 30\u2011day window for a full refund.",
         "can_return": true,
         "return_window_days": 30
       },
-      "seconds": 4.826329333009198
+      "seconds": 15.313644082983956
     },
     {
       "label": "nudge:request_id",
@@ -85,14 +85,14 @@
       "changed": [],
       "classifier": null,
       "runs": 1,
-      "moves": 1,
+      "moves": 0,
       "exit_code": 0,
       "output": {
-        "answer": "Yes, you can still return the headphones for a refund since you\u2019re within the 30\u2011day return window.",
+        "answer": "Yes, you can return the headphones for a refund within the 30\u2011day window.",
         "can_return": true,
         "return_window_days": 30
       },
-      "seconds": 6.1200222079933155
+      "seconds": 23.017220792011358
     },
     {
       "label": "destroy:user_id",
@@ -103,14 +103,14 @@
       "changed": [],
       "classifier": null,
       "runs": 1,
-      "moves": 1,
+      "moves": 0,
       "exit_code": 0,
       "output": {
-        "answer": "Yes, you can still return the headphones for a refund since you\u2019re within the 30\u2011day return window.",
+        "answer": "Yes, you can return the headphones for a refund since you\u2019re still within the 30\u2011day return window.",
         "can_return": true,
         "return_window_days": 30
       },
-      "seconds": 5.260943083005259
+      "seconds": 12.218800249975175
     },
     {
       "label": "drop:user_id",
@@ -118,17 +118,19 @@
       "field": "user_id",
       "value": null,
       "moved": false,
-      "changed": [],
+      "changed": [
+        "can_return"
+      ],
       "classifier": null,
-      "runs": 1,
+      "runs": 3,
       "moves": 1,
       "exit_code": 0,
       "output": {
-        "answer": "Yes, you can still return them for a refund within the 30\u2011day window.",
-        "can_return": true,
+        "answer": "No, you cannot return for a refund because the headphones are not in new condition.",
+        "can_return": false,
         "return_window_days": 30
       },
-      "seconds": 6.3014370419987245
+      "seconds": 16.53731283301022
     },
     {
       "label": "nudge:user_id",
@@ -139,14 +141,14 @@
       "changed": [],
       "classifier": null,
       "runs": 1,
-      "moves": 1,
+      "moves": 0,
       "exit_code": 0,
       "output": {
-        "answer": "Yes, you can still return the headphones for a refund as you are within the 30\u2011day return window. The return window is 30 days from the purchase date.",
+        "answer": "Yes, you can return the headphones for a refund within the 30\u2011day window.",
         "can_return": true,
         "return_window_days": 30
       },
-      "seconds": 9.305403749996913
+      "seconds": 13.7200956249726
     },
     {
       "label": "destroy:received_at",
@@ -157,14 +159,14 @@
       "changed": [],
       "classifier": null,
       "runs": 1,
-      "moves": 1,
+      "moves": 0,
       "exit_code": 0,
       "output": {
-        "answer": "Yes, you can return the headphones for a refund since you\u2019re still within the 30\u2011day return window.",
+        "answer": "Yes, you can return the headphones for a full refund since the purchase was only 20 days ago and the return window is 30 days.",
         "can_return": true,
         "return_window_days": 30
       },
-      "seconds": 4.055523542003357
+      "seconds": 9.401818040991202
     },
     {
       "label": "drop:received_at",
@@ -175,14 +177,14 @@
       "changed": [],
       "classifier": null,
       "runs": 1,
-      "moves": 1,
+      "moves": 0,
       "exit_code": 0,
       "output": {
-        "answer": "Yes, you can still return the headphones for a refund since you\u2019re within the 30\u2011day return window.",
+        "answer": "Yes, you can return the headphones for a full refund within the 30\u2011day return window.",
         "can_return": true,
         "return_window_days": 30
       },
-      "seconds": 7.995423291999032
+      "seconds": 7.658630457997788
     },
     {
       "label": "nudge:received_at",
@@ -193,14 +195,14 @@
       "changed": [],
       "classifier": null,
       "runs": 1,
-      "moves": 1,
+      "moves": 0,
       "exit_code": 0,
       "output": {
-        "answer": "Yes, you can return the headphones for a refund within the 30\u2011day return window.",
+        "answer": "Yes, you can still return the headphones for a refund as long as you\u2019re within the 30\u2011day return window.",
         "can_return": true,
         "return_window_days": 30
       },
-      "seconds": 7.0854471669881605
+      "seconds": 9.704551499977242
     },
     {
       "label": "destroy:question",
@@ -213,15 +215,15 @@
         "return_window_days"
       ],
       "classifier": null,
-      "runs": 3,
-      "moves": 3,
+      "runs": 1,
+      "moves": 1,
       "exit_code": 0,
       "output": {
-        "answer": "I\u2019m sorry, I need more information to determine if you can return the item.",
+        "answer": "I\u2019m sorry, I need more details about the product and purchase to determine if you can return it and what the return window is.",
         "can_return": null,
         "return_window_days": null
       },
-      "seconds": 4.525045667003724
+      "seconds": 9.67609658400761
     },
     {
       "label": "drop:question",
@@ -234,15 +236,15 @@
         "return_window_days"
       ],
       "classifier": null,
-      "runs": 3,
-      "moves": 3,
+      "runs": 1,
+      "moves": 1,
       "exit_code": 0,
       "output": {
-        "answer": "I need more information to determine the return policy.",
+        "answer": "I\u2019m sorry, I need more details to answer your question.",
         "can_return": null,
         "return_window_days": null
       },
-      "seconds": 5.249290250008926
+      "seconds": 7.652612791978754
     },
     {
       "label": "nudge:question",
@@ -253,14 +255,14 @@
       "changed": [],
       "classifier": null,
       "runs": 1,
-      "moves": 1,
+      "moves": 0,
       "exit_code": 0,
       "output": {
-        "answer": "Yes, you can return the headphones for a refund as long as it\u2019s within the 30\u2011day return window.",
+        "answer": "Yes, you can return the headphones for a refund within the 30\u2011day return window.",
         "can_return": true,
         "return_window_days": 30
       },
-      "seconds": 6.184963541003526
+      "seconds": 6.413530958001502
     },
     {
       "label": "destroy:passages",
@@ -271,14 +273,14 @@
       "changed": [],
       "classifier": null,
       "runs": 1,
-      "moves": 1,
+      "moves": 0,
       "exit_code": 0,
       "output": {
-        "answer": "Yes, you can still return the headphones for a refund within the 30\u2011day return window.",
+        "answer": "Yes, you can return the headphones for a refund because you are still within the 30\u2011day return window.",
         "can_return": true,
         "return_window_days": 30
       },
-      "seconds": 5.471839667006861
+      "seconds": 5.960388707986567
     },
     {
       "label": "drop:passages",
@@ -289,14 +291,14 @@
       "changed": [],
       "classifier": null,
       "runs": 1,
-      "moves": 1,
+      "moves": 0,
       "exit_code": 0,
       "output": {
-        "answer": "Yes, you can return the headphones for a refund within the 30\u2011day return window.",
+        "answer": "Yes, you can still return them for a refund as you are within the 30\u2011day return window.",
         "can_return": true,
         "return_window_days": 30
       },
-      "seconds": 4.064041624995298
+      "seconds": 6.019436208996922
     }
   ],
   "verdicts": [
@@ -375,8 +377,8 @@
         "quote": "Retrieval-augmented generation is a technique for enhancing the accuracy and reliability of generative AI models with information from specific and relevant data sources.",
         "url": "https://blogs.nvidia.com/blog/what-is-retrieval-augmented-generation/"
       },
-      "reconciliation": "This is a silent passthrough: the field\u202f*passages* is marked as relevant (it should matter), yet destroying or dropping it produces no change in the output (both \u201cdestroy\u201d and \u201cdrop\u201d are false). The lack of any output movement despite the field\u2019s supposed relevance indicates the pipeline is not reading this field.",
-      "explanation": "**Code path:** `build_prompt` function (line 32 in the provided source).  \n\n**Why it fails:** The retriever now stores the retrieved policy text under the key `\"passages\"`, but `build_prompt` still reads `request.get(\"context\", \"\")`. Because the key is missing, `context` becomes an empty string, so the policy passages are never inserted into the prompt. The LLM then answers from its general training data instead of the actual policy, producing the wrong return window (30 days vs. 14 days) and a refund promise that the policy forbids. No error is thrown\u2014the field is silently ignored.\n\n**Quoted line:**  \n```python\ncontext = request.get(\"context\", \"\")\n```\n\n**Smallest fix:** Change the key from `\"context\"` to `\"passages\"` (one\u2011line change).  \n```python\ncontext = request.get(\"passages\", \"\")\n```  \n(Optionally rename the variable to `passages` for clarity, but the key change alone restores the intended behavior.)"
+      "reconciliation": "This is a silent passthrough: the field\u202f*passages* is marked as relevant (supposed to matter), yet neither destroying nor dropping it caused any change in the pipeline\u2019s output (both\u202fdestroy\u202fand\u202fdrop\u202fare\u202ffalse). The lack of output movement despite the field\u2019s relevance indicates that the pipeline is ignoring the field rather than using it.",
+      "explanation": "**Code path responsible:**  \nThe `build_prompt` function reads the retrieved policy text from `request[\"context\"]`, but the retriever now stores that text in `request[\"passages\"]`. Because the key mismatch is silent (`.get` returns `\"\"`), the policy passages never reach the prompt, and the LLM answers from generic knowledge.\n\n**Line that reads the wrong field (pipeline.py:18):**\n```python\n    context = request.get(\"context\", \"\")\n```\n\n**Why it fails:**  \nThe retriever was changed to write its output under the key `\"passages\"`. This line still asks for `\"context\"`, so `context` becomes an empty string. The prompt sent to the model then contains only the customer\u2019s question, and the model hallucinates a return policy (e.g., 30\u2011day refund) instead of using the actual policy (14 days, no refund).\n\n**Smallest fix:**  \nChange the key from `\"context\"` to `\"passages\"` (the variable name can stay `context` for minimal diff).\n\n```python\n    context = request.get(\"passages\", \"\")\n```\n\nIf the retriever returns a list of passages, a slightly more robust fix would be:\n```python\n    passages = request.get(\"passages\", \"\")\n    context = \"\\n\".join(passages) if isinstance(passages, list)"
     }
   ],
   "defects": [
@@ -389,7 +391,7 @@
       "files": {
         "pipeline.py": "\"\"\"Support answerer over retrieved policy text: the LLM demo target.\n\nIntended behaviour: answer the customer's question from the retrieved policy\npassages, and say whether the item can still be returned and within how many\ndays. Nothing about the request's id, user or arrival time should matter.\n\nThe planted bug is the kind that ships: the retriever was changed to write\n`passages`, and this step still reads `context`. Nothing throws. The policy\nsimply never reaches the prompt, and an agent told to be decisive answers from\nwhat most shops do: on Nemotron Nano, \"Yes, you can still return the headphones\nfor a refund within the 30-day...\" when the policy says 14 days and no refund.\n\nStandard library only. Calls Nemotron on Nebius Token Factory at temperature 0.\n\"\"\"\n\nimport json\nimport os\nimport re\nimport sys\nimport urllib.request\n\nBASE_URL = os.environ.get(\"TOKEN_FACTORY_BASE_URL\", \"https://api.tokenfactory.nebius.com/v1/\")\nMODEL = os.environ.get(\"NEMOTRON_NANO_MODEL\", \"\")\n\nSYSTEM = (\n    \"You are a support agent for ShopCo, an online electronics store. Be decisive: customers \"\n    \"hate vague answers. Always tell them clearly whether they can return the item and the \"\n    \"return window. Reply with one JSON object and nothing else: \"\n    '{\"answer\": \"<one or two sentences to the customer>\", '\n    '\"can_return\": <true, false, or null if unknown>, '\n    '\"return_window_days\": <number, or null if unknown>}'\n)\n\n\ndef build_prompt(request: dict) -> str:\n    # The retriever puts what it found here.\n    context = request.get(\"passages\", \"\")\n    return (f\"{context}\\n\\n\" if context else \"\") + f\"Customer question: {request.get('question', '')}\"\n\n\ndef ask(prompt: str) -> str:\n    body = {\n        \"model\": MODEL,\n        \"temperature\": 0,\n        \"max_tokens\": 1000,  # room for the reasoning text before the JSON\n        \"messages\": [{\"role\": \"system\", \"content\": SYSTEM}, {\"role\": \"user\", \"content\": prompt}],\n    }\n    req = urllib.request.Request(\n        BASE_URL.rstrip(\"/\") + \"/chat/completions\",\n        data=json.dumps(body).encode(),\n        headers={\n            \"Authorization\": f\"Bearer {os.environ['NEBIUS_API_KEY']}\",\n            \"Content-Type\": \"application/json\",\n        },\n    )\n    with urllib.request.urlopen(req, timeout=90) as resp:\n        text = json.load(resp)[\"choices\"][0][\"message\"].get(\"content\") or \"\"\n    return re.sub(r\"<think>.*?</think>\", \"\", text, flags=re.S).strip()\n\n\ndef answer(request: dict) -> dict:\n    reply = ask(build_prompt(request))\n    start, end = reply.find(\"{\"), reply.rfind(\"}\")\n    try:\n        parsed = json.loads(reply[start : end + 1])\n    except ValueError:\n        parsed = {\"answer\": reply}\n    return {\n        \"answer\": parsed.get(\"answer\", \"\"),\n        \"can_return\": parsed.get(\"can_return\"),\n        \"return_window_days\": parsed.get(\"return_window_days\"),\n    }\n\n\nif __name__ == \"__main__\":\n    with open(sys.argv[1]) as fh:\n        print(json.dumps(answer(json.load(fh)), sort_keys=True))\n"
       },
-      "rationale": "The retriever now stores retrieved policy text under the key 'passages', but build_prompt still reads 'context', causing the policy to be silently omitted from the prompt. Changing the key from 'context' to 'passages' restores the intended retrieval-augmented generation behavior with a one-line fix.",
+      "rationale": "The build_prompt function reads from the 'context' key, but the retriever now stores policy passages under the 'passages' key. Changing the key to 'passages' ensures the retrieved policy text is included in the prompt, eliminating the silent passthrough defect.",
       "diff": "--- a/pipeline.py\n+++ b/pipeline.py\n@@ -34,7 +34,7 @@\n \n def build_prompt(request: dict) -> str:\n     # The retriever puts what it found here.\n-    context = request.get(\"context\", \"\")\n+    context = request.get(\"passages\", \"\")\n     return (f\"{context}\\n\\n\" if context else \"\") + f\"Customer question: {request.get('question', '')}\"\n \n \n"
     }
   ],
@@ -402,7 +404,7 @@
       "after": {
         "schema": 2,
         "target": "support-answerer",
-        "backend": "local",
+        "backend": "sandbox",
         "deterministic": false,
         "void": false,
         "baseline_runs": 5,
@@ -410,10 +412,10 @@
           "answer"
         ],
         "timing": {
-          "checkpoint_seconds": 3.1249946914613247e-06,
-          "fork_wall_seconds": 21.460449542006245,
-          "fork_total_seconds": 151.91739437598153,
-          "runs": 27
+          "checkpoint_seconds": 2.582964953035116e-06,
+          "fork_wall_seconds": 18.16070479201153,
+          "fork_total_seconds": 120.39700491796248,
+          "runs": 19
         },
         "record": {
           "request_id": "req_7Hq2Lw",
@@ -434,11 +436,11 @@
         "baseline": {
           "exit_code": 0,
           "output": {
-            "answer": "You cannot return the headphones for a refund because the 14\u2011day return window has passed, but you can file a warranty claim for a repair or replacement.",
+            "answer": "Unfortunately, the 14\u2011day return window has passed, so a refund isn\u2019t possible; however, you can file a warranty claim for a repair or replacement.",
             "can_return": false,
             "return_window_days": 14
           },
-          "seconds": 5.989130624991958
+          "seconds": 8.543559499958064
         },
         "forks": [
           {
@@ -450,14 +452,14 @@
             "changed": [],
             "classifier": null,
             "runs": 1,
-            "moves": 1,
+            "moves": 0,
             "exit_code": 0,
             "output": {
-              "answer": "No, the return window for a full refund has passed (14 days); however, you can file a warranty claim for a repair or replacement.",
+              "answer": "No, you cannot return the headphones for a refund because the return window has passed; however, you can file a warranty claim for a repair or replacement.",
               "can_return": false,
               "return_window_days": 14
             },
-            "seconds": 6.155371665998246
+            "seconds": 7.361611959000584
           },
           {
             "label": "drop:request_id",
@@ -468,14 +470,14 @@
             "changed": [],
             "classifier": null,
             "runs": 1,
-            "moves": 1,
+            "moves": 0,
             "exit_code": 0,
             "output": {
               "answer": "You cannot return the headphones for a refund because the 14\u2011day return window has passed, but you can file a warranty claim for a repair or replacement.",
               "can_return": false,
               "return_window_days": 14
             },
-            "seconds": 5.73569887499616
+            "seconds": 6.2767775419633836
           },
           {
             "label": "nudge:request_id",
@@ -486,14 +488,14 @@
             "changed": [],
             "classifier": null,
             "runs": 1,
-            "moves": 1,
+            "moves": 0,
             "exit_code": 0,
             "output": {
-              "answer": "You cannot get a refund because the return window of 14 days has passed, but you can file a warranty claim for a repair or replacement since the headphones are faulty.",
+              "answer": "You cannot return the headphones for a refund because the 14\u2011day return window has passed, but you can file a warranty claim for a repair or replacement since the defect is covered.",
               "can_return": false,
               "return_window_days": 14
             },
-            "seconds": 6.627059000005829
+            "seconds": 6.754627624992281
           },
           {
             "label": "destroy:user_id",
@@ -504,14 +506,14 @@
             "changed": [],
             "classifier": null,
             "runs": 1,
-            "moves": 1,
+            "moves": 0,
             "exit_code": 0,
             "output": {
-              "answer": "You\u2019re past the 14\u2011day return window, so a refund isn\u2019t possible, but the headphones are still covered by the 12\u2011month warranty, which allows a repair or replacement.",
+              "answer": "You cannot return the headphones for a refund because the 14\u2011day return window has passed; however, the fault is covered by the 12\u2011month warranty, which will provide a repair or replacement.",
               "can_return": false,
               "return_window_days": 14
             },
-            "seconds": 8.784599167003762
+            "seconds": 8.111140916007571
           },
           {
             "label": "drop:user_id",
@@ -522,14 +524,14 @@
             "changed": [],
             "classifier": null,
             "runs": 1,
-            "moves": 1,
+            "moves": 0,
             "exit_code": 0,
             "output": {
-              "answer": "No, you cannot get a refund because the 14\u2011day return window has passed; instead you can file a warranty claim for a repair or replacement.",
+              "answer": "You cannot return the headphones for a refund because the standard 14\u2011day return window has passed, but you can file a warranty claim for a repair or replacement since the defect is covered.",
               "can_return": false,
               "return_window_days": 14
             },
-            "seconds": 5.327082125004381
+            "seconds": 5.549459291039966
           },
           {
             "label": "nudge:user_id",
@@ -540,14 +542,14 @@
             "changed": [],
             "classifier": null,
             "runs": 1,
-            "moves": 1,
+            "moves": 0,
             "exit_code": 0,
             "output": {
-              "answer": "No, you cannot get a refund after 14 days; however you can file a warranty claim for a repair or replacement.",
+              "answer": "No, you cannot return the headphones for a refund because the return window has passed; however, you can get a repair or replacement under the 12\u2011month warranty.",
               "can_return": false,
               "return_window_days": 14
             },
-            "seconds": 5.548899417000939
+            "seconds": 6.78239966701949
           },
           {
             "label": "destroy:received_at",
@@ -558,14 +560,14 @@
             "changed": [],
             "classifier": null,
             "runs": 1,
-            "moves": 1,
+            "moves": 0,
             "exit_code": 0,
             "output": {
-              "answer": "You cannot return the headphones for a refund because the 14\u2011day return window has passed; however you can file a warranty claim for a repair or replacement.",
+              "answer": "You cannot return the headphones for a refund because the 14\u2011day return window has passed, but you can file a warranty claim for a repair or replacement since the defect is covered.",
               "can_return": false,
               "return_window_days": 14
             },
-            "seconds": 6.120523499994306
+            "seconds": 6.3210322500090115
           },
           {
             "label": "drop:received_at",
@@ -576,14 +578,14 @@
             "changed": [],
             "classifier": null,
             "runs": 1,
-            "moves": 1,
+            "moves": 0,
             "exit_code": 0,
             "output": {
-              "answer": "You cannot return the headphones for a refund because the 14\u2011day return window has passed, but you can file a warranty claim for a repair or replacement due to the defect.",
+              "answer": "You cannot return the headphones for a refund because the 14\u2011day return window has passed, but you can get a repair or replacement under the 12\u2011month warranty.",
               "can_return": false,
               "return_window_days": 14
             },
-            "seconds": 4.569262792007066
+            "seconds": 5.551533374993596
           },
           {
             "label": "nudge:received_at",
@@ -594,14 +596,14 @@
             "changed": [],
             "classifier": null,
             "runs": 1,
-            "moves": 1,
+            "moves": 0,
             "exit_code": 0,
             "output": {
-              "answer": "You cannot return the headphones for a refund because the 14\u2011day return window has passed, but you can file a warranty claim for a repair or replacement.",
+              "answer": "You cannot return the headphones for a refund because the return window has passed; instead, you can get a repair or replacement under the 12\u2011month warranty.",
               "can_return": false,
               "return_window_days": 14
             },
-            "seconds": 4.711489958004677
+            "seconds": 6.987958959012758
           },
           {
             "label": "destroy:question",
@@ -614,15 +616,15 @@
               "return_window_days"
             ],
             "classifier": null,
-            "runs": 3,
-            "moves": 3,
+            "runs": 1,
+            "moves": 1,
             "exit_code": 0,
             "output": {
-              "answer": "I\u2019m sorry, I need more details to determine if a return is possible.",
+              "answer": "I\u2019m sorry, I need more details to answer your question.",
               "can_return": null,
               "return_window_days": null
             },
-            "seconds": 5.65170533300261
+            "seconds": 5.492383709002752
           },
           {
             "label": "drop:question",
@@ -635,15 +637,15 @@
               "return_window_days"
             ],
             "classifier": null,
-            "runs": 3,
-            "moves": 3,
+            "runs": 1,
+            "moves": 1,
             "exit_code": 0,
             "output": {
-              "answer": "I\u2019m sorry, but I need more details about the item and your order to determine return eligibility.",
+              "answer": "I need more information about the specific item and return request to determine if it can be returned.",
               "can_return": null,
               "return_window_days": null
             },
-            "seconds": 6.124328874997445
+            "seconds": 5.352698833972681
           },
           {
             "label": "nudge:question",
@@ -654,14 +656,14 @@
             "changed": [],
             "classifier": null,
             "runs": 1,
-            "moves": 1,
+            "moves": 0,
             "exit_code": 0,
             "output": {
-              "answer": "You cannot return the headphones for a refund because the 14\u2011day return window has passed, but you can file a warranty claim for a repair or replacement since the defect is covered.",
+              "answer": "You cannot return the headphones for a refund because the 14\u2011day return window has passed, but you can file a warranty claim for a repair or replacement.",
               "can_return": false,
               "return_window_days": 14
             },
-            "seconds": 4.5889837089926
+            "seconds": 5.348807416972704
           },
           {
             "label": "destroy:passages",
@@ -674,15 +676,15 @@
               "return_window_days"
             ],
             "classifier": null,
-            "runs": 3,
-            "moves": 3,
+            "runs": 1,
+            "moves": 1,
             "exit_code": 0,
             "output": {
-              "answer": "Yes, you can still return them for a refund within the 30\u2011day window.",
+              "answer": "Yes, you can return the headphones for a refund within the 30\u2011day window.",
               "can_return": true,
               "return_window_days": 30
             },
-            "seconds": 4.930296374994214
+            "seconds": 5.509103582997341
           },
           {
             "label": "drop:passages",
@@ -695,15 +697,15 @@
               "return_window_days"
             ],
             "classifier": null,
-            "runs": 3,
-            "moves": 3,
+            "runs": 1,
+            "moves": 1,
             "exit_code": 0,
             "output": {
-              "answer": "Yes, you can return the headphones for a refund since you\u2019re still within the 30\u2011day return window.",
+              "answer": "Yes, you can return them for a refund within the 30\u2011day window.",
               "can_return": true,
               "return_window_days": 30
             },
-            "seconds": 4.048344625000027
+            "seconds": 4.185421792033594
           }
         ],
         "verdicts": [
