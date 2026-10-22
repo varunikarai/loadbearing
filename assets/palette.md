@@ -11,3 +11,10 @@ Five colours, taken from the front page so the README, the report, the video and
 | Phantom | phantom sensitivity | `#ffb020` | 11.0:1 | `#a35f00` | 4.8:1 |
 
 The dark values are the front page's as they are. Two light values are darker than the front page's: its light lime `#4f8f00` is 3.8:1 and its light amber `#c77700` is 3.3:1, both under 4.5:1 for small text.
+
+## Files
+
+- `cover.png`: the Devpost cover, 1500×1000 (3:2).
+- `thumbnail.png`: the video thumbnail, 1280×720.
+
+Both use the dark values above and the fork tree of the recorded Sandboxes run: `question` load-bearing, `passages` a silent passthrough.
