@@ -318,7 +318,7 @@ def _wild(demo: Any) -> str:
         "with the bug and the release with the fix, on Nebius Sandboxes: it flags the first, on the field the "
         "issue names, and clears the second. No model was needed to find any of them.</p>"
         f'<p class="wscore"><b data-count="{right}">{right}</b><small> / {total}</small>'
-        "<span>releases judged right: every bug caught, every fix cleared</span></p>"
+        "<span>releases called correctly: every bug caught, every fix cleared</span></p>"
         f'<div class="wgrid">{"".join(rows)}</div></div></section>'
     )
 

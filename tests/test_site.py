@@ -97,7 +97,7 @@ class FrontPageTests(unittest.TestCase):
 
 
 class CaughtInTheWildTests(unittest.TestCase):
-    """Real bugs from public issues, judged from the recorded runs of both releases."""
+    """Real bugs from public issues, verdicts read from the recorded runs of both releases."""
 
     def setUp(self):
         self._tmp = tempfile.TemporaryDirectory()
