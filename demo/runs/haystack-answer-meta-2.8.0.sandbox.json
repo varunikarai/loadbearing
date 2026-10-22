@@ -1,0 +1,512 @@
+{
+  "schema": 2,
+  "target": "haystack-answer-meta-2.8.0",
+  "backend": "sandbox",
+  "deterministic": true,
+  "void": false,
+  "baseline_runs": 2,
+  "unstable_keys": [],
+  "timing": {
+    "checkpoint_seconds": 29.436941833992023,
+    "fork_wall_seconds": 8.094150915974751,
+    "fork_total_seconds": 53.15268187405309,
+    "runs": 17
+  },
+  "record": {
+    "request_id": "req_8Kx2pd",
+    "query": "Can I still return headphones after 20 days?",
+    "reply": "No, the 14-day return window has passed, but the warranty covers a repair.",
+    "meta": {
+      "source_url": "https://shop.example/help/returns-policy",
+      "policy_version": "2026-09"
+    }
+  },
+  "baseline": {
+    "exit_code": 0,
+    "output": {
+      "answers": [
+        {
+          "data": "No, the 14-day return window has passed, but the warranty covers a repair.",
+          "meta": {
+            "model": "nemotron",
+            "policy_version": "2026-09",
+            "source_url": "https://shop.example/help/returns-policy"
+          },
+          "query": "Can I still return headphones after 20 days?"
+        }
+      ]
+    },
+    "seconds": 2.6769851249991916
+  },
+  "forks": [
+    {
+      "label": "destroy:request_id",
+      "kind": "destroy",
+      "field": "request_id",
+      "value": "xxxxxxxxxx",
+      "moved": false,
+      "changed": [],
+      "classifier": null,
+      "runs": 1,
+      "moves": 0,
+      "exit_code": 0,
+      "output": {
+        "answers": [
+          {
+            "data": "No, the 14-day return window has passed, but the warranty covers a repair.",
+            "meta": {
+              "model": "nemotron",
+              "policy_version": "2026-09",
+              "source_url": "https://shop.example/help/returns-policy"
+            },
+            "query": "Can I still return headphones after 20 days?"
+          }
+        ]
+      },
+      "seconds": 3.6073410420212895
+    },
+    {
+      "label": "drop:request_id",
+      "kind": "drop",
+      "field": "request_id",
+      "value": null,
+      "moved": false,
+      "changed": [],
+      "classifier": null,
+      "runs": 1,
+      "moves": 0,
+      "exit_code": 0,
+      "output": {
+        "answers": [
+          {
+            "data": "No, the 14-day return window has passed, but the warranty covers a repair.",
+            "meta": {
+              "model": "nemotron",
+              "policy_version": "2026-09",
+              "source_url": "https://shop.example/help/returns-policy"
+            },
+            "query": "Can I still return headphones after 20 days?"
+          }
+        ]
+      },
+      "seconds": 3.8976573330000974
+    },
+    {
+      "label": "nudge:request_id",
+      "kind": "nudge",
+      "field": "request_id",
+      "value": "req_8Kx2pd ",
+      "moved": false,
+      "changed": [],
+      "classifier": null,
+      "runs": 1,
+      "moves": 0,
+      "exit_code": 0,
+      "output": {
+        "answers": [
+          {
+            "data": "No, the 14-day return window has passed, but the warranty covers a repair.",
+            "meta": {
+              "model": "nemotron",
+              "policy_version": "2026-09",
+              "source_url": "https://shop.example/help/returns-policy"
+            },
+            "query": "Can I still return headphones after 20 days?"
+          }
+        ]
+      },
+      "seconds": 3.158659707987681
+    },
+    {
+      "label": "destroy:query",
+      "kind": "destroy",
+      "field": "query",
+      "value": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+      "moved": true,
+      "changed": [
+        "answers"
+      ],
+      "classifier": null,
+      "runs": 1,
+      "moves": 1,
+      "exit_code": 0,
+      "output": {
+        "answers": [
+          {
+            "data": "No, the 14-day return window has passed, but the warranty covers a repair.",
+            "meta": {
+              "model": "nemotron",
+              "policy_version": "2026-09",
+              "source_url": "https://shop.example/help/returns-policy"
+            },
+            "query": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+          }
+        ]
+      },
+      "seconds": 3.852272249991074
+    },
+    {
+      "label": "drop:query",
+      "kind": "drop",
+      "field": "query",
+      "value": null,
+      "moved": true,
+      "changed": [
+        "<exit>"
+      ],
+      "classifier": null,
+      "runs": 1,
+      "moves": 1,
+      "exit_code": 1,
+      "output": "",
+      "seconds": 3.186666959023569
+    },
+    {
+      "label": "nudge:query",
+      "kind": "nudge",
+      "field": "query",
+      "value": "Can I still return headphones after 20 days? ",
+      "moved": true,
+      "changed": [
+        "answers"
+      ],
+      "classifier": null,
+      "runs": 1,
+      "moves": 1,
+      "exit_code": 0,
+      "output": {
+        "answers": [
+          {
+            "data": "No, the 14-day return window has passed, but the warranty covers a repair.",
+            "meta": {
+              "model": "nemotron",
+              "policy_version": "2026-09",
+              "source_url": "https://shop.example/help/returns-policy"
+            },
+            "query": "Can I still return headphones after 20 days? "
+          }
+        ]
+      },
+      "seconds": 3.6061939579667524
+    },
+    {
+      "label": "destroy:reply",
+      "kind": "destroy",
+      "field": "reply",
+      "value": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+      "moved": true,
+      "changed": [
+        "answers"
+      ],
+      "classifier": null,
+      "runs": 1,
+      "moves": 1,
+      "exit_code": 0,
+      "output": {
+        "answers": [
+          {
+            "data": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+            "meta": {
+              "model": "nemotron",
+              "policy_version": "2026-09",
+              "source_url": "https://shop.example/help/returns-policy"
+            },
+            "query": "Can I still return headphones after 20 days?"
+          }
+        ]
+      },
+      "seconds": 2.8360747499973513
+    },
+    {
+      "label": "drop:reply",
+      "kind": "drop",
+      "field": "reply",
+      "value": null,
+      "moved": true,
+      "changed": [
+        "<exit>"
+      ],
+      "classifier": null,
+      "runs": 1,
+      "moves": 1,
+      "exit_code": 1,
+      "output": "",
+      "seconds": 2.651911207998637
+    },
+    {
+      "label": "nudge:reply",
+      "kind": "nudge",
+      "field": "reply",
+      "value": "No, the 14-day return window has passed, but the warranty covers a repair. ",
+      "moved": true,
+      "changed": [
+        "answers"
+      ],
+      "classifier": null,
+      "runs": 1,
+      "moves": 1,
+      "exit_code": 0,
+      "output": {
+        "answers": [
+          {
+            "data": "No, the 14-day return window has passed, but the warranty covers a repair. ",
+            "meta": {
+              "model": "nemotron",
+              "policy_version": "2026-09",
+              "source_url": "https://shop.example/help/returns-policy"
+            },
+            "query": "Can I still return headphones after 20 days?"
+          }
+        ]
+      },
+      "seconds": 2.6418698750203475
+    },
+    {
+      "label": "destroy:meta.source_url",
+      "kind": "destroy",
+      "field": "meta.source_url",
+      "value": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+      "moved": true,
+      "changed": [
+        "answers"
+      ],
+      "classifier": null,
+      "runs": 1,
+      "moves": 1,
+      "exit_code": 0,
+      "output": {
+        "answers": [
+          {
+            "data": "No, the 14-day return window has passed, but the warranty covers a repair.",
+            "meta": {
+              "model": "nemotron",
+              "policy_version": "2026-09",
+              "source_url": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+            },
+            "query": "Can I still return headphones after 20 days?"
+          }
+        ]
+      },
+      "seconds": 2.9342994590406306
+    },
+    {
+      "label": "drop:meta.source_url",
+      "kind": "drop",
+      "field": "meta.source_url",
+      "value": null,
+      "moved": true,
+      "changed": [
+        "answers"
+      ],
+      "classifier": null,
+      "runs": 1,
+      "moves": 1,
+      "exit_code": 0,
+      "output": {
+        "answers": [
+          {
+            "data": "No, the 14-day return window has passed, but the warranty covers a repair.",
+            "meta": {
+              "model": "nemotron",
+              "policy_version": "2026-09"
+            },
+            "query": "Can I still return headphones after 20 days?"
+          }
+        ]
+      },
+      "seconds": 3.6684258329914883
+    },
+    {
+      "label": "nudge:meta.source_url",
+      "kind": "nudge",
+      "field": "meta.source_url",
+      "value": "https://shop.example/help/returns-policy ",
+      "moved": true,
+      "changed": [
+        "answers"
+      ],
+      "classifier": null,
+      "runs": 1,
+      "moves": 1,
+      "exit_code": 0,
+      "output": {
+        "answers": [
+          {
+            "data": "No, the 14-day return window has passed, but the warranty covers a repair.",
+            "meta": {
+              "model": "nemotron",
+              "policy_version": "2026-09",
+              "source_url": "https://shop.example/help/returns-policy "
+            },
+            "query": "Can I still return headphones after 20 days?"
+          }
+        ]
+      },
+      "seconds": 3.3776939579984173
+    },
+    {
+      "label": "destroy:meta.policy_version",
+      "kind": "destroy",
+      "field": "meta.policy_version",
+      "value": "xxxxxxx",
+      "moved": true,
+      "changed": [
+        "answers"
+      ],
+      "classifier": null,
+      "runs": 1,
+      "moves": 1,
+      "exit_code": 0,
+      "output": {
+        "answers": [
+          {
+            "data": "No, the 14-day return window has passed, but the warranty covers a repair.",
+            "meta": {
+              "model": "nemotron",
+              "policy_version": "xxxxxxx",
+              "source_url": "https://shop.example/help/returns-policy"
+            },
+            "query": "Can I still return headphones after 20 days?"
+          }
+        ]
+      },
+      "seconds": 2.6753480409970507
+    },
+    {
+      "label": "drop:meta.policy_version",
+      "kind": "drop",
+      "field": "meta.policy_version",
+      "value": null,
+      "moved": true,
+      "changed": [
+        "answers"
+      ],
+      "classifier": null,
+      "runs": 1,
+      "moves": 1,
+      "exit_code": 0,
+      "output": {
+        "answers": [
+          {
+            "data": "No, the 14-day return window has passed, but the warranty covers a repair.",
+            "meta": {
+              "model": "nemotron",
+              "source_url": "https://shop.example/help/returns-policy"
+            },
+            "query": "Can I still return headphones after 20 days?"
+          }
+        ]
+      },
+      "seconds": 2.632191958022304
+    },
+    {
+      "label": "nudge:meta.policy_version",
+      "kind": "nudge",
+      "field": "meta.policy_version",
+      "value": "2026-09 ",
+      "moved": true,
+      "changed": [
+        "answers"
+      ],
+      "classifier": null,
+      "runs": 1,
+      "moves": 1,
+      "exit_code": 0,
+      "output": {
+        "answers": [
+          {
+            "data": "No, the 14-day return window has passed, but the warranty covers a repair.",
+            "meta": {
+              "model": "nemotron",
+              "policy_version": "2026-09 ",
+              "source_url": "https://shop.example/help/returns-policy"
+            },
+            "query": "Can I still return headphones after 20 days?"
+          }
+        ]
+      },
+      "seconds": 2.580124749976676
+    }
+  ],
+  "verdicts": [
+    {
+      "field": "request_id",
+      "intent": "irrelevant",
+      "moved": {
+        "destroy": false,
+        "drop": false,
+        "nudge": false
+      },
+      "verdict": "inert",
+      "defect": false,
+      "intent_source": "declared",
+      "evidence": null,
+      "reconciliation": null,
+      "explanation": null
+    },
+    {
+      "field": "query",
+      "intent": "relevant",
+      "moved": {
+        "destroy": true,
+        "drop": true,
+        "nudge": true
+      },
+      "verdict": "load-bearing",
+      "defect": false,
+      "intent_source": "declared",
+      "evidence": null,
+      "reconciliation": null,
+      "explanation": null
+    },
+    {
+      "field": "reply",
+      "intent": "relevant",
+      "moved": {
+        "destroy": true,
+        "drop": true,
+        "nudge": true
+      },
+      "verdict": "load-bearing",
+      "defect": false,
+      "intent_source": "declared",
+      "evidence": null,
+      "reconciliation": null,
+      "explanation": null
+    },
+    {
+      "field": "meta.source_url",
+      "intent": "relevant",
+      "moved": {
+        "destroy": true,
+        "drop": true,
+        "nudge": true
+      },
+      "verdict": "load-bearing",
+      "defect": false,
+      "intent_source": "declared",
+      "evidence": null,
+      "reconciliation": null,
+      "explanation": null
+    },
+    {
+      "field": "meta.policy_version",
+      "intent": "relevant",
+      "moved": {
+        "destroy": true,
+        "drop": true,
+        "nudge": true
+      },
+      "verdict": "load-bearing",
+      "defect": false,
+      "intent_source": "declared",
+      "evidence": null,
+      "reconciliation": null,
+      "explanation": null
+    }
+  ],
+  "defects": [],
+  "fixes": [],
+  "proofs": [],
+  "rejected_fixes": []
+}

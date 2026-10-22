@@ -44,6 +44,21 @@ class TargetV2Tests(unittest.TestCase):
         self.assertEqual(t.docs["urls"], ["https://example.com"])
         self.assertEqual(t.sources, ["pipeline.py"])
 
+    def test_a_target_that_installs_packages_runs_in_a_sandbox_only(self):
+        from loadbearing.backends.local import LocalBackend
+
+        t = load_target(self.write(needs_sandbox=True, setup="pip install --target deps x==1"))
+        self.assertTrue(t.needs_sandbox)
+        self.assertFalse(load_target(EXAMPLE).needs_sandbox)
+        backend = LocalBackend()
+        try:
+            with self.assertRaisesRegex(RuntimeError, "--backend sandbox"):
+                backend.checkpoint(t)  # refused before setup could touch the host's Python
+        finally:
+            backend.close()
+        with self.assertRaisesRegex(RuntimeError, "needs_sandbox"):
+            load_target(self.write(needs_sandbox="yes"))
+
     def test_bad_values_are_named_at_load_time(self):
         cases = [
             ({"baseline_runs": 1}, "baseline_runs"),

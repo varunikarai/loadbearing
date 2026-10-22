@@ -1,0 +1,342 @@
+{
+  "schema": 2,
+  "target": "pydantic-ai-description-2.5.0",
+  "backend": "sandbox",
+  "deterministic": true,
+  "void": false,
+  "baseline_runs": 2,
+  "unstable_keys": [],
+  "timing": {
+    "checkpoint_seconds": 10.770480624982156,
+    "fork_wall_seconds": 5.597396874974947,
+    "fork_total_seconds": 39.93111554288771,
+    "runs": 14
+  },
+  "record": {
+    "user_id": "u_48213",
+    "question": "What is a banana?",
+    "output_name": "fruit_or_vehicle",
+    "output_description": "Classify the thing the user asks about: a fruit with its colour, or a vehicle with its number of wheels."
+  },
+  "baseline": {
+    "exit_code": 0,
+    "output": {
+      "model_was_told": {
+        "output_description": "A vehicle",
+        "output_name": "fruit_or_vehicle",
+        "prompt": "What is a banana?"
+      }
+    },
+    "seconds": 2.8811408749897964
+  },
+  "forks": [
+    {
+      "label": "destroy:user_id",
+      "kind": "destroy",
+      "field": "user_id",
+      "value": "xxxxxxx",
+      "moved": false,
+      "changed": [],
+      "classifier": null,
+      "runs": 1,
+      "moves": 0,
+      "exit_code": 0,
+      "output": {
+        "model_was_told": {
+          "output_description": "A vehicle",
+          "output_name": "fruit_or_vehicle",
+          "prompt": "What is a banana?"
+        }
+      },
+      "seconds": 2.8891098749591038
+    },
+    {
+      "label": "drop:user_id",
+      "kind": "drop",
+      "field": "user_id",
+      "value": null,
+      "moved": false,
+      "changed": [],
+      "classifier": null,
+      "runs": 1,
+      "moves": 0,
+      "exit_code": 0,
+      "output": {
+        "model_was_told": {
+          "output_description": "A vehicle",
+          "output_name": "fruit_or_vehicle",
+          "prompt": "What is a banana?"
+        }
+      },
+      "seconds": 2.9379983749822713
+    },
+    {
+      "label": "nudge:user_id",
+      "kind": "nudge",
+      "field": "user_id",
+      "value": "u_48213 ",
+      "moved": false,
+      "changed": [],
+      "classifier": null,
+      "runs": 1,
+      "moves": 0,
+      "exit_code": 0,
+      "output": {
+        "model_was_told": {
+          "output_description": "A vehicle",
+          "output_name": "fruit_or_vehicle",
+          "prompt": "What is a banana?"
+        }
+      },
+      "seconds": 2.8912359999958426
+    },
+    {
+      "label": "destroy:question",
+      "kind": "destroy",
+      "field": "question",
+      "value": "xxxxxxxxxxxxxxxxx",
+      "moved": true,
+      "changed": [
+        "model_was_told"
+      ],
+      "classifier": null,
+      "runs": 1,
+      "moves": 1,
+      "exit_code": 0,
+      "output": {
+        "model_was_told": {
+          "output_description": "A vehicle",
+          "output_name": "fruit_or_vehicle",
+          "prompt": "xxxxxxxxxxxxxxxxx"
+        }
+      },
+      "seconds": 3.0204236249555834
+    },
+    {
+      "label": "drop:question",
+      "kind": "drop",
+      "field": "question",
+      "value": null,
+      "moved": true,
+      "changed": [
+        "<exit>"
+      ],
+      "classifier": null,
+      "runs": 1,
+      "moves": 1,
+      "exit_code": 1,
+      "output": "",
+      "seconds": 2.966448416991625
+    },
+    {
+      "label": "nudge:question",
+      "kind": "nudge",
+      "field": "question",
+      "value": "What is a banana? ",
+      "moved": true,
+      "changed": [
+        "model_was_told"
+      ],
+      "classifier": null,
+      "runs": 1,
+      "moves": 1,
+      "exit_code": 0,
+      "output": {
+        "model_was_told": {
+          "output_description": "A vehicle",
+          "output_name": "fruit_or_vehicle",
+          "prompt": "What is a banana? "
+        }
+      },
+      "seconds": 2.89425970899174
+    },
+    {
+      "label": "destroy:output_name",
+      "kind": "destroy",
+      "field": "output_name",
+      "value": "xxxxxxxxxxxxxxxx",
+      "moved": true,
+      "changed": [
+        "model_was_told"
+      ],
+      "classifier": null,
+      "runs": 1,
+      "moves": 1,
+      "exit_code": 0,
+      "output": {
+        "model_was_told": {
+          "output_description": "A vehicle",
+          "output_name": "xxxxxxxxxxxxxxxx",
+          "prompt": "What is a banana?"
+        }
+      },
+      "seconds": 2.6153451669961214
+    },
+    {
+      "label": "drop:output_name",
+      "kind": "drop",
+      "field": "output_name",
+      "value": null,
+      "moved": true,
+      "changed": [
+        "<exit>"
+      ],
+      "classifier": null,
+      "runs": 1,
+      "moves": 1,
+      "exit_code": 1,
+      "output": "",
+      "seconds": 2.7067668749950826
+    },
+    {
+      "label": "nudge:output_name",
+      "kind": "nudge",
+      "field": "output_name",
+      "value": "fruit_or_vehicle ",
+      "moved": true,
+      "changed": [
+        "model_was_told"
+      ],
+      "classifier": null,
+      "runs": 1,
+      "moves": 1,
+      "exit_code": 0,
+      "output": {
+        "model_was_told": {
+          "output_description": "A vehicle",
+          "output_name": "fruit_or_vehicle ",
+          "prompt": "What is a banana?"
+        }
+      },
+      "seconds": 2.6822000830434263
+    },
+    {
+      "label": "destroy:output_description",
+      "kind": "destroy",
+      "field": "output_description",
+      "value": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+      "moved": false,
+      "changed": [],
+      "classifier": null,
+      "runs": 1,
+      "moves": 0,
+      "exit_code": 0,
+      "output": {
+        "model_was_told": {
+          "output_description": "A vehicle",
+          "output_name": "fruit_or_vehicle",
+          "prompt": "What is a banana?"
+        }
+      },
+      "seconds": 2.675232917012181
+    },
+    {
+      "label": "drop:output_description",
+      "kind": "drop",
+      "field": "output_description",
+      "value": null,
+      "moved": false,
+      "changed": [],
+      "classifier": null,
+      "runs": 1,
+      "moves": 0,
+      "exit_code": 0,
+      "output": {
+        "model_was_told": {
+          "output_description": "A vehicle",
+          "output_name": "fruit_or_vehicle",
+          "prompt": "What is a banana?"
+        }
+      },
+      "seconds": 2.641770499991253
+    },
+    {
+      "label": "nudge:output_description",
+      "kind": "nudge",
+      "field": "output_description",
+      "value": "Classify the thing the user asks about: a fruit with its colour, or a vehicle with its number of wheels. ",
+      "moved": false,
+      "changed": [],
+      "classifier": null,
+      "runs": 1,
+      "moves": 0,
+      "exit_code": 0,
+      "output": {
+        "model_was_told": {
+          "output_description": "A vehicle",
+          "output_name": "fruit_or_vehicle",
+          "prompt": "What is a banana?"
+        }
+      },
+      "seconds": 2.5847082920372486
+    }
+  ],
+  "verdicts": [
+    {
+      "field": "user_id",
+      "intent": "irrelevant",
+      "moved": {
+        "destroy": false,
+        "drop": false,
+        "nudge": false
+      },
+      "verdict": "inert",
+      "defect": false,
+      "intent_source": "declared",
+      "evidence": null,
+      "reconciliation": null,
+      "explanation": null
+    },
+    {
+      "field": "question",
+      "intent": "relevant",
+      "moved": {
+        "destroy": true,
+        "drop": true,
+        "nudge": true
+      },
+      "verdict": "load-bearing",
+      "defect": false,
+      "intent_source": "declared",
+      "evidence": null,
+      "reconciliation": null,
+      "explanation": null
+    },
+    {
+      "field": "output_name",
+      "intent": "relevant",
+      "moved": {
+        "destroy": true,
+        "drop": true,
+        "nudge": true
+      },
+      "verdict": "load-bearing",
+      "defect": false,
+      "intent_source": "declared",
+      "evidence": null,
+      "reconciliation": null,
+      "explanation": null
+    },
+    {
+      "field": "output_description",
+      "intent": "relevant",
+      "moved": {
+        "destroy": false,
+        "drop": false,
+        "nudge": false
+      },
+      "verdict": "silent passthrough",
+      "defect": true,
+      "intent_source": "declared",
+      "evidence": null,
+      "reconciliation": null,
+      "explanation": null
+    }
+  ],
+  "defects": [
+    "output_description"
+  ],
+  "fixes": [],
+  "proofs": [],
+  "rejected_fixes": []
+}

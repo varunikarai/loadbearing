@@ -62,7 +62,8 @@ class Demo:
         if not self.readonly:
             return True
         free = self.backend == "local" and self.classify_factory is None
-        return free and not load_target(self.targets[name]).env
+        target = load_target(self.targets[name])
+        return free and not target.env and not target.needs_sandbox
 
     def cached(self, name: str) -> Optional[dict]:
         """This backend's latest run, else a recorded run from another backend."""

@@ -1,0 +1,22 @@
+{
+  "name": "pydantic-ai-description-2.5.1",
+  "image": "python:3.12-slim",
+  "setup": "pip install --quiet --disable-pip-version-check --target deps pydantic-ai-slim==2.5.1",
+  "needs_sandbox": true,
+  "files": [
+    "pipeline.py"
+  ],
+  "command": "python3 pipeline.py input.json",
+  "record": "request.json",
+  "timeout": 120,
+  "expects": {
+    "relevant": [
+      "question",
+      "output_name",
+      "output_description"
+    ],
+    "irrelevant": [
+      "user_id"
+    ]
+  }
+}
