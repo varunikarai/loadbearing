@@ -16,7 +16,7 @@ Every task below is written so either builder can pick it up cold: why it exists
 
 | ID | Task | Type | Pts | Due | Status |
 |---|---|---|---|---|---|
-| V1 | Sandboxes live run | tech | 4 | Sat 10-10 | todo |
+| V1 | Sandboxes live run | tech | 4 | Sat 10-10 | done 10-22 (Aeshvarya): the same two defects found on Nebius Sandboxes |
 | V2 | Nemotron layer verified | tech | 6 | Sun 10-11 | live 10-10: Nano 18, 19, 19 of 20 (bar 18); `--explain` live on the toy target; timings named as noise 10-11 (hand-off 17), re-score pending; Sandboxes run after V1 |
 | V3 | Noise floor | tech | 3 | Sat 10-10 | done 10-07 |
 | V4 | Tavily intent inference | tech | 5 | Sat 10-17 | live 10-10 on the support answerer: `passages` inferred relevant from a quoted source; own docs quoted before search hits 10-11, re-record pending (hand-off 18) |
