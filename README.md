@@ -13,7 +13,7 @@
   <img alt="A Loadbearing report on a live RAG support bot: one checkpoint fans out into 14 forks, and the passages field is flagged as a silent passthrough" src="docs/img/report-hero-dark.png">
 </picture>
 
-<sub>The report from a live run: Nemotron 3 on Nebius Token Factory, the forks on the local backend. Every image on this page is Loadbearing's real output from live runs; the terminal is drawn from the captured text of one.</sub>
+<sub>The report from a live run: Nemotron 3 on Nebius Token Factory, the checkpoint and every fork in Nebius Sandboxes. Every image on this page is Loadbearing's real output from live runs; the terminal is drawn from the captured text of one.</sub>
 
 </div>
 
@@ -42,23 +42,23 @@ customer something the policy does not say:
 
 | | Before | After Ultra's fix, proven in a fresh fork |
 |---|---|---|
-| `answer` | "Yes, you can return the headphones for a refund within the 30‑day return window." | "You cannot return the headphones for a refund because the 14‑day return window has passed, but you can file a warranty claim for a repair or replacement." |
+| `answer` | "Yes, you can return the headphones for a full refund within the 30‑day return window." | "Unfortunately, the 14‑day return window has passed, so a refund isn’t possible; however, you can file a warranty claim for a repair or replacement." |
 | `can_return` | `true` | `false` |
 | `return_window_days` | `30` | `14` |
 
 One command finds it, explains it, fixes it and proves the fix:
 
-<p align="center"><img alt="loadbearing probe --intent --prove in a terminal: passages is a silent passthrough" src="docs/img/terminal.png" width="880"></p>
+<p align="center"><img alt="loadbearing probe --backend sandbox --intent --prove in a terminal: passages is a silent passthrough" src="docs/img/terminal.png" width="880"></p>
 
 <details>
 <summary>The full terminal output of that run</summary>
 
 ```
-$ loadbearing probe examples/support_answerer/target.json --intent --prove
-support-answerer: 14 forks from one checkpoint (local)
-checkpoint 0.01s, then 23 runs in 22.89s wall (127.80s one after another, 5.6x parallel)
+$ loadbearing probe examples/support_answerer/target.json --backend sandbox --intent --prove
+support-answerer: 14 forks from one checkpoint (sandbox)
+checkpoint 4.68s, then 21 runs in 39.16s wall (258.71s one after another, 6.6x parallel)
 noise floor: 5 baseline runs; varies on its own, not judged: answer
-confirmed: 2 moved fork(s) re-run, counted only if most runs moved
+confirmed: 1 moved fork(s) re-run, counted only if most runs moved; not counted: drop:user_id (1 of 3)
 
 field        intent      destroy  drop   nudge  verdict
 request_id   irrelevant  same     same   same   inert
@@ -73,32 +73,40 @@ why passages:
   intent: "Retrieval-augmented generation is a technique for enhancing the accuracy and reliability
           of generative AI models with information from specific and relevant data sources."
           (https://blogs.nvidia.com/blog/what-is-retrieval-augmented-generation/)
-  Super:  This is a silent passthrough: the field *passages* is marked as relevant (it should
-          matter), yet destroying or dropping it produces no change in the output (both “destroy”
-          and “drop” are false). The lack of any output movement despite the field’s supposed
-          relevance indicates the pipeline is not reading this field.
-  Ultra:  Code path: `build_prompt` function (line 32 in the provided source).
+  Super:  This is a silent passthrough: the field *passages* is marked as relevant (supposed to
+          matter), yet neither destroying nor dropping it caused any change in the pipeline’s output
+          (both destroy and drop are false). The lack of output movement despite the field’s
+          relevance indicates that the pipeline is ignoring the field rather than using it.
+  Ultra:  Code path responsible:
+          The `build_prompt` function reads the retrieved policy text from `request["context"]`, but
+          the retriever now stores that text in `request["passages"]`. Because the key mismatch is
+          silent (`.get` returns `""`), the policy passages never reach the prompt, and the LLM
+          answers from generic knowledge.
 
-          Why it fails: The retriever now stores the retrieved policy text under the key
-          `"passages"`, but `build_prompt` still reads `request.get("context", "")`. Because the key
-          is missing, `context` becomes an empty string, so the policy passages are never inserted
-          into the prompt. The LLM then answers from its general training data instead of the actual
-          policy, producing the wrong return window (30 days vs. 14 days) and a refund promise that
-          the policy forbids. No error is thrown—the field is silently ignored.
+          Line that reads the wrong field (pipeline.py:18):
+                  context = request.get("context", "")
 
-          Quoted line:
-              context = request.get("context", "")
+          Why it fails:
+          The retriever was changed to write its output under the key `"passages"`. This line still
+          asks for `"context"`, so `context` becomes an empty string. The prompt sent to the model
+          then contains only the customer’s question, and the model hallucinates a return policy
+          (e.g., 30‑day refund) instead of using the actual policy (14 days, no refund).
 
-          Smallest fix: Change the key from `"context"` to `"passages"` (one‑line change).
-              context = request.get("passages", "")
-          (Optionally rename the variable to `passages` for clarity, but the key change alone
-          restores the intended behavior.)
+          Smallest fix:
+          Change the key from `"context"` to `"passages"` (the variable name can stay `context` for
+          minimal diff).
+
+                  context = request.get("passages", "")
+
+          If the retriever returns a list of passages, a slightly more robust fix would be:
+                  passages = request.get("passages", "")
+                  context = "\n".join(passages) if isinstance(passages, list)
 
 fix for passages (silent passthrough):
-  Ultra:  The retriever now stores retrieved policy text under the key 'passages', but build_prompt
-          still reads 'context', causing the policy to be silently omitted from the prompt. Changing
-          the key from 'context' to 'passages' restores the intended retrieval-augmented generation
-          behavior with a one-line fix.
+  Ultra:  The build_prompt function reads from the 'context' key, but the retriever now stores
+          policy passages under the 'passages' key. Changing the key to 'passages' ensures the
+          retrieved policy text is included in the prompt, eliminating the silent passthrough
+          defect.
 --- a/pipeline.py
 +++ b/pipeline.py
 @@ -34,7 +34,7 @@
@@ -112,10 +120,10 @@ proof: passages is now load-bearing, and no other field gained a defect.
 ```
 
 The bot samples its answers, so two runs can differ by chance. The noise floor showed `answer`
-varies on its own, so each fork that moved ran three times and counted only if most of its runs
-moved. In an earlier run this kept one chance answer, on a `received_at` fork (moved 1 of 3),
-from being reported as a phantom sensitivity. Since then only moves on fields that should not
-matter are re-run: those are the ones a chance answer could turn into a false defect.
+varies on its own, so a fork that moved on a field that should not matter ran three times and
+counted only if most of its runs moved. In this run that kept one chance answer, on a `user_id`
+fork (moved 1 of 3), from being reported as a phantom sensitivity. Only those moves are re-run:
+they are the ones a chance answer could turn into a false defect.
 
 </details>
 
@@ -396,7 +404,7 @@ a fake Token Factory server that the LLM demo target talks to over HTTP, unmodif
 
 ## Status
 
-Built and tested offline unless it says live. Nemotron and Tavily have run live on Token Factory; the Sandboxes backend has not yet.
+Built and tested offline unless it says live. Nemotron, Tavily and the Sandboxes backend have all run live on Token Factory.
 
 - [x] Mutation engine: destroy (template-replace), drop, nudge
 - [x] Checkpoint-and-fork engine, timed: checkpoint, parallel wall time, and the same runs one after another
@@ -414,7 +422,7 @@ Built and tested offline unless it says live. Nemotron and Tavily have run live 
 - [x] GitHub Action with a job summary
 - [x] Live: Nemotron Nano, Super and Ultra on Token Factory. Nano scored 19 of 20 labelled diffs on each of three runs; Super and Ultra explain each defect and write the fix
 - [x] Live: Tavily inferring which fields should matter. On the support answerer it finds a RAG source saying answers come from the retrieved passages, which makes the unread `passages` field a defect; Ultra's one-line fix is proven, and the answer goes from "30 days, refund" to "14 days, warranty"
-- [ ] Sandboxes backend run against a live account (checked against the contree-sdk 0.3.6 source, not yet run)
+- [x] Live: the Sandboxes backend. The toy target finds the same two defects on Nebius (checkpoint 4.4 s, then 17 runs in 5.3 s, 7.6x parallel), and the support answerer's whole loop, intent, fix and proof, ran there and is the recorded run
 - [x] Hosted demo at [loadbearing-demo.vercel.app](https://loadbearing-demo.vercel.app): free targets run on request, paid runs are shown as recorded
 - [ ] Demo video
 

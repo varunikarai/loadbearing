@@ -100,7 +100,7 @@ class DemoServerTests(unittest.TestCase):
         self.assertEqual(status, 200)
         self.assertIn("Backend: sandbox", body)
         index = self.get(base + "/")[1]
-        self.assertIn("recorded on sandbox", index)
+        self.assertIn("recorded live on Nebius Sandboxes", index)
         # A paid target offers its recorded run, never a button that would spend credits.
         row = index.split('data-name="support_answerer"', 1)[1].split("</article>", 1)[0]
         self.assertIn("View the recorded run", row)

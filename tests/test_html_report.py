@@ -130,6 +130,13 @@ class ProseTests(unittest.TestCase):
         self.assertNotIn("```", html)
         self.assertNotIn("**", html)
 
+    def test_a_fence_cut_off_at_the_length_limit_is_still_code(self):
+        from loadbearing.html_report import _prose
+
+        html = _prose("A fix:\n```python\nx = r.get('passages')\n```\n\nOr:\n```python\nctx = join(x) if")
+        self.assertIn('<pre class="code">ctx = join(x) if</pre>', html)
+        self.assertNotIn("```", html)
+
     def test_markup_in_model_text_stays_escaped(self):
         from loadbearing.html_report import _prose
 

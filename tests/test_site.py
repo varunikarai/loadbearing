@@ -24,7 +24,7 @@ class FrontPageTests(unittest.TestCase):
         self._tmp.cleanup()
 
     def test_the_hero_quotes_the_recorded_bot_before_and_after_the_fix(self):
-        data = json.loads((RUNS / "support_answerer.local.json").read_text())
+        data = json.loads((RUNS / "support_answerer.sandbox.json").read_text())
         from html import escape
 
         before = data["baseline"]["output"]["answer"]
@@ -33,7 +33,7 @@ class FrontPageTests(unittest.TestCase):
         self.assertIn(escape(after), self.page)
 
     def test_the_hero_replays_every_copy_of_the_recorded_run_and_its_fix(self):
-        data = json.loads((RUNS / "support_answerer.local.json").read_text())
+        data = json.loads((RUNS / "support_answerer.sandbox.json").read_text())
         replay = json.loads(self.page.split('id="replay-data">', 1)[1].split("</script>", 1)[0])
         self.assertEqual([(f["field"], f["kind"], f["moved"]) for f in replay["forks"]],
                          [(f["field"], f["kind"], f["moved"]) for f in data["forks"]])
@@ -42,8 +42,9 @@ class FrontPageTests(unittest.TestCase):
         self.assertEqual(replay["after"]["verdicts"]["passages"], "load-bearing")
 
     def test_the_run_time_names_every_run_it_covers(self):
-        data = json.loads((RUNS / "support_answerer.local.json").read_text())
-        self.assertIn(f'for all {data["timing"]["runs"]} runs on Nemotron', self.page)
+        data = json.loads((RUNS / "support_answerer.sandbox.json").read_text())
+        where = "Nebius Sandboxes" if data["backend"] == "sandbox" else "Nemotron"
+        self.assertIn(f'for all {data["timing"]["runs"]} runs on {where}', self.page)
         self.assertNotIn("Every test passed", self.page)  # the demo target has no tests
 
     def test_the_benchmark_numbers_come_from_results_json(self):
@@ -84,7 +85,10 @@ class FrontPageTests(unittest.TestCase):
 
     def test_the_page_claims_nothing_that_is_not_true_yet(self):
         self.assertNotIn("pip install loadbearing", self.page)  # not on PyPI
-        self.assertIn("waiting on beta access", self.page)  # Sandboxes has not run live
+        # Sandboxes is claimed only because the replayed run was recorded there.
+        self.assertEqual(json.loads((RUNS / "support_answerer.sandbox.json").read_text())["backend"], "sandbox")
+        self.assertIn("recorded there, live", self.page)
+        self.assertIn("recorded live on Nebius Sandboxes", self.page)
         self.assertNotIn("http://", self.page.replace("http://www.w3.org/2000/svg", ""))
 
     def test_the_page_fetches_nothing_from_elsewhere(self):
