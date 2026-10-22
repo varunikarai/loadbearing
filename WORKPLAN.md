@@ -2,7 +2,7 @@
 
 Who does what, by when, through submission on **Sun 2026-10-25** (hard deadline Fri 2026-10-30 10:00 PT, 22:30 IST).
 
-Every task below is written so either builder can pick it up cold: why it exists, which files it owns, what it needs first, the steps, and the test for done. The work is split evenly: each builder has core engine work, Nemotron and Sandboxes work, a judged writing piece, half the video, a feedback file, and a review duty.
+Every task below is written so either builder can pick it up cold: why it exists, which files it owns, what it needs first, the steps, and the test for done. The work is split evenly: each builder has core engine work, Nemotron and Sandboxes work, a published writing piece, half the video, a feedback file, and a review duty.
 
 ## How to use this file
 
@@ -27,7 +27,6 @@ Every task below is written so either builder can pick it up cold: why it exists
 | V9 | Visual identity | non-tech | 4 | palette Sat 10-10, rest Tue 10-20 | palette, Devpost cover and video thumbnail done 10-22; hand-drawn wordmark and diagram open |
 | V10 | Video script and voice ✍ | non-tech | 3 | outline Sun 10-11, voice Sun 10-18 | todo |
 | V11 | Feedback: Sandboxes and Tavily ✍ | non-tech | 1.5 | Fri 10-23 | todo |
-| V12 | Judging self-review | non-tech | 2 | Tue 10-20 and Fri 10-23 | dry run 10-10; scored review 1 on 10-22 (27 of 40, two days late); review 2 Fri 10-23 |
 | A1 | Contracts | tech | 2 | Fri 10-09 | done 10-06 |
 | A2 | Secrets into forks | tech | 2 | Sat 10-10 | done 10-06 |
 | A3 | LLM demo target | tech | 6 | shortlist Fri 10-09, done Sat 10-17 | live 10-10 on the local backend, recorded (PR #1); Sandboxes recording after V1 |
@@ -35,7 +34,6 @@ Every task below is written so either builder can pick it up cold: why it exists
 | A5 | Report and UI v2 | tech | 5 | Sat 10-17 | schema 2 and panels done 10-07; palette and logo wait on V9 |
 | A6 | Hosted demo | tech | 4 | live Sun 10-11, final Sat 10-17 | live 10-16: https://loadbearing-demo.vercel.app, redeploys on every sync of the fork |
 | A7 | CI and clean-clone check | tech | 2 | Sun 10-18 | done 10-08 |
-| A8 | Field scan | non-tech | 2 | Tue 10-13 | done 10-09 |
 | A9 | Video production | non-tech | 5 | uploaded Wed 10-21 | storyboard drafted 10-10, kept outside the repo; recording after the live run |
 | A10 | Devpost page ✍ | non-tech | 3 | draft Tue 10-20, final Fri 10-23 | todo |
 | A11 | Feedback: Token Factory and Nemotron ✍ | non-tech | 1.5 | Fri 10-23 | todo |
@@ -43,7 +41,7 @@ Every task below is written so either builder can pick it up cold: why it exists
 | A13 | Benchmark: detection on planted bugs against two baselines | tech | 4 | Sat 10-17 | done 10-10: offline and against Nemotron Super reading the code |
 | A14 | GitHub Action: run a probe in any repo's CI | tech | 2 | Tue 10-13 | done 10-09 |
 
-V = Varunika, A = Aeshvarya. One point is roughly one focused hour; the points are estimates for balance, not promises. ✍ marks text that judges read as ours: its final words are the owner's own.
+V = Varunika, A = Aeshvarya. One point is roughly one focused hour; the points are estimates for balance, not promises. ✍ marks text that is published as ours: its final words are the owner's own.
 
 ## Rules
 
@@ -54,7 +52,7 @@ V = Varunika, A = Aeshvarya. One point is roughly one focused hour; the points a
 5. **Contracts C1 to C7 are frozen from Sun 2026-10-11.** Changing one needs the other builder's OK in PROGRESS.md first.
 6. **Tests run offline:** no network, no keys. Live calls sit behind CLI flags, and tests use the fakes in `tests/fakes.py`.
 7. **Secrets never land** in the repo, a checkpoint, a report, or a log.
-8. **Feature freeze Fri 2026-10-23.** After that, only fixes. No pushes to `main` between the deadline and the results, so judges see what was submitted.
+8. **Feature freeze Fri 2026-10-23.** After that, only fixes. No pushes to `main` between the deadline and the results, so `main` stays what was submitted.
 
 ## Ownership
 
@@ -158,11 +156,11 @@ Every function behind a flag must also be callable without the CLI, so it can be
 
 ### V1 · Sandboxes live run · tech · 4 pts · Sat 10-10: prep before 11:00, live run from 12:00
 
-**Why.** Everything accepted on 2026-10-06 depends on the Sandboxes path, and it has never run once. It is also the core evidence for Technological Implementation.
+**Why.** Everything accepted on 2026-10-06 depends on the Sandboxes path, and it has never run once. It is also the core evidence that the product runs on Nebius.
 **Owns.** Your local `.env` (never committed). May fix `backends/contree.py` on the spot.
 **Needs.** Nothing.
 **Steps.**
-1. Claim the hackathon credit (the promo form, activation code `NEBIUS-DEVPOST-GLOBAL26`) and the Builders Program credit. Note both balances.
+1. Claim the hackathon credit (the promo form) and the Builders Program credit. Note both balances.
 2. `pip install -e '.[sandbox]'`, then put `NEBIUS_API_KEY` and `NEBIUS_PROJECT_ID` in `.env`. Or install the CLI (`uv tool install contree-cli`) and run `contree auth`: it saves a profile the SDK also reads. Note the CLI calls the project variable `NEBIUS_AI_PROJECT`; the SDK calls it `NEBIUS_PROJECT_ID`.
 3. Create a Token Factory key, put `NEBIUS_API_KEY` in `.env`, run `loadbearing models`, and paste the Nano, Super and Ultra IDs into `.env`.
 4. `loadbearing probe examples/ticket_triage/target.json --backend sandbox`, then again with `--nano`.
@@ -174,7 +172,7 @@ Every function behind a flag must also be callable without the CLI, so it can be
 
 ### V2 · Nemotron layer verified · tech · 6 pts · Sun 10-11
 
-**Why.** Routing by job (Nano per fork, Super per field, Ultra for the why) is the NVIDIA half of Technological Implementation, and none of it has run live.
+**Why.** Routing by job (Nano per fork, Super per field, Ultra for the why) is how the product uses NVIDIA's models, and none of it has run live.
 **Owns.** `nemotron.py`, `tests/fakes.py`, `tests/test_nemotron.py`, `tests/fixtures/diffs.json`, `scripts/eval_nano.py`, the judging step in `probe.py`, and `FieldVerdict.reconciliation` and `.explanation`.
 **Needs.** V1 (model IDs).
 **Steps.**
@@ -204,7 +202,7 @@ Every function behind a flag must also be callable without the CLI, so it can be
 
 ### V4 · Tavily intent inference · tech · 5 pts · part 1 Fri 10-16, part 2 Sat 10-17
 
-**Why.** The $3,000 Tavily prize needs a runtime call that does real work. This one decides which undeclared fields should matter, so they can carry a defect claim too.
+**Why.** Tavily has to do real work at run time. This one decides which undeclared fields should matter, so they can carry a defect claim too.
 **Owns.** `intent.py`, `tavily.py`, `Evidence`, `FieldVerdict.intent_source` and `.evidence`, `tests/test_intent.py`.
 **Needs.** A1 (`docs`), A3 (the LLM target's `docs`), V2.
 **Steps.**
@@ -246,7 +244,7 @@ Every function behind a flag must also be callable without the CLI, so it can be
 
 ### V7 · Prior art and evidence · non-tech · 3 pts · Tue 10-20
 
-**Why.** Quality of the Idea asks whether the team "shows genuine understanding of the problem space". Naming the right prior work, and saying exactly how Loadbearing differs, is that evidence.
+**Why.** Naming the right prior work, and saying exactly how Loadbearing differs, is that evidence.
 **Owns.** `docs/prior-art.md` and the README prior-art section.
 **Steps.**
 1. Leads to verify. Open each source yourself before citing it:
@@ -255,14 +253,14 @@ Every function behind a flag must also be callable without the CLI, so it can be
    - input ablation
    - how LLMs use or ignore their context: Liu et al., "Lost in the Middle", TACL (2024)
 2. For each, one line on what it does and one on how Loadbearing differs: it mutates inputs, not code; one field at a time from a byte-identical checkpoint; a defect claim tied to declared or sourced intent; and a fix that is proven, not suggested.
-3. Three documented real cases of a pipeline silently ignoring an input, each with a source. These feed Potential Impact.
+3. Three documented real cases of a pipeline silently ignoring an input, each with a source. They show the problem is real.
 
 **Done when.** Every claim links a source you opened, and the README section is at most five lines with a link to the full page.
 **Hands to.** V8, V10, A10.
 
 ### V8 · README narrative ✍ · non-tech · 3 pts · Sun 10-18
 
-**Why.** The README is the first thing a judge opens.
+**Why.** The README is the first thing a reader opens.
 **Owns.** README top pitch, "Why it matters", prior art (from V7), team.
 **Steps.**
 1. Top: the problem in three sentences, using the LLM demo target's real defect as the example.
@@ -276,7 +274,7 @@ Every function behind a flag must also be callable without the CLI, so it can be
 
 ### V9 · Visual identity · non-tech · 4 pts · palette Sat 10-10, the rest Tue 10-20
 
-**Why.** Design is 25% of the score, and hand-drawn originals stand out against template graphics.
+**Why.** Hand-drawn originals stand out against template graphics.
 **Owns.** `assets/`.
 **Steps.**
 1. Sat 10-10: a palette of five colours with hex values, readable in light and dark, handed to A5.
@@ -307,17 +305,10 @@ Every function behind a flag must also be callable without the CLI, so it can be
 
 ### V11 · Feedback: Sandboxes and Tavily ✍ · non-tech · 1.5 pts · draft Tue 10-20, final Fri 10-23
 
-**Why.** Most Valuable Feedback pays ten winners, and specific, reproducible feedback is what wins it.
+**Why.** Specific, reproducible feedback is what Nebius can act on.
 **Owns.** `docs/feedback/sandboxes-tavily.md`.
 **Steps.** Keep notes during V1 and V4: exact errors, confusing docs, missing features, and what was excellent. In the final version, give every point steps to reproduce and a concrete suggestion.
 **Done when.** The final file is merged, and A12 knows where it gets submitted.
-
-### V12 · Judging self-review · non-tech · 2 pts · Tue 10-20 and Fri 10-23
-
-**Why.** Find and fix the weakest criterion while there is still time.
-**Owns.** Two review entries in the Log.
-**Steps.** Score each of the four criteria from 1 to 10 against the evidence a judge would actually see, cross-check A12's Stage One checklist, and list the top three gaps with an owner for each.
-**Done when.** Both reviews are logged and every gap has an owner.
 
 ## Aeshvarya's tasks
 
@@ -350,11 +341,11 @@ Every function behind a flag must also be callable without the CLI, so it can be
 
 ### A3 · LLM demo target · tech · 6 pts · shortlist Fri 10-09, local Tue 10-13, on Sandboxes Sat 10-17
 
-**Why.** The demo target carries Design and Potential Impact. Decided 2026-10-06: an LLM pipeline on Nemotron.
+**Why.** The demo target is what shows the product working. Decided 2026-10-06: an LLM pipeline on Nemotron.
 **Owns.** `examples/<target>/`.
 **Needs.** A2, V3. V1 for the Sandboxes run. Your own Token Factory key, credits and project ID in `.env`, claimed the same way as V1 steps 1 to 3, so your runs bill to your account.
 **Steps.**
-1. Fri 10-09: post three candidates under Open questions in PROGRESS.md, each with its planted defect and why a judge would recognise it. Shapes worth considering:
+1. Fri 10-09: post three candidates under Open questions in PROGRESS.md, each with its planted defect and why a reader would recognise it. Shapes worth considering:
    - a retrieval answerer whose prompt template reads the retrieved passage under the wrong key, so it answers fluently from the model's priors
    - a tool-calling step whose tool result field was renamed, so the model fills the value in itself
    - a summariser whose instructions field never reaches the prompt
@@ -382,7 +373,7 @@ Every function behind a flag must also be callable without the CLI, so it can be
 
 ### A5 · Report and UI v2 · tech · 5 pts · Sat 10-17
 
-**Why.** Design is 25% of the score, and the report is what judges look at in the demo and the video.
+**Why.** The report is what people look at in the demo and the video.
 **Owns.** `report.py` (schema 2), `html_report.py`, the `serve.py` pages.
 **Needs.** C5. V9's palette (Sat 10-10) and logo.
 **Steps.**
@@ -394,15 +385,15 @@ Every function behind a flag must also be callable without the CLI, so it can be
 **Done when.** The LLM target's full report (probe, evidence, fix, proof) reads clearly on a laptop and on a phone.
 **Hands to.** A6, A9, V8.
 
-### A6 · Hosted demo · tech · 4 pts · live Sun 10-11, final Sat 10-17, up through judging
+### A6 · Hosted demo · tech · 4 pts · live Sun 10-11, final Sat 10-17, kept live after submission
 
-**Why.** A hard deliverable. It has to work for a judge who clicks through from Devpost.
+**Why.** A hard deliverable. It has to work for anyone who clicks through from the project page.
 **Owns.** Hosting, deploys, uptime.
 **Needs.** A3 and A5 for the final version.
 **Steps.**
 1. Pick the host (Render, Fly or Railway) and deploy the Dockerfile with the toy target on the local backend. Live by 10-11, URL in PROGRESS.md. If connecting the host to the repo needs owner approval, ask Varunika.
 2. 10-17: add the recorded Sandboxes runs of the LLM target and serve with `--readonly`, so visits never spend credits.
-3. A health check. Make sure a free tier does not sleep through a judge's visit.
+3. A health check. Make sure a free tier does not sleep through a visitor's.
 4. Check it logged out on 10-18, 10-23 and 10-25.
 
 **Done when.** The URL works logged out and shows the LLM target's full report.
@@ -420,13 +411,6 @@ Every function behind a flag must also be callable without the CLI, so it can be
 **Done when.** CI is green on `main`, and the clean-clone job passes.
 **Hands to.** V6 (the audit runs after this), A12.
 
-### A8 · Field scan · non-tech · 2 pts · Tue 10-13
-
-**Why.** It confirms nobody else is building Loadbearing, and sharpens how we describe the difference. Read only: nothing is copied, because the rules require original work.
-**Owns.** Private notes, kept outside this repo since it goes public, plus one Decisions line with the conclusion.
-**Steps.** Look through public GitHub repos and any visible Devpost entries for this hackathon. For each relevant one, note what it does, its track, its overlap with us, and whether it uses Tavily.
-**Done when.** The Decisions line is in, and anything that changes our framing is flagged to V8 and A10.
-
 ### A9 · Video production · non-tech · 5 pts · storyboard Mon 10-12, recordings Sat 10-17, uploaded Wed 10-21
 
 **Why.** A hard deliverable, and historically the one most often dropped.
@@ -443,7 +427,7 @@ Every function behind a flag must also be callable without the CLI, so it can be
 
 ### A10 · Devpost page ✍ · non-tech · 3 pts · draft Tue 10-20, final Fri 10-23
 
-**Why.** It is what judges read alongside the video.
+**Why.** It is what people read alongside the video.
 **Owns.** The Devpost project page.
 **Steps.**
 1. By Sun 10-11: confirm both builders are on the Devpost project team.
@@ -462,7 +446,7 @@ Every function behind a flag must also be callable without the CLI, so it can be
 
 ### A12 · Compliance and submission · non-tech · 2 pts · checklist Tue 10-20, submit Sun 10-25
 
-**Why.** Stage One is pass or fail, and one missing item kills the entry.
+**Why.** Every requirement is pass or fail, and one missing item kills the entry.
 **Owns.** The checklist (in PROGRESS.md) and the final Devpost submit.
 **Steps.**
 1. A checklist from the official rules: Token Factory or AI Cloud used; an NVIDIA open model used; the repo public with an OSS licence; the demo URL works; the video is public, 3:00 or less, with audio covering Token Factory and the model; the track chosen; the team listed.
@@ -487,12 +471,12 @@ Every kind of work has one owner on each side:
 | Engine | V3 noise floor | A1 contracts, A2 secrets into forks |
 | Closing the loop | V5 fix writer | A4 fix and prove |
 | Quality and safety | V6 pre-public audit | A7 CI and clean clone |
-| What judges look at | V9 visual identity | A5 report and UI |
-| Judged writing | V8 README narrative | A10 Devpost page |
+| What people look at | V9 visual identity | A5 report and UI |
+| Published writing | V8 README narrative | A10 project page |
 | Video | V10 script and voice | A9 production |
-| Research | V7 prior art | A8 field scan |
-| Feedback prize | V11 | A11 |
-| Final checks | V12 self-review | A12 compliance and submission |
+| Research | V7 prior art | |
+| Feedback | V11 | A11 |
+| Final checks | | A12 compliance and submission |
 
 ## Timeline
 
@@ -506,16 +490,16 @@ Varunika's build days are weekends, Friday evenings from 10-16, Mon 10-19 evenin
 | Sat 10-10 | V1 prep and the V5 `Fix` contract (before 11:00). V1 live run (from 12:00). V3 noise floor (afternoon). V9 palette (evening) | A2 secrets into forks. A3 build starts | By 13:00: Varunika picks the LLM target |
 | Sun 10-11 | V2 Nemotron layer. V10 outline | A6 demo live with the toy target. Devpost team confirmed | **Contracts frozen** |
 | Mon 10-12 | | A9 storyboard. A4 on the toy target | |
-| Tue 10-13 | | A3 runs locally. A4 on the toy target done. A8 field scan | |
+| Tue 10-13 | | A3 runs locally. A4 on the toy target done | |
 | Wed 10-14 to Thu 10-15 | | A5 report v2 against fixtures | |
 | Fri 10-16 | V4 part 1. V5 on the toy target | A4 on Sandboxes. A5 | |
 | Sat 10-17 | V4 part 2. V5 on the LLM target | A3 on Sandboxes. A5 palette and logo. A6 recorded runs. A9 screen recordings | **Loop closed on the LLM target, on Sandboxes** |
 | Sun 10-18 | V6 audit, then the public flip. V8 README narrative. V10 narration | A7 CI and clean clone, before the audit | **Repo public** |
 | Mon 10-19 | V9 logo and diagram (evening). V10 caption check | A9 edit | |
-| Tue 10-20 | V9 finished. V7 prior art. V11 draft. V12 review 1 | A9 edit. A10 draft. A12 checklist | Review 1 gaps assigned |
+| Tue 10-20 | V9 finished. V7 prior art. V11 draft | A9 edit. A10 draft. A12 checklist | |
 | Wed 10-21 | | A9 video uploaded | |
 | Thu 10-22 | | Fixes from review 1 | |
-| Fri 10-23 | V11 final. V12 review 2 | A10 final. A11 final | **Feature freeze** |
+| Fri 10-23 | V11 final | A10 final. A11 final | **Feature freeze** |
 | Sat 10-24 | Not available | Buffer | |
 | Sun 10-25 | Every link checked logged out | A12 submits | **Submitted** |
 | Mon 10-26 to Thu 10-29 | Buffer | Demo uptime | Fixes only |
@@ -523,23 +507,11 @@ Varunika's build days are weekends, Friday evenings from 10-16, Mon 10-19 evenin
 
 Two dates differ from the original deliverables list, on purpose: the video moves to Wed 10-21 because it has to show the loop closed on 10-17, and the feedback is final on Fri 10-23, two days earlier than needed.
 
-## What each judging criterion sees
-
-| Criterion | What a judge sees | Tasks |
-|---|---|---|
-| Technological Implementation (25%) | Live Sandboxes numbers, the Nemotron routing working, tests and CI, a fix proven from the same checkpoint | V1, V2, V3, V5, A2, A4, A7 |
-| Design (25%) | The report and the demo, the hand-drawn identity, the video | V9, A5, A6, A9 |
-| Potential Impact (25%) | A realistic LLM pipeline failing silently, real cases with sources | A3, V7, V8, A10 |
-| Quality of the Idea (25%) | Find, explain, fix, prove on one checkpoint primitive; intent drawn from sources; the prior art and how this differs | V4, V5, A4, V7, SPEC.md |
-| Stage One (pass or fail) | Every requirement met | A12 |
-| Best Use of Tavily ($3,000) | A runtime call that decides intent, with quotes and links | V4, shown in A5 and A9 |
-| Most Valuable Feedback | Two specific, reproducible feedback files | V11, A11 |
-
 ## Risks
 
 | Risk | Early signal | Response |
 |---|---|---|
-| Sandboxes fails live | V1 not done by Sat 10-10 evening | Fix in `contree.py`; Builders Program office hours. Stage One still passes on Token Factory inference with Nemotron, and the local backend keeps the demo alive while it is fixed |
+| Sandboxes fails live | V1 not done by Sat 10-10 evening | Fix in `contree.py`; Builders Program office hours. the requirements are still met on Token Factory inference with Nemotron, and the local backend keeps the demo alive while it is fixed |
 | The LLM target is too noisy | V3 marks most of its keys unstable | Temperature 0, structured JSON output, fewer free-text fields, `baseline_runs` up to 8 |
 | Credits run out | Balances logged in V1 | Read-only demo on recorded runs, cached Tavily results, a per-run budget |
 | Sat 10-17 slips | Loop not closed by Saturday night | The cut order below |

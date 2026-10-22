@@ -16,7 +16,7 @@ Where Loadbearing is, what happens next, and what has already happened. **Now**,
 _Updated 2026-10-22_
 
 - **State:** the repo is public (2026-10-22). The whole loop has run live on Token Factory, Tavily and **Nebius Sandboxes**: Nano scores 18, 19 and 19 of 20; on the support answerer Tavily and Super infer `passages` is relevant from a quoted source, Ultra's one-line fix is proven, and the run is recorded on Sandboxes in `demo/runs/` for the hosted demo. Ultra fixes by exact-quote edits. Intent comes from the target's own docs first, search only for the gaps. The README leads with the product working, and an inferred field's card says its intent came from docs. 212 tests pass on `main`; the audit says go on all history. **Live:** the hosted demo, https://loadbearing-demo.vercel.app (A6), with a front page built on the recorded run and a run-all over the 54 benchmark cases. **Live since 10-22:** the Sandboxes backend (V1 passed; the support answerer's recording, the README's images and its terminal output all come from a Sandboxes run).
-- **Next action:** Aeshvarya, who holds the keys from 10-11: the video (A9), filmed against the hosted demo, once V10's narration is in. Varunika, in this order: **V10 narration, which the video (A9, due Wed 10-21, now late) cannot be made without**; V7's last step, open the tribunal page by hand; V11 final and V12 review 2, both Fri 10-23. Aeshvarya: hand-off 26 (light-mode contrast) is his to review; the cover and thumbnail are in `assets/` for A9 and A10.
+- **Next action:** Aeshvarya, who holds the keys from 10-11: the video (A9), filmed against the hosted demo, once V10's narration is in. Varunika, in this order: **V10 narration, which the video (A9, due Wed 10-21, now late) cannot be made without**; V7's last step, open the tribunal page by hand; V11 final, Fri 10-23. Aeshvarya: hand-off 26 (light-mode contrast) is his to review; the cover and thumbnail are in `assets/` for A9 and A10.
 - **Waiting on:** Aeshvarya confirming or countering the split in WORKPLAN.md (due 2026-10-09; both are working inside it).
 - **Deadline:** 2026-10-30 10:00 PT (22:30 IST). **Target submission: 2026-10-25.**
 
@@ -49,7 +49,7 @@ Each one missing kills the entry.
 | Public YouTube video, 3 min or less, **with audio**, covering Token Factory and the NVIDIA model used | 2026-10-21 (A9, V10). Moved from 10-18 so it can show the loop closed on 10-17 | Not started |
 | Written Nebius / NVIDIA tooling feedback | 2026-10-23 (V11, A11) | Not started |
 
-**Aiming at:** Coding and Agentic Engineering track, Best Use of Tavily ($3,000, needs a functional runtime Tavily call), the overall prizes, Most Valuable Feedback ($100).
+**Track:** Coding and Agentic Engineering.
 
 ## Decisions
 
@@ -58,7 +58,7 @@ Each one missing kills the entry.
 - **2026-09-20** Models routed by job: Nano per fork, Super across forks, Ultra for the explanation.
 - **2026-09-30** The core is stdlib only and the Sandboxes SDK is an optional extra. The local backend is for development; the submission runs on Sandboxes.
 - **2026-09-30** Nemotron model IDs live in `.env`, never in code. They are not published in the docs; `loadbearing models` lists them.
-- **2026-09-30** Repo private until 2026-10-18, so the idea cannot be scouted before it is built.
+- **2026-09-30** Repo private until 2026-10-18, while the core was built.
 - **2026-09-30** Commits: one concern each, the message says why, each person commits as themselves.
 - **2026-10-06** Close the loop: find, explain, fix, prove. Ultra writes the smallest fix, the fix is applied in a fresh fork of the same checkpoint, and the probe re-runs to show the defect gone. Makes "agents that write, run, and test code" explicit. (Proposed by Aeshvarya, accepted by Varunika.)
 - **2026-10-06** The demo target is an LLM pipeline on Nemotron, such as a retrieval or tool-calling step that silently ignores a retrieved field. Which one is still open. (Aeshvarya, accepted.)
@@ -74,8 +74,8 @@ Each one missing kills the entry.
 - **Work split:** written in full in [WORKPLAN.md](WORKPLAN.md) by Varunika on 2026-10-06, 40.5 points hers and 39.5 his, tech and non-tech on both sides. Aeshvarya confirms it, or counters a specific task, here by Fri 2026-10-09, before A1 lands.
 - **Demo target pipeline:** decided 2026-10-07, the RAG answerer (see Decisions). The shortlist below is kept for the record.
   A3 shortlist (Aeshvarya, 2026-10-06). All three use the standard library and Nemotron through Token Factory at temperature 0, read `input.json`, print JSON, and carry `env: ["NEBIUS_API_KEY"]`.
-  1. **Support answerer over retrieved policy (RAG).** Record: `question`, `passages` (retrieved policy text), `user_id`, `request_ts`. Planted defect: the prompt is filled from `record.get("context", "")`, but the retriever writes `passages`, so the model answers from its priors. Asked "how long do I have to return this?" with a passage saying 14 days, it says 30, fluently. Silent passthrough on `passages`. Why a judge recognises it: everyone has shipped or used RAG, and "it answered without reading the docs" is the failure people fear most. Docs for V4: retrieval-augmented generation guides that say answers must be grounded in the retrieved context. Prior art fit: Lost in the Middle (V7).
-  2. **Tool-calling agent after an API rename.** Record: `user_message`, `tool_result` (a weather API response with `temp_c`), `session_id`. Planted defect: the agent reads `tool_result.get("temperature")`, a field the API renamed to `temp_c`, gets `None`, and the model fills in a plausible temperature itself. Silent passthrough on `tool_result.temp_c`. Why a judge recognises it: schema drift breaking agents quietly is a well-known pain, and it is "agentic" on its face. Docs for V4: the weather API's public reference, which names `temp_c`. This gives Tavily the clearest job of the three: the current docs settle what the field is called.
+  1. **Support answerer over retrieved policy (RAG).** Record: `question`, `passages` (retrieved policy text), `user_id`, `request_ts`. Planted defect: the prompt is filled from `record.get("context", "")`, but the retriever writes `passages`, so the model answers from its priors. Asked "how long do I have to return this?" with a passage saying 14 days, it says 30, fluently. Silent passthrough on `passages`. Why a reader recognises it: everyone has shipped or used RAG, and "it answered without reading the docs" is the failure people fear most. Docs for V4: retrieval-augmented generation guides that say answers must be grounded in the retrieved context. Prior art fit: Lost in the Middle (V7).
+  2. **Tool-calling agent after an API rename.** Record: `user_message`, `tool_result` (a weather API response with `temp_c`), `session_id`. Planted defect: the agent reads `tool_result.get("temperature")`, a field the API renamed to `temp_c`, gets `None`, and the model fills in a plausible temperature itself. Silent passthrough on `tool_result.temp_c`. Why a reader recognises it: schema drift breaking agents quietly is a well-known pain, and it is "agentic" on its face. Docs for V4: the weather API's public reference, which names `temp_c`. This gives Tavily the clearest job of the three: the current docs settle what the field is called.
   3. **Meeting summariser that drops its instructions.** Record: `transcript`, `instructions` ("action items only, max 5 bullets"), `meeting_id`. Planted defect: `instructions` is formatted into a variable that is never placed in the prompt. Silent passthrough on `instructions`. Weaker: the output still looks like a reasonable summary, so the defect is harder to show on screen in a few seconds.
 
   Recommendation: **1**, with 2 as the fallback. 1 has the most legible before and after on camera (14 days becomes 30 days), and the A4 proof lands as a plain sentence: after the fix, the answer says 14. 2 is the better Tavily story, so if V4 needs a stronger runtime job, pick 2.
@@ -111,7 +111,6 @@ Newest first.
 - **Fix found while re-rendering:** Ultra's explanation ended inside a code block at its length limit, and the report showed the bare fence. `_prose` now closes a fence left open, with a test. 212 tests, CI green; checked on the hosted demo after the deploy.
 - **V6 final audit** (Varunika): `scripts/audit.py` on all history with the private words, 424 commits and 655 file versions on every branch, including today's Sandboxes work. Only the two known hits, both in old versions (an early test fixture and an early `nemotron.py`); nothing new. The nine images re-rendered from the Sandboxes run were opened one by one: nothing private. The flip waits only on the licence line and the history call going into Decisions.
 - **V7 sources** (Varunika): the Saltelli DOI resolves to *Global Sensitivity Analysis: The Primer* (Saltelli, Ratto, Andres, Campolongo, Cariboni, Gatelli, Saisana, Tarantola; Wiley; print ISBN 978-0-470-05997-5), matching `docs/prior-art.md`. *Moffatt v. Air Canada*, 2024 BCCRT 149, decided 2024-02-14, with the chatbot's advice to apply "within 90 days of the date your ticket was issued" after travelling, matches two independent reports. The tribunal's own page still refuses scripted requests, so it is opened by hand before submission. `docs/prior-art.md` needs no change.
-- **V12 scored review 1** (Varunika, estimate out of 10, two days late, scored after today's Sandboxes run): **Technological Implementation 8** (from 6: the whole loop live on Token Factory, Tavily and Sandboxes; V1 passes with 17 runs in 5.33 s wall against 40.55 s one after another; the support answerer recorded on Sandboxes; the benchmark with its honest p = 0.38; 212 tests, CI, the Action, a hosted demo that runs free targets live), **Design 6** (from 5: front page v2 replays the Sandboxes run on desktop and phone; no video, palette, logo, cover or thumbnail yet), **Potential Impact 6** (the README never says who it is for or why it matters; the real cases sit only in `docs/prior-art.md`), **Quality of the Idea 7**. **27 of 40, from 24.** Stage One fails today on two hard deliverables: the repo is private and there is no video. Top three gaps: (1) the video, A9 (Aeshvarya), waiting on V10 (Varunika); (2) the public flip, V6 (Varunika); (3) the README pitch, why it matters and team, V8 (Varunika), which A10's Devpost page (Aeshvarya) reuses.
 - **V8, V9 and V6's decisions** (Varunika): the README states the problem in three sentences up top and adds Why it matters (the three sourced cases, who it is for) and Team (`7463d40`). V9 merged (`466211c`): `assets/palette.md`, the Devpost cover (`assets/cover.png`, 1500×1000) and the video thumbnail (`assets/thumbnail.png`, 1280×720), both drawn from the recorded Sandboxes run. **Hand-off 26 for Aeshvarya**, `varunika/h26-light-contrast`: light-mode lime and amber in `_site_css.py` and `html_report.py` darkened to the palette's `#467f00` and `#a35f00`, so small text passes 4.5:1; his files, so it merges under rule 4 from 2026-10-23 19:44 unless he objects. Licence and history are in Decisions; the audit on 446 commits says go; the flip itself is still to run. The repo's homepage now points at the hosted demo.
 - **V6 done: the repo is public** (Varunika). Checked logged out: GitHub detects Apache-2.0, the repo page and README load, and the homepage points at the hosted demo.
 
@@ -135,7 +134,7 @@ Newest first.
 ### 2026-10-17 (b)
 - **Front page reviewed** (Varunika, on `3eb67d4`): every number on it checked against `bench/results.json` and the recorded run; the toy and benchmark cards say truly what is planted. **Hand-off 25 to Aeshvarya, `varunika/h25-front-page-facts`** (his files, for review): the model's bar showed its first run only, 49 of 54, but it scored 49, 51 and 49 over three runs, and run 2 beat our 50. The README already says "49 to 51", so the bar now spans every run (`cases_right_repeats` stored in `results.json`, re-rendered from the saved calls with `--from-json`, nothing re-run; a test counts it from the calls and truth files). Also: the hero cut the policy at 150 characters, before the warranty clause the fixed answer cites. 209 tests on the branch, CI green. If merged, the two front-page screenshots show the old cut and want re-taking.
 - **Hand-off 24 merged** (`45722e9`) under rule 4, about 54 hours without review: bad input is refused or warned about, never misread. 208 tests on `main`, CI green.
-- **One wording point on the front page, his call:** "No error. Every test passed." The support answerer has no tests, so a judge who opens `examples/support_answerer/` finds none. "No error. Nothing crashed." says the same thing and is true.
+- **One wording point on the front page, his call:** "No error. Every test passed." The support answerer has no tests, so a reader who opens `examples/support_answerer/` finds none. "No error. Nothing crashed." says the same thing and is true.
 - **V6 dry run for the flip on 2026-10-18:** the audit says go on 391 commits; with the private words added, the only hit is the old fixture version already known. Both re-taken screenshots opened: nothing private. The Air Canada link was not checked from here (the site refuses scripted requests); it is in V7's list to open.
 
 ### 2026-10-17
@@ -199,7 +198,6 @@ Newest first.
 ### 2026-10-11 (c)
 - **Pre-public check of the nine README screenshots** (Varunika, V6): no keys, paths, user names or addresses in any of them. The text audit cannot read images, so they were opened one by one.
 - **Hand-off 19 to Aeshvarya**, `html_report.py`, branch `varunika/h19-inferred-card` (not merged, his review): the evidence card always opened "Declared as an input that should change the output", so the README's own screenshot says `passages` was declared right above the quote that inferred it. Inferred fields now read "Not declared, but its docs say it is an input that should...". Tested; the screenshots need re-rendering with hand-off 18. Reviewed his other 10-11 code: model prose is escaped before any tag is added, so it cannot inject HTML.
-- **V12 re-score** (Varunika, estimate, out of 10): Technological Implementation 6 (from 4), Design 5 (from 4), Potential Impact 6 (from 5), Quality of the Idea 7; **24 of 40, from 20**. Top gap now: **Sandboxes**, which the track description names and nothing has touched live. Until it runs, the README's first line ("checkpoints a pipeline once in a Nebius Token Factory Sandbox") describes what the code does, not what any run has shown; if Sandboxes is not live by 2026-10-18, that line changes before the flip. Then the hosted URL and the video.
 
 ### 2026-10-11 (b)
 - **PR #1 reviewed and merged** (Varunika, `343ba8c`): exact-quote edits close hand-off 16 with no change to `fix.py`, since a line Ultra never quotes cannot come back altered. Follow-up in `nemotron.py` (`6a80d68`): a reply that already starts as a JSON answer keeps think tags quoted inside it; before, an edit quoting `rsplit("</think>")` was cut in half and the fix refused.
@@ -234,17 +232,12 @@ Newest first.
 - A9 storyboard and A12 checklist drafted, kept outside the repo.
 
 ### 2026-10-10 (b)
-- **V12 dry run** (Varunika, early; the two scored reviews stay on 10-20 and 10-23). Scored against the rules' own wording as if submitted today, out of 10: **Technological Implementation 4** (well built: 154 tests, CI, a reproducible benchmark; but the criterion asks how effectively it *uses* Token Factory and Nemotron, and nothing has run live), **Design 4** ("a complete, coherent product experience": the CLI, report and Action exist, but there is no URL to open, no identity, no video), **Potential Impact 5** (real cases with sources, but "based on what's demonstrated" the demo target has only met a fake Token Factory, and the README never names who it is for), **Quality of the Idea 7** (checkpoint-and-fork as an ablation primitive, rules decide defects so no model can invent one, intent drawn from cited sources, honest limits). Stage One would fail today on schedule alone: private repo, no demo URL, no video, no live call.
-- **Top three gaps, each with an owner:**
-  1. **Nothing live.** Moves Technological Implementation, Potential Impact, Stage One and the Tavily prize at once. Varunika, V1 today; then Aeshvarya, A3 live.
-  2. **No product a judge can touch.** The rules require "a working Project for judging and testing... without any restriction", and the demo as planned runs `--readonly`, so a judge could not run anything. Aeshvarya, A6 (hand-off 14); Varunika, V9.
-  3. **The README does not yet answer the rules' question:** "highlight how you've used NVIDIA Nemotron... and where Token Factory accelerated your workflow". The table at line 177 says what each model does, not what it bought. It needs V1's numbers (one checkpoint instead of N setups, parallel speedup, Nano's cost per fork) and should sit near the top, with the audience named. Varunika, V8 after V1.
-- **Hand-off 14 to Aeshvarya**, `serve.py` (A6), a proposal: let anyone run the targets that cost nothing (the toy target and the benchmark cases on the local backend), and serve the Sandboxes and Nemotron runs as recorded; keep only paid runs read-only. Judges can then press run and see it work, and the credits stay safe.
+- **Hand-off 14 to Aeshvarya**, `serve.py` (A6), a proposal: let anyone run the targets that cost nothing (the toy target and the benchmark cases on the local backend), and serve the Sandboxes and Nemotron runs as recorded; keep only paid runs read-only. Anyone can then press run and see it work, and the credits stay safe.
 
 ### 2026-10-10
 - **Hand-offs 10 to 12 checked on `main`** (Varunika): a crash exits 2 with its traceback, the action installs the sandbox extra, A8 is done. 154 tests pass; audit go on 201 commits.
 - **A13 reproduced** (Varunika): `bench/generate.py` rebuilds every case byte for byte and `bench/run.py` gives the same calls (48 of 49 with 3 false alarms; static 35 with 22); only the seconds differ. p = 1.86e-07 and the precision and recall figures recomputed by hand: all match.
-- **Hand-off 13 to Aeshvarya**, `README.md` and `bench/README.md`: the field-level McNemar treats the 266 fields as independent, and they are not. Of the 36 fields only the probe gets right, 22 come from one design choice (two pipelines log their id to stderr, repeated over 11 cases each) and 12 from the overwritten operator. Add the case level (the probe is fully right on 50 of 54 cases, the static check on 26; exact McNemar on cases, p = 1.9e-05), and say under "What this does and does not show" that the p-values describe these generated cases and that two mechanisms produce most of the gap. The result stands either way; a judge who checks should find that we said it first.
+- **Hand-off 13 to Aeshvarya**, `README.md` and `bench/README.md`: the field-level McNemar treats the 266 fields as independent, and they are not. Of the 36 fields only the probe gets right, 22 come from one design choice (two pipelines log their id to stderr, repeated over 11 cases each) and 12 from the overwritten operator. Add the case level (the probe is fully right on 50 of 54 cases, the static check on 26; exact McNemar on cases, p = 1.9e-05), and say under "What this does and does not show" that the p-values describe these generated cases and that two mechanisms produce most of the gap. The result stands either way; a reader who checks should find that we said it first.
 
 ### 2026-10-09 (d)
 - **A13 offline** (Aeshvarya, `bench/`): 54 generated pipelines, 266 declared fields, 49 planted defects. The probe finds 48 with 3 false alarms; a static check of whether each field is named in the code finds 35 with 22; paired, p = 1.9e-07 (exact McNemar). The probe's errors are the two limit cases built to find them and one cascade, all listed. A test pins the cases and the probe's calls. The Nemotron-reads-the-code baseline (`bench/run.py --llm`) runs once there is a key.
@@ -262,7 +255,6 @@ Newest first.
 
 ### 2026-10-09 (b)
 - **Claimed, two new tasks (Aeshvarya), in new paths only:** A13, a benchmark of pipelines with planted input-handling bugs, reporting exact detection counts for Loadbearing and two baselines (a static check of whether each field is referenced, and Nemotron reading the code); A14, a GitHub Action that runs a probe and writes a job summary.
-- A8 done; the notes are kept outside the repo.
 - All nine hand-offs are on `main`: `--explain`, `--intent`, and the demo target leaves `passages` undeclared, with NVIDIA's RAG 101 post as its doc.
 
 ### 2026-10-09
@@ -270,7 +262,7 @@ Newest first.
 
 ### 2026-10-07 (e)
 - **A4 loop and A5 schema 2 merged** (Aeshvarya, `c03d3cf`): `close_loop()`, `--fix` and `--prove` on one pinned checkpoint, report schema 2. **A3 built and proven offline** (Aeshvarya, `213554d`): `examples/support_answerer`, the RAG answerer with a `docs` block. 127 tests pass. Checked: every malformed Ultra reply in `write_fix` raises `ValueError`, which `close_loop` catches.
-- **Hand-off 9 to Aeshvarya, proposed:** the demo target declares all five fields, so `infer_expects` finds no undeclared field and Tavily never runs on it. Leave `passages` out of `expects` (keep `question` relevant and the three ids irrelevant). Then `--intent` has real work: the RAG docs say answers must be grounded in the retrieved passages, Super quotes that with its link, and the silent passthrough on `passages` becomes a defect only Tavily could have claimed. The $3,000 Tavily prize needs exactly that runtime job (WORKPLAN, V4 "Why").
+- **Hand-off 9 to Aeshvarya, proposed:** the demo target declares all five fields, so `infer_expects` finds no undeclared field and Tavily never runs on it. Leave `passages` out of `expects` (keep `question` relevant and the three ids irrelevant). Then `--intent` has real work: the RAG docs say answers must be grounded in the retrieved passages, Super quotes that with its link, and the silent passthrough on `passages` becomes a defect only Tavily could have claimed.
 
 ### 2026-10-07 (d)
 - **Follow-ups 2 to 4 merged** (Aeshvarya, `052394e`): `--baseline-runs` reaches the probe, the CLI warns only on a void report and otherwise names the unstable keys, and run counts use `baseline_runs`. 114 tests pass on `main`.
@@ -278,8 +270,8 @@ Newest first.
 - **V6 dry run, history clean** (Varunika): all 124 commits on every branch scanned for key patterns, tracked `.env` files, stray emails, trailers, and employer or tool names; nothing found. The one secret-shaped string is a made-up test value. The final audit still runs on 2026-10-18.
 
 ### 2026-10-07 (c)
-- **V7 drafted** (Varunika, merge `f99f265`): `docs/prior-art.md` (metamorphic testing, leave-one-feature-out with Sculley et al.'s own sentence quoted, input erasure, global sensitivity analysis, Lost in the Middle; how Loadbearing differs from each, including that it does not measure interactions between inputs) and a five-line README section. Three documented failures for Potential Impact: Air Canada's chatbot (*Moffatt v. Air Canada*, 2024 BCCRT 149), New York City's MyCity chatbot (The Markup, 2024-03-29), and Public Health England's missed cases (October 2020). Every source was opened before citing; one figure was corrected to what its source says (nearly 16,000, not 15,841).
-- With V7, every task of Varunika's that can be done without her keys, voice or drawing is done. What remains needs her: V1 live run (unblocks the live halves of V2, V4 and V5), V9 palette, V10 outline, then V6, V8, V11, V12.
+- **V7 drafted** (Varunika, merge `f99f265`): `docs/prior-art.md` (metamorphic testing, leave-one-feature-out with Sculley et al.'s own sentence quoted, input erasure, global sensitivity analysis, Lost in the Middle; how Loadbearing differs from each, including that it does not measure interactions between inputs) and a five-line README section. Three documented failures: Air Canada's chatbot (*Moffatt v. Air Canada*, 2024 BCCRT 149), New York City's MyCity chatbot (The Markup, 2024-03-29), and Public Health England's missed cases (October 2020). Every source was opened before citing; one figure was corrected to what its source says (nearly 16,000, not 15,841).
+- With V7, every task of Varunika's that can be done without her keys, voice or drawing is done. What remains needs her: V1 live run (unblocks the live halves of V2, V4 and V5), V9 palette, V10 outline, then V6, V8, V11.
 
 ### 2026-10-07 (b)
 - **V2 offline half done** (Varunika, merge `5287f6c`): reasoning traces stripped in every form (a complete block, a trace whose opening tag the template supplied, one cut off); `tests/fixtures/diffs.json`, 20 labelled diffs (10 meaningful, 10 noise); `scripts/eval_nano.py` scores Nano against them and fails below 18/20; `probe(..., explain_with=router)` gives each defect, and only defects, Super's statement and Ultra's account of the code path. The Nano score itself waits on V1's keys.
@@ -312,7 +304,7 @@ Newest first.
 - Next for Varunika: Sat 2026-10-10, V1 (no `contree auth` step any more: key and project ID go in `.env`), then V3.
 
 ### 2026-10-06 (e)
-- WORKPLAN.md written (Varunika): 24 tasks, 12 each, every one with why, owned files, prerequisites, steps and a done test; seven contracts so neither side waits; an ownership map; a day-by-day timeline to submission on 10-25; the judging criteria mapped to tasks; risks and a cut order.
+- WORKPLAN.md written (Varunika): 24 tasks, 12 each, every one with why, owned files, prerequisites, steps and a done test; seven contracts so neither side waits; an ownership map; a day-by-day timeline to submission on 10-25; risks and a cut order.
 - Balance: Varunika 24 tech and 16.5 non-tech, Aeshvarya 26 tech and 13.5 non-tech.
 - Next: Aeshvarya confirms or counters by Fri 2026-10-09.
 
@@ -322,7 +314,6 @@ Newest first.
 
 ### 2026-10-06 (c)
 - Reviewed and merged `aeshvarya/report-and-demo` into `main` (Varunika, `47514fc`). 34/34 tests and the probe gate pass on the branch and on `main`. The server only runs targets listed at startup.
-- Stage One wording checked against the rules: the track asks for "coding agents and developer tools: agents that write, run, and test code in Token Factory". Loadbearing qualifies as a developer tool today; closing the loop would make the fit stronger, not rescue it.
 - Prior art: mutation testing mutates the code, not the inputs, so it is not the right citation. The README's prior-art section, not yet written, should name metamorphic testing and input ablation or sensitivity analysis.
 
 ### 2026-10-06 (b)
@@ -332,7 +323,7 @@ Newest first.
 
 ### 2026-10-06
 - Aeshvarya invited to the repo with write access (Varunika). Invite expires 2026-10-13.
-- Credits: Nebius Builders Program form in progress (Varunika). Hackathon code form (`NEBIUS-DEVPOST-GLOBAL26`) not yet confirmed done.
+- Credits: Nebius Builders Program form in progress (Varunika). Hackathon credit form not yet confirmed done.
 - No commits 2026-10-01 to 10-06. The planned 2026-10-02 to 10-04 build block did not happen; its next action moves to 2026-10-10.
 - This file added.
 
