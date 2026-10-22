@@ -13,11 +13,11 @@ Where Loadbearing is, what happens next, and what has already happened. **Now**,
 
 ## Now
 
-_Updated 2026-10-20_
+_Updated 2026-10-22_
 
-- **State:** the whole loop has run live on Token Factory and Tavily, on the local backend: Nano scores 18, 19 and 19 of 20; on the support answerer Tavily and Super infer `passages` is relevant from a quoted source, Ultra's one-line fix is proven, and the run is recorded in `demo/runs/` for the hosted demo. Ultra fixes by exact-quote edits. Intent comes from the target's own docs first, search only for the gaps. The README leads with the product working, and an inferred field's card says its intent came from docs. 211 tests pass on `main`; the audit says go on all history. **Live:** the hosted demo, https://loadbearing-demo.vercel.app (A6), with a front page built on the recorded run and a run-all over the 54 benchmark cases. **Not yet live:** the Sandboxes backend (V1, beta not enabled: 403), any recording made on Sandboxes.
-- **Next action:** Aeshvarya, who holds the keys from 10-11: Sandboxes beta access (still 403 on 10-20), then V1's run (hand-off 20 is in, so the image step is covered), `loadbearing probe examples/ticket_triage/target.json --backend sandbox --nano` (pass = the same two defects, found on Nebius), then the support answerer on Sandboxes. Varunika, in this order: **V6, late since 10-18**: the dry run says go, so the flip is one command after the final audit; V8 README narrative, late since 10-18; **V10 narration, which the video (A9, due Wed 10-21) cannot be made without**; V7, open the two sources that refuse scripts, due 10-20; V12 scored review, due 10-20. V9 palette still open: the front page's lime `#c8ff3d`, red `#ff4d4d` and amber `#ffb020` can be adopted as is.
-- **Waiting on:** Aeshvarya confirming or countering the split in WORKPLAN.md (due 2026-10-09; both are working inside it); Sandboxes beta access.
+- **State:** the whole loop has run live on Token Factory, Tavily and **Nebius Sandboxes**: Nano scores 18, 19 and 19 of 20; on the support answerer Tavily and Super infer `passages` is relevant from a quoted source, Ultra's one-line fix is proven, and the run is recorded on Sandboxes in `demo/runs/` for the hosted demo. Ultra fixes by exact-quote edits. Intent comes from the target's own docs first, search only for the gaps. The README leads with the product working, and an inferred field's card says its intent came from docs. 212 tests pass on `main`; the audit says go on all history. **Live:** the hosted demo, https://loadbearing-demo.vercel.app (A6), with a front page built on the recorded run and a run-all over the 54 benchmark cases. **Live since 10-22:** the Sandboxes backend (V1 passed; the support answerer's recording, the README's images and its terminal output all come from a Sandboxes run).
+- **Next action:** Aeshvarya, who holds the keys from 10-11: the video (A9), filmed against the hosted demo, once V10's narration is in. Varunika, in this order: **V6, late since 10-18**: the dry run says go, so the flip is one command after the final audit; V8 README narrative, late since 10-18; **V10 narration, which the video (A9, due Wed 10-21) cannot be made without**; V7, open the two sources that refuse scripts, due 10-20; V12 scored review, due 10-20. V9 palette still open: the front page's lime `#c8ff3d`, red `#ff4d4d` and amber `#ffb020` can be adopted as is.
+- **Waiting on:** Aeshvarya confirming or countering the split in WORKPLAN.md (due 2026-10-09; both are working inside it).
 - **Deadline:** 2026-10-30 10:00 PT (22:30 IST). **Target submission: 2026-10-25.**
 
 ## Plan
@@ -95,6 +95,12 @@ Problem statement: [SPEC.md](SPEC.md). Setup, target format, layout: [README.md]
 ## Log
 
 Newest first.
+
+### 2026-10-22
+- **Sandboxes is live** (Aeshvarya): beta access came through. **V1 passes:** `loadbearing probe examples/ticket_triage/target.json --backend sandbox --nano` finds the same two defects on Nebius, `submitted_at` (phantom sensitivity) and `body` (silent passthrough); checkpoint 4.38 s, then 17 runs in 5.33 s wall (40.55 s one after another, 7.6x parallel).
+- **The support answerer re-recorded on Sandboxes** (`--backend sandbox --intent --prove`, 1 min 17 s): Tavily cites NVIDIA's RAG page again, `passages` is the one defect, Ultra's fix is the same one line, and the proof is clean (`passages` load-bearing, no new defect); the answer goes from "30 days, full refund" to "14 days, warranty". One chance move (`drop:user_id`, 1 of 3) was not counted. Checked the record for key values before committing: none, only the pipeline's own `os.environ[...]` lines, as before. `demo/runs/support_answerer.sandbox.json` replaces the local recording, so the hosted demo replays the Sandboxes run.
+- **README:** every report image, the terminal image and the full terminal output now come from the Sandboxes run; the status says Sandboxes has run live. The front page says the replayed run was recorded there, and its run time reads "for all 21 runs on Nebius Sandboxes".
+- **Fix found while re-rendering:** Ultra's explanation ended inside a code block at its length limit, and the report showed the bare fence. `_prose` now closes a fence left open, with a test. 212 tests, CI green; checked on the hosted demo after the deploy.
 
 ### 2026-10-20
 - **Hand-off 25 reviewed and merged** (Aeshvarya, `8e767c7`): the model's bar spans its three runs, 49 to 51, and the chat shows the whole policy. Read the diff; 210 tests on the merge.
