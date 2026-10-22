@@ -7,8 +7,8 @@ CSS = r"""
 --glow:rgba(200,255,61,.22);--rglow:rgba(255,77,77,.22);--shadow:0 1px 0 rgba(255,255,255,.04) inset,0 30px 80px -20px rgba(0,0,0,.7),0 10px 30px -10px rgba(0,0,0,.6);
 --ease:cubic-bezier(.16,1,.3,1)}
 @media (prefers-color-scheme:light){:root{--bg:#fafaf6;--bg2:#f2f2ec;--panel:#fff;--panel2:#f7f7f2;--line:#e4e4dc;
---line2:#d6d6ce;--text:#0b0b0d;--dim:#5f5f68;--faint:#9a9aa0;--lime:#4f8f00;--red:#d62828;--amber:#c77700;--ink:#fff;
---moved:#4f8f00;--same:#cfcfc8;--silent:#d62828;--phantom:#c77700;--ok:#4f8f00;--glow:rgba(110,180,0,.18);
+--line2:#d6d6ce;--text:#0b0b0d;--dim:#5f5f68;--faint:#9a9aa0;--lime:#467f00;--red:#d62828;--amber:#a35f00;--ink:#fff;
+--moved:#467f00;--same:#cfcfc8;--silent:#d62828;--phantom:#a35f00;--ok:#467f00;--glow:rgba(110,180,0,.18);
 --rglow:rgba(214,40,40,.14);--shadow:0 1px 0 rgba(255,255,255,.8) inset,0 30px 70px -24px rgba(20,20,10,.22),0 8px 24px -12px rgba(20,20,10,.16)}}
 *{box-sizing:border-box}html{scroll-behavior:smooth}
 body{margin:0;background:var(--bg);color:var(--text);overflow-x:hidden;
