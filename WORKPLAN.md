@@ -22,7 +22,7 @@ Every task below is written so either builder can pick it up cold: why it exists
 | V4 | Tavily intent inference | tech | 5 | Sat 10-17 | live 10-10 on the support answerer: `passages` inferred relevant from a quoted source; own docs quoted before search hits 10-11, re-record pending (hand-off 18) |
 | V5 | Fix writer | tech | 4 | contract Sat 10-10, done Sat 10-17 | live 10-10: Ultra's fix proven on the support answerer; edits, not whole files (PR #1) |
 | V6 | Pre-public audit and the public flip | tech | 2 | Sun 10-18 | `scripts/audit.py` built 10-09, go on all history; final run and flip Sun 10-18 |
-| V7 | Prior art and evidence | non-tech | 3 | Tue 10-20 | drafted 10-07; Varunika to open each source |
+| V7 | Prior art and evidence | non-tech | 3 | Tue 10-20 | drafted 10-07; sources checked 10-22, the tribunal page still to open by hand |
 | V8 | README narrative ✍ | non-tech | 3 | Sun 10-18 | todo |
 | V9 | Visual identity | non-tech | 4 | palette Sat 10-10, rest Tue 10-20 | todo |
 | V10 | Video script and voice ✍ | non-tech | 3 | outline Sun 10-11, voice Sun 10-18 | todo |
