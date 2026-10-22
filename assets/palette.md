@@ -1,6 +1,6 @@
 # Palette
 
-Five colours, taken from the front page so the README, the report, the video and Devpost match what a judge already sees on the live demo. Each has a dark and a light value. Contrast is the WCAG ratio against that theme's background; 4.5:1 is the bar for small text, 3:1 for large text and graphics.
+Five colours, taken from the front page so the README, the report, the video and the project page match what a visitor already sees on the live demo. Each has a dark and a light value. Contrast is the WCAG ratio against that theme's background; 4.5:1 is the bar for small text, 3:1 for large text and graphics.
 
 | Role | Used for | Dark | Contrast | Light | Contrast |
 |---|---|---|---|---|---|
