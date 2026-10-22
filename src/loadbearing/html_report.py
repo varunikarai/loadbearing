@@ -21,7 +21,7 @@ CSS = """
 :root{--bg:#0b0b0c;--panel:#141416;--line:#26262a;--text:#f3f3f1;--dim:#8d8d93;
 --moved:#c8ff3d;--same:#3a3a40;--silent:#ff4d4d;--phantom:#ffb020;--ok:#c8ff3d}
 @media (prefers-color-scheme:light){:root{--bg:#fafaf7;--panel:#fff;--line:#e4e4df;--text:#111;
---dim:#6b6b70;--moved:#4c8a00;--same:#cfcfca;--silent:#d62828;--phantom:#c77700;--ok:#4c8a00}}
+--dim:#6b6b70;--moved:#467f00;--same:#cfcfca;--silent:#d62828;--phantom:#a35f00;--ok:#467f00}}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--text);
 font:16px/1.5 Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif}
