@@ -154,7 +154,7 @@ the *same* checkpoint and probed again: the defect is gone and no other field ga
 The demo bug above is planted. These are not: each was a public issue in an open-source AI
 library. Loadbearing ran the release with the bug and the release with the fix on Nebius
 Sandboxes. It flags the first, on the field the issue names, and clears the second: **6 of 6
-releases judged right, with no model needed to find any of them.**
+releases called correctly, with no model needed to find any of them.**
 
 | Library | What went wrong | Release with the bug | Release with the fix | Issue |
 |---|---|---|---|---|
