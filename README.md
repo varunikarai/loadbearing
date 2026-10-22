@@ -28,6 +28,7 @@ The problem statement is in [SPEC.md](SPEC.md).
 
 <p align="center">
   <a href="#see-it-work">See it work</a> ·
+  <a href="#why-it-matters">Why it matters</a> ·
   <a href="#how-it-works">How it works</a> ·
   <a href="#quickstart">Quickstart</a> ·
   <a href="#in-ci">In CI</a> ·
