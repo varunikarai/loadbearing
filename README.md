@@ -448,6 +448,15 @@ Built and tested offline unless it says live. Nemotron, Tavily and the Sandboxes
 
 Sources, differences in full, and documented real failures: [docs/prior-art.md](docs/prior-art.md).
 
+## Team
+
+Built for the Nebius x NVIDIA Global AI Hackathon by two people. Who did what, task by task, is in [WORKPLAN.md](WORKPLAN.md); the history is in [PROGRESS.md](PROGRESS.md).
+
+| | Built |
+|---|---|
+| **Varunika Rai** ([@varunikarai](https://github.com/varunikarai)) | The spec; mutations, verdict rules and the noise floor; the Nemotron layer (Nano judging each fork, Super reconciling them, Ultra explaining and writing the fix); Tavily intent inference; the ticket triage target; the pre-public audit; prior art; the palette |
+| **Aeshvarya Awasthi** ([@Aeshvarya](https://github.com/Aeshvarya)) | The target format and both backends, including the first live Sandboxes runs; secrets into forks; fix and prove; the report and HTML report; the CLI; the support answerer target; the benchmark; CI and the GitHub Action; the hosted demo and its front page |
+
 ## License
 
 [Apache 2.0](LICENSE)
