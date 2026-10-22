@@ -17,6 +17,8 @@
 
 </div>
 
+A pipeline can stop reading one of its inputs and keep producing confident, well-formed output. In the run below, a support bot's retriever writes the store's policy into `passages` while the prompt builder still reads `context`, so nothing throws and the bot promises a 30-day refund the policy does not give. Loadbearing finds that kind of bug by running the pipeline, not by reading it, then fixes it and proves the fix.
+
 Loadbearing checkpoints a pipeline once, in a Nebius Token Factory Sandbox or on your own machine, forks that checkpoint once per input mutation, runs every fork in parallel from the same snapshot, and reports two defect classes:
 
 - **Silent passthrough**: an input that should matter was destroyed, and the output did not move.
