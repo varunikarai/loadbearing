@@ -17,6 +17,8 @@
 
 </div>
 
+A pipeline can stop reading one of its inputs and keep producing confident, well-formed output. In the run below, a support bot's retriever writes the store's policy into `passages` while the prompt builder still reads `context`, so nothing throws and the bot promises a 30-day refund the policy does not give. Loadbearing finds that kind of bug by running the pipeline, not by reading it, then fixes it and proves the fix.
+
 Loadbearing checkpoints a pipeline once, in a Nebius Token Factory Sandbox or on your own machine, forks that checkpoint once per input mutation, runs every fork in parallel from the same snapshot, and reports two defect classes:
 
 - **Silent passthrough**: an input that should matter was destroyed, and the output did not move.
@@ -26,6 +28,7 @@ The problem statement is in [SPEC.md](SPEC.md).
 
 <p align="center">
   <a href="#see-it-work">See it work</a> ·
+  <a href="#why-it-matters">Why it matters</a> ·
   <a href="#how-it-works">How it works</a> ·
   <a href="#quickstart">Quickstart</a> ·
   <a href="#in-ci">In CI</a> ·
@@ -147,6 +150,16 @@ the *same* checkpoint and probed again: the defect is gone and no other field ga
   <img alt="The proof card: a one-line diff from context to passages, silent passthrough turned load-bearing, and the answer before and after" src="docs/img/report-proof-dark.png" width="880">
 </picture>
 </p>
+
+## Why it matters
+
+A bug like this has no error to catch. Tests check that code runs and types match, and a language model fills a missing input with a fluent guess, so the pipeline looks healthy until someone who already knows the right answer reads its output. Failures of this shape reach real people:
+
+- **Air Canada (decided 2024).** The airline's website chatbot told a customer that a bereavement discount could be claimed after travelling, which the airline's policy did not allow. A tribunal held the airline responsible for what its chatbot said ([*Moffatt v. Air Canada*, 2024 BCCRT 149](https://decisions.civilresolutionbc.ca/crt/crtd/en/525448/1/document.do)).
+- **New York City's MyCity chatbot (2024)** told business owners things contrary to city law ([The Markup](https://themarkup.org/news/2024/03/29/nycs-ai-chatbot-tells-businesses-to-break-the-law)).
+- **Public Health England (2020)** left nearly 16,000 positive COVID-19 cases out of its daily figures when a spreadsheet template ran out of rows and later results were silently dropped ([The Conversation](https://theconversation.com/why-you-should-never-use-excel-to-count-coronavirus-cases-147681)).
+
+These are not claims about how those systems were built; they show the failure Loadbearing is built to catch. It is for anyone who ships a pipeline whose output looks right whether or not it used its inputs: retrieval-augmented bots, agents and data pipelines. Run it once on a pipeline you are unsure about, or [in CI](#in-ci), where it fails the build the day a change disconnects an input that should matter.
 
 ## How it works
 
@@ -434,6 +447,15 @@ Built and tested offline unless it says live. Nemotron, Tavily and the Sandboxes
 - **"Lost in the Middle"** (Liu et al., TACL 2024) shows why a retrieval pipeline can answer without using what it retrieved.
 
 Sources, differences in full, and documented real failures: [docs/prior-art.md](docs/prior-art.md).
+
+## Team
+
+Built for the Nebius x NVIDIA Global AI Hackathon by two people. Who did what, task by task, is in [WORKPLAN.md](WORKPLAN.md); the history is in [PROGRESS.md](PROGRESS.md).
+
+| | Built |
+|---|---|
+| **Varunika Rai** ([@varunikarai](https://github.com/varunikarai)) | The spec; mutations, verdict rules and the noise floor; the Nemotron layer (Nano judging each fork, Super reconciling them, Ultra explaining and writing the fix); Tavily intent inference; the ticket triage target; the pre-public audit; prior art; the palette |
+| **Aeshvarya Awasthi** ([@Aeshvarya](https://github.com/Aeshvarya)) | The target format and both backends, including the first live Sandboxes runs; secrets into forks; fix and prove; the report and HTML report; the CLI; the support answerer target; the benchmark; CI and the GitHub Action; the hosted demo and its front page |
 
 ## License
 
