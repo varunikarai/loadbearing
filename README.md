@@ -150,6 +150,16 @@ the *same* checkpoint and probed again: the defect is gone and no other field ga
 </picture>
 </p>
 
+## Why it matters
+
+A bug like this has no error to catch. Tests check that code runs and types match, and a language model fills a missing input with a fluent guess, so the pipeline looks healthy until someone who already knows the right answer reads its output. Failures of this shape reach real people:
+
+- **Air Canada (decided 2024).** The airline's website chatbot told a customer that a bereavement discount could be claimed after travelling, which the airline's policy did not allow. A tribunal held the airline responsible for what its chatbot said ([*Moffatt v. Air Canada*, 2024 BCCRT 149](https://decisions.civilresolutionbc.ca/crt/crtd/en/525448/1/document.do)).
+- **New York City's MyCity chatbot (2024)** told business owners things contrary to city law ([The Markup](https://themarkup.org/news/2024/03/29/nycs-ai-chatbot-tells-businesses-to-break-the-law)).
+- **Public Health England (2020)** left nearly 16,000 positive COVID-19 cases out of its daily figures when a spreadsheet template ran out of rows and later results were silently dropped ([The Conversation](https://theconversation.com/why-you-should-never-use-excel-to-count-coronavirus-cases-147681)).
+
+These are not claims about how those systems were built; they show the failure Loadbearing is built to catch. It is for anyone who ships a pipeline whose output looks right whether or not it used its inputs: retrieval-augmented bots, agents and data pipelines. Run it once on a pipeline you are unsure about, or [in CI](#in-ci), where it fails the build the day a change disconnects an input that should matter.
+
 ## How it works
 
 ```mermaid
