@@ -213,6 +213,28 @@ background:radial-gradient(260px circle at var(--mx,50%) var(--my,50%),color-mix
 .js .chat.in>*:nth-child(4){animation-delay:1.5s}.js .chat.in>*:nth-child(5){animation-delay:2.6s}
 @keyframes msg{to{opacity:1;transform:none}}
 
+/* caught in the wild */
+.wild-s{background:linear-gradient(180deg,transparent,color-mix(in srgb,var(--red) 5%,transparent) 30%,transparent)}
+.wscore{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin:-8px 0 30px}
+.wscore b{font-size:clamp(44px,5vw,64px);font-weight:900;letter-spacing:-.05em;line-height:1}
+.wscore small{font-size:24px;font-weight:800;color:var(--dim)}
+.wscore span{font-size:15px;font-weight:750;color:var(--dim);margin-left:6px}
+.wgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.wcase{display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--line2);border-radius:22px;padding:24px;box-shadow:var(--shadow)}
+.wcase h3{font-size:22px;letter-spacing:-.03em;margin:4px 0 10px}
+.wstory{color:var(--dim);font-size:15px;margin:0 0 18px}
+.vs{display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
+.vrow{display:flex;flex-direction:column;gap:6px;padding:12px 14px;border-radius:14px;border:1px solid var(--line);background:var(--bg2);text-decoration:none;transition:border-color .2s,transform .2s var(--ease)}
+.vrow:hover{transform:translateX(3px)}
+.vrow.bad{border-color:color-mix(in srgb,var(--red) 55%,var(--line))}
+.vrow.good{border-color:color-mix(in srgb,var(--lime) 55%,var(--line))}
+.ver{font:700 13px ui-monospace,"SF Mono",Menlo,monospace;color:var(--dim)}.ver b{color:var(--text)}
+.vgot{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:13px}
+.vpair{display:inline-flex;flex-wrap:wrap;align-items:center;gap:6px}.vpair>*{white-space:nowrap}.wgrid>*{min-width:0}.vgot code{overflow-wrap:anywhere}.vgot code{font:700 12.5px ui-monospace,"SF Mono",Menlo,monospace}
+.v.ok{background:var(--lime);color:var(--ink)}
+.shipped{font-size:13.5px;font-weight:750;color:var(--text);margin:0 0 10px;padding:10px 12px;border-radius:12px;background:color-mix(in srgb,var(--red) 8%,transparent);border:1px solid color-mix(in srgb,var(--red) 30%,var(--line))}
+.wlinks{margin:auto 0 0;font-size:14px;font-weight:750;color:var(--dim)}.wlinks a{text-decoration:none}.wlinks a:hover{color:var(--text)}
+
 /* how it works */
 .how{display:grid;grid-template-columns:.8fr 1.2fr;gap:56px;align-items:start}
 .steps{list-style:none;padding:0;margin:0}
@@ -384,7 +406,7 @@ background:radial-gradient(closest-side,var(--glow),transparent);filter:blur(40p
 .m-body{grid-template-columns:1fr;gap:18px}.m-link{display:none}
 .story,.use,.bugs,.featured,.how{grid-template-columns:1fr}.how-side{position:static}.steps li{min-height:0;padding:18px 0 18px 22px}
 .js .how-on .steps li:not(.on){opacity:1}
-.stats{grid-template-columns:1fr 1fr}.stats div:nth-child(3){border-left:0}.stats div:nth-child(n+3){border-top:1px solid var(--line)}
+.wgrid{grid-template-columns:1fr}.stats{grid-template-columns:1fr 1fr}.stats div:nth-child(3){border-left:0}.stats div:nth-child(n+3){border-top:1px solid var(--line)}
 .bento{grid-template-columns:1fr 1fr}.arena{grid-template-columns:1fr}.score{margin:0 auto}
 .bar{grid-template-columns:1fr auto}.track{grid-column:1/-1;order:3}section{padding:88px 0}
 .nav nav{display:none}}

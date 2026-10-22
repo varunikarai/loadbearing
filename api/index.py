@@ -27,4 +27,4 @@ if not (BIN / "python3").exists():
     (BIN / "python3").symlink_to(sys.executable)
 os.environ["PATH"] = f"{BIN}{os.pathsep}{os.environ.get('PATH', '')}"
 
-app = wsgi_app(Demo(["examples", "bench/cases"], CACHE, "local", readonly=True))
+app = wsgi_app(Demo(["examples", "bench/cases", "realworld"], CACHE, "local", readonly=True))

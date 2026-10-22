@@ -1,0 +1,23 @@
+{
+  "name": "haystack-split-overlap-2.30.2",
+  "image": "python:3.12-slim",
+  "setup": "pip install --quiet --disable-pip-version-check --target deps haystack-ai==2.30.2",
+  "needs_sandbox": true,
+  "files": [
+    "pipeline.py"
+  ],
+  "command": "python3 pipeline.py input.json",
+  "record": "request.json",
+  "timeout": 120,
+  "expects": {
+    "relevant": [
+      "text",
+      "split_length",
+      "split_overlap"
+    ],
+    "irrelevant": [
+      "request_id",
+      "source"
+    ]
+  }
+}

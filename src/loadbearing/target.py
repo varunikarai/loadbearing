@@ -28,6 +28,9 @@ class Target:
     env: list[str] = field(default_factory=list)
     docs: Optional[dict[str, Any]] = None  # {"query": str, "urls": [str]} for Tavily intent
     sources: list[str] = field(default_factory=list)  # files a fix may read and rewrite
+    # The setup installs packages (a pinned library, say), so it runs in a sandbox, never on
+    # the host: the local backend would install them into whatever Python runs it.
+    needs_sandbox: bool = False
 
 
 def load_target(path: str | Path) -> Target:
@@ -53,6 +56,7 @@ def load_target(path: str | Path) -> Target:
         env=list(spec.get("env", [])),
         docs=spec.get("docs"),
         sources=list(spec.get("sources", files)),
+        needs_sandbox=spec.get("needs_sandbox", False),
     )
     _check(target, path)
     return target
@@ -74,6 +78,8 @@ def _check(target: Target, path: Path) -> None:
     runs = target.baseline_runs
     if isinstance(runs, bool) or not isinstance(runs, int) or runs < 2:
         raise RuntimeError(f"{path}: baseline_runs must be an integer, 2 or more")
+    if not isinstance(target.needs_sandbox, bool):
+        raise RuntimeError(f"{path}: needs_sandbox must be true or false")
     if not all(isinstance(name, str) and name for name in target.env):
         raise RuntimeError(f"{path}: env must be a list of variable names")
     if target.docs is not None:

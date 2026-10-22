@@ -1,0 +1,417 @@
+{
+  "schema": 2,
+  "target": "haystack-split-overlap-2.30.2",
+  "backend": "sandbox",
+  "deterministic": true,
+  "void": false,
+  "baseline_runs": 2,
+  "unstable_keys": [],
+  "timing": {
+    "checkpoint_seconds": 24.503973875020165,
+    "fork_wall_seconds": 11.216151624976192,
+    "fork_total_seconds": 67.15189708193066,
+    "runs": 17
+  },
+  "record": {
+    "request_id": "req_31Hq7c",
+    "source": "help/returns-policy",
+    "text": "You can return most items within 14 days of delivery for a full refund. After 14 days, returns are not accepted, but faulty items may still be covered by the 12-month warranty: a repair or a replacement.",
+    "split_length": 80,
+    "split_overlap": 20
+  },
+  "baseline": {
+    "exit_code": 0,
+    "output": {
+      "chunks": [
+        "You can return most items within 14 days of delivery for a full refund. After 14",
+        " days, returns are not accepted, but faulty items may still be covered by the 12",
+        "-month warranty: a repair or a replacement."
+      ]
+    },
+    "seconds": 4.136548292008229
+  },
+  "forks": [
+    {
+      "label": "destroy:request_id",
+      "kind": "destroy",
+      "field": "request_id",
+      "value": "xxxxxxxxxx",
+      "moved": false,
+      "changed": [],
+      "classifier": null,
+      "runs": 1,
+      "moves": 0,
+      "exit_code": 0,
+      "output": {
+        "chunks": [
+          "You can return most items within 14 days of delivery for a full refund. After 14",
+          " days, returns are not accepted, but faulty items may still be covered by the 12",
+          "-month warranty: a repair or a replacement."
+        ]
+      },
+      "seconds": 4.61421974998666
+    },
+    {
+      "label": "drop:request_id",
+      "kind": "drop",
+      "field": "request_id",
+      "value": null,
+      "moved": false,
+      "changed": [],
+      "classifier": null,
+      "runs": 1,
+      "moves": 0,
+      "exit_code": 0,
+      "output": {
+        "chunks": [
+          "You can return most items within 14 days of delivery for a full refund. After 14",
+          " days, returns are not accepted, but faulty items may still be covered by the 12",
+          "-month warranty: a repair or a replacement."
+        ]
+      },
+      "seconds": 4.209283499978483
+    },
+    {
+      "label": "nudge:request_id",
+      "kind": "nudge",
+      "field": "request_id",
+      "value": "req_31Hq7c ",
+      "moved": false,
+      "changed": [],
+      "classifier": null,
+      "runs": 1,
+      "moves": 0,
+      "exit_code": 0,
+      "output": {
+        "chunks": [
+          "You can return most items within 14 days of delivery for a full refund. After 14",
+          " days, returns are not accepted, but faulty items may still be covered by the 12",
+          "-month warranty: a repair or a replacement."
+        ]
+      },
+      "seconds": 4.142004999972414
+    },
+    {
+      "label": "destroy:source",
+      "kind": "destroy",
+      "field": "source",
+      "value": "xxxxxxxxxxxxxxxxxxx",
+      "moved": false,
+      "changed": [],
+      "classifier": null,
+      "runs": 1,
+      "moves": 0,
+      "exit_code": 0,
+      "output": {
+        "chunks": [
+          "You can return most items within 14 days of delivery for a full refund. After 14",
+          " days, returns are not accepted, but faulty items may still be covered by the 12",
+          "-month warranty: a repair or a replacement."
+        ]
+      },
+      "seconds": 4.148153999994975
+    },
+    {
+      "label": "drop:source",
+      "kind": "drop",
+      "field": "source",
+      "value": null,
+      "moved": false,
+      "changed": [],
+      "classifier": null,
+      "runs": 1,
+      "moves": 0,
+      "exit_code": 0,
+      "output": {
+        "chunks": [
+          "You can return most items within 14 days of delivery for a full refund. After 14",
+          " days, returns are not accepted, but faulty items may still be covered by the 12",
+          "-month warranty: a repair or a replacement."
+        ]
+      },
+      "seconds": 4.137012874998618
+    },
+    {
+      "label": "nudge:source",
+      "kind": "nudge",
+      "field": "source",
+      "value": "help/returns-policy ",
+      "moved": false,
+      "changed": [],
+      "classifier": null,
+      "runs": 1,
+      "moves": 0,
+      "exit_code": 0,
+      "output": {
+        "chunks": [
+          "You can return most items within 14 days of delivery for a full refund. After 14",
+          " days, returns are not accepted, but faulty items may still be covered by the 12",
+          "-month warranty: a repair or a replacement."
+        ]
+      },
+      "seconds": 4.379529832978733
+    },
+    {
+      "label": "destroy:text",
+      "kind": "destroy",
+      "field": "text",
+      "value": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+      "moved": true,
+      "changed": [
+        "chunks"
+      ],
+      "classifier": null,
+      "runs": 1,
+      "moves": 1,
+      "exit_code": 0,
+      "output": {
+        "chunks": [
+          "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+          "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+          "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+        ]
+      },
+      "seconds": 3.8284507080097683
+    },
+    {
+      "label": "drop:text",
+      "kind": "drop",
+      "field": "text",
+      "value": null,
+      "moved": true,
+      "changed": [
+        "<exit>"
+      ],
+      "classifier": null,
+      "runs": 1,
+      "moves": 1,
+      "exit_code": 1,
+      "output": "",
+      "seconds": 2.922079250041861
+    },
+    {
+      "label": "nudge:text",
+      "kind": "nudge",
+      "field": "text",
+      "value": "You can return most items within 14 days of delivery for a full refund. After 14 days, returns are not accepted, but faulty items may still be covered by the 12-month warranty: a repair or a replacement. ",
+      "moved": true,
+      "changed": [
+        "chunks"
+      ],
+      "classifier": null,
+      "runs": 1,
+      "moves": 1,
+      "exit_code": 0,
+      "output": {
+        "chunks": [
+          "You can return most items within 14 days of delivery for a full refund. After 14",
+          " days, returns are not accepted, but faulty items may still be covered by the 12",
+          "-month warranty: a repair or a replacement. "
+        ]
+      },
+      "seconds": 3.8972504579578526
+    },
+    {
+      "label": "destroy:split_length",
+      "kind": "destroy",
+      "field": "split_length",
+      "value": 0,
+      "moved": true,
+      "changed": [
+        "<exit>"
+      ],
+      "classifier": null,
+      "runs": 1,
+      "moves": 1,
+      "exit_code": 1,
+      "output": "",
+      "seconds": 3.7080088750226423
+    },
+    {
+      "label": "drop:split_length",
+      "kind": "drop",
+      "field": "split_length",
+      "value": null,
+      "moved": true,
+      "changed": [
+        "chunks"
+      ],
+      "classifier": null,
+      "runs": 1,
+      "moves": 1,
+      "exit_code": 0,
+      "output": {
+        "chunks": [
+          "You can return most items within 14 days of delivery for a full refund. After 14 days, returns are not accepted, but faulty items may still be covered by the 12-month warranty: a repair or a replaceme",
+          "nt."
+        ]
+      },
+      "seconds": 3.855966624978464
+    },
+    {
+      "label": "nudge:split_length",
+      "kind": "nudge",
+      "field": "split_length",
+      "value": 81,
+      "moved": true,
+      "changed": [
+        "chunks"
+      ],
+      "classifier": null,
+      "runs": 1,
+      "moves": 1,
+      "exit_code": 0,
+      "output": {
+        "chunks": [
+          "You can return most items within 14 days of delivery for a full refund. After 14 ",
+          "days, returns are not accepted, but faulty items may still be covered by the 12-m",
+          "onth warranty: a repair or a replacement."
+        ]
+      },
+      "seconds": 3.6765378330019303
+    },
+    {
+      "label": "destroy:split_overlap",
+      "kind": "destroy",
+      "field": "split_overlap",
+      "value": 0,
+      "moved": false,
+      "changed": [],
+      "classifier": null,
+      "runs": 1,
+      "moves": 0,
+      "exit_code": 0,
+      "output": {
+        "chunks": [
+          "You can return most items within 14 days of delivery for a full refund. After 14",
+          " days, returns are not accepted, but faulty items may still be covered by the 12",
+          "-month warranty: a repair or a replacement."
+        ]
+      },
+      "seconds": 3.4311057499726303
+    },
+    {
+      "label": "drop:split_overlap",
+      "kind": "drop",
+      "field": "split_overlap",
+      "value": null,
+      "moved": false,
+      "changed": [],
+      "classifier": null,
+      "runs": 1,
+      "moves": 0,
+      "exit_code": 0,
+      "output": {
+        "chunks": [
+          "You can return most items within 14 days of delivery for a full refund. After 14",
+          " days, returns are not accepted, but faulty items may still be covered by the 12",
+          "-month warranty: a repair or a replacement."
+        ]
+      },
+      "seconds": 3.769071583985351
+    },
+    {
+      "label": "nudge:split_overlap",
+      "kind": "nudge",
+      "field": "split_overlap",
+      "value": 21,
+      "moved": false,
+      "changed": [],
+      "classifier": null,
+      "runs": 1,
+      "moves": 0,
+      "exit_code": 0,
+      "output": {
+        "chunks": [
+          "You can return most items within 14 days of delivery for a full refund. After 14",
+          " days, returns are not accepted, but faulty items may still be covered by the 12",
+          "-month warranty: a repair or a replacement."
+        ]
+      },
+      "seconds": 4.1544909160002135
+    }
+  ],
+  "verdicts": [
+    {
+      "field": "request_id",
+      "intent": "irrelevant",
+      "moved": {
+        "destroy": false,
+        "drop": false,
+        "nudge": false
+      },
+      "verdict": "inert",
+      "defect": false,
+      "intent_source": "declared",
+      "evidence": null,
+      "reconciliation": null,
+      "explanation": null
+    },
+    {
+      "field": "source",
+      "intent": "irrelevant",
+      "moved": {
+        "destroy": false,
+        "drop": false,
+        "nudge": false
+      },
+      "verdict": "inert",
+      "defect": false,
+      "intent_source": "declared",
+      "evidence": null,
+      "reconciliation": null,
+      "explanation": null
+    },
+    {
+      "field": "text",
+      "intent": "relevant",
+      "moved": {
+        "destroy": true,
+        "drop": true,
+        "nudge": true
+      },
+      "verdict": "load-bearing",
+      "defect": false,
+      "intent_source": "declared",
+      "evidence": null,
+      "reconciliation": null,
+      "explanation": null
+    },
+    {
+      "field": "split_length",
+      "intent": "relevant",
+      "moved": {
+        "destroy": true,
+        "drop": true,
+        "nudge": true
+      },
+      "verdict": "load-bearing",
+      "defect": false,
+      "intent_source": "declared",
+      "evidence": null,
+      "reconciliation": null,
+      "explanation": null
+    },
+    {
+      "field": "split_overlap",
+      "intent": "relevant",
+      "moved": {
+        "destroy": false,
+        "drop": false,
+        "nudge": false
+      },
+      "verdict": "silent passthrough",
+      "defect": true,
+      "intent_source": "declared",
+      "evidence": null,
+      "reconciliation": null,
+      "explanation": null
+    }
+  ],
+  "defects": [
+    "split_overlap"
+  ],
+  "fixes": [],
+  "proofs": [],
+  "rejected_fixes": []
+}

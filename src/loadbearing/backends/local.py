@@ -27,6 +27,11 @@ class LocalBackend:
         self._tmp = tempfile.TemporaryDirectory(prefix="loadbearing-")
 
     def checkpoint(self, target: Target) -> Path:
+        if target.needs_sandbox:
+            raise RuntimeError(
+                f"{target.name} installs packages in its setup, so it runs in a sandbox only: "
+                "use --backend sandbox"
+            )
         forwarded_env(target)  # a missing variable fails here, before any run
         ckpt = Path(tempfile.mkdtemp(prefix="checkpoint-", dir=self._tmp.name))
         for rel in target.files:

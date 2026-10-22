@@ -9,10 +9,11 @@ COPY src ./src
 COPY examples ./examples
 COPY bench/cases ./bench/cases
 COPY bench/results.json ./bench/results.json
+COPY realworld ./realworld
 COPY demo/runs ./runs
 RUN pip install --no-cache-dir . && useradd --create-home demo && chown -R demo runs
 USER demo
 ENV PORT=8000
 EXPOSE 8000
 CMD ["loadbearing", "serve", "--host", "0.0.0.0", "--readonly", \
-     "--targets", "examples", "--targets", "bench/cases", "--cache", "runs"]
+     "--targets", "examples", "--targets", "bench/cases", "--targets", "realworld", "--cache", "runs"]

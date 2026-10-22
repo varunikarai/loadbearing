@@ -26,6 +26,7 @@ The problem statement is in [SPEC.md](SPEC.md).
 
 <p align="center">
   <a href="#see-it-work">See it work</a> ·
+  <a href="#caught-in-the-wild">Caught in the wild</a> ·
   <a href="#how-it-works">How it works</a> ·
   <a href="#quickstart">Quickstart</a> ·
   <a href="#in-ci">In CI</a> ·
@@ -147,6 +148,38 @@ the *same* checkpoint and probed again: the defect is gone and no other field ga
   <img alt="The proof card: a one-line diff from context to passages, silent passthrough turned load-bearing, and the answer before and after" src="docs/img/report-proof-dark.png" width="880">
 </picture>
 </p>
+
+## Caught in the wild
+
+The demo bug above is planted. These are not: each was a public issue in an open-source AI
+library. Loadbearing ran the release with the bug and the release with the fix on Nebius
+Sandboxes. It flags the first, on the field the issue names, and clears the second: **6 of 6
+releases judged right, with no model needed to find any of them.**
+
+| Library | What went wrong | Release with the bug | Release with the fix | Issue |
+|---|---|---|---|---|
+| Haystack | `RecursiveDocumentSplitter` dropped `split_overlap` when the text had no separator in it: RAG chunks came back with no overlap. In every release from 2.12.0 (April 2025) to 2.30.2, 37 releases over 15 months (we checked 6 of them) | `haystack-ai` 2.30.2: **SILENT PASSTHROUGH** `split_overlap` | 2.31.0: no defect | [#11767](https://github.com/deepset-ai/haystack/issues/11767) |
+| Haystack | `AnswerBuilder` dropped the caller's runtime `meta` (source URL, policy version) when the reply came from a chat model | `haystack-ai` 2.7.0: **SILENT PASSTHROUGH** `meta.source_url`, `meta.policy_version` | 2.8.0: no defect | [#8542](https://github.com/deepset-ai/haystack/issues/8542) |
+| pydantic-ai | For a union `NativeOutput`, the model was told the last type's docstring ("A vehicle") instead of the caller's `description` | `pydantic-ai-slim` 2.5.0: **SILENT PASSTHROUGH** `output_description` | 2.5.1: no defect | [#6262](https://github.com/pydantic/pydantic-ai/issues/6262) |
+
+Each release is its own target in [`realworld/`](realworld/): the setup pins the library, the
+checkpoint freezes it, and every fork runs against it. The calling code is a few lines that pass
+the request's fields to the library, as a pipeline would.
+
+```
+$ loadbearing probe realworld/haystack-split-overlap-2.30.2/target.json --backend sandbox
+haystack-split-overlap-2.30.2: 15 forks from one checkpoint (sandbox)
+checkpoint 24.50s, then 17 runs in 11.22s wall (67.15s one after another, 6.0x parallel)
+
+field          intent      destroy  drop   nudge  verdict
+request_id     irrelevant  same     same   same   inert
+source         irrelevant  same     same   same   inert
+text           relevant    moved    moved  moved  load-bearing
+split_length   relevant    moved    moved  moved  load-bearing
+split_overlap  relevant    same     same   same   SILENT PASSTHROUGH
+
+1 defect(s): split_overlap (silent passthrough)
+```
 
 ## How it works
 

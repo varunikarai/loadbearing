@@ -1,0 +1,6 @@
+{
+  "user_id": "u_48213",
+  "question": "What is a banana?",
+  "output_name": "fruit_or_vehicle",
+  "output_description": "Classify the thing the user asks about: a fruit with its colour, or a vehicle with its number of wheels."
+}

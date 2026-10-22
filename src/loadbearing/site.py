@@ -77,7 +77,7 @@ HEADLINES = {
 def render_index(demo: Any) -> str:
     hero = demo.cached(HERO) if HERO in demo.targets else None
     starter = STARTER in demo.targets and demo.can_run(STARTER)
-    cases = sum(1 for _, names in demo.groups for n in names if n not in EXAMPLES)
+    cases = len(_bench_names(demo))
     body = "".join([
         '<div class="bg" aria-hidden="true"><i class="aur a1"></i><i class="aur a2"></i><i class="aur a3"></i></div>',
         '<div class="progress" aria-hidden="true"></div>',
@@ -85,6 +85,7 @@ def render_index(demo: Any) -> str:
         _hero(hero, cases),
         _stats(hero),
         _story(hero),
+        _wild(demo),
         _how(hero),
         _two_bugs(),
         _try(demo),
@@ -117,7 +118,7 @@ def _nav() -> str:
     return (
         '<header class="nav"><div class="nav-in">'
         '<a class="logo" href="/"><span class="mark" aria-hidden="true"></span>Loadbearing</a>'
-        '<nav><a href="#how">How it works</a><a href="#try">Try it</a><a href="#benchmark">Benchmark</a>'
+        '<nav><a href="#wild">Real bugs</a><a href="#how">How it works</a><a href="#try">Try it</a><a href="#benchmark">Benchmark</a>'
         f'<a href="{REPO}">GitHub</a></nav>'
         '<a class="btn sm glow" href="#try">Run it live</a></div></header>'
     )
@@ -273,6 +274,55 @@ def _story(data: Optional[dict]) -> str:
     )
 
 
+def _wild(demo: Any) -> str:
+    """Real bugs from public issues: each library's release with the bug and the release with the fix."""
+    rows, right, total = [], 0, 0
+    for case in _cases():
+        buggy, fixed = demo.cached(case["buggy"]), demo.cached(case["fixed"])
+        if not buggy or not fixed:
+            continue
+        flagged = [v for v in buggy["verdicts"] if v.get("defect")]
+        caught = bool(flagged) and all(_names(v["field"], case["field"]) for v in flagged)
+        clean = not any(v.get("defect") for v in fixed["verdicts"])
+        right += caught + clean
+        total += 2
+        chips = "".join(
+            f'<span class="vpair"><span class="v {_cls(v["verdict"])}">{escape(v["verdict"])}</span> '
+            f'<code>{escape(v["field"])}</code></span>'
+            for v in flagged
+        ) or '<span class="muted">no defect found</span>'
+        rows.append(
+            '<article class="wcase spot">'
+            f'<div class="card-top"><span class="kicker">{escape(case["library"])}</span>'
+            f'<a class="tag" href="{escape(case["issue"])}">issue #{escape(case["issue"].rsplit("/", 1)[1])}</a></div>'
+            f'<h3>{escape(case["title"])}</h3><p class="wstory">{escape(case["story"])}</p>'
+            '<div class="vs">'
+            f'<a class="vrow bad" href="/t/{escape(case["buggy"])}"><span class="ver">{escape(case["package"])} '
+            f'<b>{escape(_version(case["buggy"]))}</b></span><span class="vgot">{chips}</span></a>'
+            f'<a class="vrow good" href="/t/{escape(case["fixed"])}"><span class="ver">{escape(case["package"])} '
+            f'<b>{escape(_version(case["fixed"]))}</b></span><span class="vgot">'
+            + ('<span class="v ok">no defect</span> <span class="muted">the fix works</span>' if clean
+               else '<span class="miss">still flagged</span>')
+            + "</span></a></div>"
+            + (f'<p class="shipped">{escape(case["shipped"])}</p>' if case.get("shipped") else "")
+            + f'<p class="wlinks"><a href="{escape(case["issue"])}">The issue</a> · <a href="{escape(case["fix"])}">The fix</a>'
+            f' · <a href="/t/{escape(case["buggy"])}">Loadbearing\'s run →</a></p></article>'
+        )
+    if not rows:
+        return ""
+    return (
+        '<section id="wild" class="wild-s"><div class="wrap">'
+        '<p class="eyebrow">Caught in the wild</p>'
+        "<h2>Not planted by us. Real bugs, in libraries you already use.</h2>"
+        '<p class="lead">Each one was a public issue in an open-source AI library. Loadbearing ran the release '
+        "with the bug and the release with the fix, on Nebius Sandboxes: it flags the first, on the field the "
+        "issue names, and clears the second. No model was needed to find any of them.</p>"
+        f'<p class="wscore"><b data-count="{right}">{right}</b><small> / {total}</small>'
+        "<span>releases judged right: every bug caught, every fix cleared</span></p>"
+        f'<div class="wgrid">{"".join(rows)}</div></div></section>'
+    )
+
+
 def _how(data: Optional[dict]) -> str:
     forks = len(data["forks"]) if data else 14
     steps = [
@@ -340,11 +390,8 @@ def _try(demo: Any) -> str:
     for name in (STARTER, HERO):
         if name in demo.targets:
             featured.append(_card(demo, name, featured=True))
-    for label, names in demo.groups:
-        for name in names:
-            if name in EXAMPLES:
-                continue
-            cases.append(_card(demo, name))
+    for name in _bench_names(demo):
+        cases.append(_card(demo, name))
     chips = "".join(
         f'<button class="chip" data-domain="{k}" type="button">{escape(v)}</button>'
         for k, v in DOMAINS.items()
@@ -633,6 +680,31 @@ def _replay(data: dict) -> dict:
             **out(after.get("baseline", {}).get("output")),
         }
     return replay
+
+
+def _cases() -> list:
+    for base in (Path.cwd(), Path(__file__).resolve().parents[2]):
+        path = base / "realworld" / "cases.json"
+        if path.is_file():
+            try:
+                return json.loads(path.read_text())
+            except ValueError:
+                return []
+    return []
+
+
+def _bench_names(demo: Any) -> list:
+    """The benchmark cases: every target except the two examples and the real-world releases."""
+    return [n for _, names in demo.groups for n in names
+            if n not in EXAMPLES and Path(demo.targets[n]).parent.parent.name != "realworld"]
+
+
+def _names(field: str, named: str) -> bool:
+    return field == named or field.startswith(named + ".")
+
+
+def _version(name: str) -> str:
+    return name.rsplit("-", 1)[1]
 
 
 def _lookup(record: Any, field: str) -> Any:

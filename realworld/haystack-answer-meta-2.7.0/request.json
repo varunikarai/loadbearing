@@ -1,0 +1,9 @@
+{
+  "request_id": "req_8Kx2pd",
+  "query": "Can I still return headphones after 20 days?",
+  "reply": "No, the 14-day return window has passed, but the warranty covers a repair.",
+  "meta": {
+    "source_url": "https://shop.example/help/returns-policy",
+    "policy_version": "2026-09"
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "name": "haystack-answer-meta-2.7.0",
+  "image": "python:3.12-slim",
+  "setup": "pip install --quiet --disable-pip-version-check --target deps haystack-ai==2.7.0",
+  "needs_sandbox": true,
+  "files": [
+    "pipeline.py"
+  ],
+  "command": "python3 pipeline.py input.json",
+  "record": "request.json",
+  "timeout": 120,
+  "expects": {
+    "relevant": [
+      "query",
+      "reply",
+      "meta.source_url",
+      "meta.policy_version"
+    ],
+    "irrelevant": [
+      "request_id"
+    ]
+  }
+}

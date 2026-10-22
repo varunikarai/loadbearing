@@ -1,0 +1,38 @@
+[
+  {
+    "library": "Haystack",
+    "package": "haystack-ai",
+    "field": "split_overlap",
+    "title": "Chunk overlap silently dropped",
+    "story": "A RAG pipeline asks for chunks that overlap by 20 characters, so no sentence is cut in half at a chunk boundary. When the text has no blank line in it, the splitter quietly returned chunks with no overlap at all.",
+    "issue": "https://github.com/deepset-ai/haystack/issues/11767",
+    "fix": "https://github.com/deepset-ai/haystack/pull/11768",
+    "buggy": "haystack-split-overlap-2.30.2",
+    "fixed": "haystack-split-overlap-2.31.0",
+    "shipped": "In every release from 2.12.0 (April 2025) to 2.30.2: 37 releases over 15 months. We checked 6 of them, both ends and four between."
+  },
+  {
+    "library": "Haystack",
+    "package": "haystack-ai",
+    "field": "meta",
+    "title": "Answer metadata silently dropped",
+    "story": "A RAG pipeline attaches where each answer came from, a source URL and a policy version, for citations and audit. When the reply came from a chat model, AnswerBuilder kept the model's metadata and threw the caller's away.",
+    "issue": "https://github.com/deepset-ai/haystack/issues/8542",
+    "fix": "https://github.com/deepset-ai/haystack/pull/8544",
+    "buggy": "haystack-answer-meta-2.7.0",
+    "fixed": "haystack-answer-meta-2.8.0",
+    "shipped": ""
+  },
+  {
+    "library": "pydantic-ai",
+    "package": "pydantic-ai-slim",
+    "field": "output_description",
+    "title": "The model was told the wrong thing",
+    "story": "An agent describes the structured output it wants: a fruit or a vehicle, and what each should hold. For a union of output types, the model was told \"A vehicle\", the docstring of the last type, whatever description the caller gave.",
+    "issue": "https://github.com/pydantic/pydantic-ai/issues/6262",
+    "fix": "https://github.com/pydantic/pydantic-ai/pull/6265",
+    "buggy": "pydantic-ai-description-2.5.0",
+    "fixed": "pydantic-ai-description-2.5.1",
+    "shipped": ""
+  }
+]

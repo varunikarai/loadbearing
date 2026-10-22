@@ -76,6 +76,13 @@ class DemoServerTests(unittest.TestCase):
         self.assertEqual(status, 303)
         self.assertIn("2 defects", self.get(base + "/")[1])
 
+    def test_readonly_never_runs_a_target_that_needs_a_sandbox(self):
+        realworld = EXAMPLES.parent / "realworld"
+        demo = Demo(realworld, self._tmp.name, readonly=True)
+        self.assertTrue(demo.targets)
+        for name in demo.targets:
+            self.assertFalse(demo.can_run(name), name)  # each installs a pinned library
+
     def test_readonly_refuses_a_target_that_needs_keys(self):
         base = self.start(readonly=True)
         status, _ = self.post(base + "/t/support_answerer/run")

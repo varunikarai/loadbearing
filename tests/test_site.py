@@ -96,5 +96,40 @@ class FrontPageTests(unittest.TestCase):
             self.assertNotIn(tag, self.page)
 
 
+class CaughtInTheWildTests(unittest.TestCase):
+    """Real bugs from public issues, judged from the recorded runs of both releases."""
+
+    def setUp(self):
+        self._tmp = tempfile.TemporaryDirectory()
+        for run in RUNS.glob("*.json"):
+            (Path(self._tmp.name) / run.name).write_text(run.read_text())
+        demo = Demo([ROOT / "examples", ROOT / "bench" / "cases", ROOT / "realworld"], self._tmp.name, readonly=True)
+        self.page = render_index(demo)
+
+    def tearDown(self):
+        self._tmp.cleanup()
+
+    def test_every_case_is_caught_on_the_buggy_release_and_cleared_on_the_fixed_one(self):
+        cases = json.loads((ROOT / "realworld" / "cases.json").read_text())
+        for case in cases:
+            buggy = json.loads((RUNS / f'{case["buggy"]}.sandbox.json').read_text())
+            fixed = json.loads((RUNS / f'{case["fixed"]}.sandbox.json').read_text())
+            flagged = [v["field"] for v in buggy["verdicts"] if v["defect"]]
+            self.assertTrue(flagged, case["buggy"])
+            self.assertTrue(all(f == case["field"] or f.startswith(case["field"] + ".") for f in flagged), flagged)
+            self.assertFalse([v for v in fixed["verdicts"] if v["defect"]], case["fixed"])
+            self.assertEqual((buggy["backend"], fixed["backend"]), ("sandbox", "sandbox"))
+            self.assertIn(case["issue"], self.page)
+        total = 2 * len(cases)
+        self.assertIn(f'data-count="{total}">{total}</b><small> / {total}</small>', self.page)
+
+    def test_the_releases_stay_out_of_the_benchmark_and_never_run_on_the_host(self):
+        self.assertIn("Run all 54, live", self.page)
+        for target in (ROOT / "realworld").glob("*/target.json"):
+            card = self.page.split(f'href="/t/{target.parent.name}"', 1)
+            self.assertEqual(len(card), 2, target.parent.name)  # linked from its case
+            self.assertNotIn(f'action="/t/{target.parent.name}/run"', self.page)
+
+
 if __name__ == "__main__":
     unittest.main()
