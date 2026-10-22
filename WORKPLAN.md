@@ -21,10 +21,10 @@ Every task below is written so either builder can pick it up cold: why it exists
 | V3 | Noise floor | tech | 3 | Sat 10-10 | done 10-07 |
 | V4 | Tavily intent inference | tech | 5 | Sat 10-17 | live 10-10 on the support answerer: `passages` inferred relevant from a quoted source; own docs quoted before search hits 10-11, re-record pending (hand-off 18) |
 | V5 | Fix writer | tech | 4 | contract Sat 10-10, done Sat 10-17 | live 10-10: Ultra's fix proven on the support answerer; edits, not whole files (PR #1) |
-| V6 | Pre-public audit and the public flip | tech | 2 | Sun 10-18 | `scripts/audit.py` built 10-09, go on all history; final run and flip Sun 10-18 |
+| V6 | Pre-public audit and the public flip | tech | 2 | Sun 10-18 | final audit 10-22: go on 446 commits; licence and history decided; the flip still to run |
 | V7 | Prior art and evidence | non-tech | 3 | Tue 10-20 | drafted 10-07; sources checked 10-22, the tribunal page still to open by hand |
-| V8 | README narrative ✍ | non-tech | 3 | Sun 10-18 | todo |
-| V9 | Visual identity | non-tech | 4 | palette Sat 10-10, rest Tue 10-20 | todo |
+| V8 | README narrative ✍ | non-tech | 3 | Sun 10-18 | done 10-22: the problem up top, why it matters, team |
+| V9 | Visual identity | non-tech | 4 | palette Sat 10-10, rest Tue 10-20 | palette, Devpost cover and video thumbnail done 10-22; hand-drawn wordmark and diagram open |
 | V10 | Video script and voice ✍ | non-tech | 3 | outline Sun 10-11, voice Sun 10-18 | todo |
 | V11 | Feedback: Sandboxes and Tavily ✍ | non-tech | 1.5 | Fri 10-23 | todo |
 | V12 | Judging self-review | non-tech | 2 | Tue 10-20 and Fri 10-23 | dry run 10-10; scored review 1 on 10-22 (27 of 40, two days late); review 2 Fri 10-23 |
