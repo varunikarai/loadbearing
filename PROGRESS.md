@@ -67,6 +67,7 @@ Each one missing kills the entry.
 - **2026-10-06** Prior art in the README: metamorphic testing and input ablation or sensitivity analysis. Not mutation testing, which mutates the code, not the inputs. (Aeshvarya, accepted.)
 - **2026-10-07** Demo target: **shortlist option 1, the support answerer over retrieved policy (RAG)**. Planted defect: the prompt reads `context`, the retriever writes `passages`, so a 14-day return policy comes out as 30 days. Option 2 (weather tool agent) is the fallback. (Picked by Varunika from Aeshvarya's shortlist.)
 - **2026-10-22** Licence: Apache 2.0 stays. It is what `LICENSE` says and what GitHub detects; changing it would need both builders' agreement here first. (Varunika.)
+- **2026-10-22** History stays as it is: the audit's two known hits, both in old versions and neither a secret, are not rewritten out, since a rewrite changes every commit hash cited in this file and breaks both clones. (Varunika.)
 
 ## Open questions
 
