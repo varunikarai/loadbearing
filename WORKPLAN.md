@@ -27,7 +27,7 @@ Every task below is written so either builder can pick it up cold: why it exists
 | V9 | Visual identity | non-tech | 4 | palette Sat 10-10, rest Tue 10-20 | todo |
 | V10 | Video script and voice ✍ | non-tech | 3 | outline Sun 10-11, voice Sun 10-18 | todo |
 | V11 | Feedback: Sandboxes and Tavily ✍ | non-tech | 1.5 | Fri 10-23 | todo |
-| V12 | Judging self-review | non-tech | 2 | Tue 10-20 and Fri 10-23 | dry run 10-10: three gaps, each with an owner; scored reviews 10-20 and 10-23 |
+| V12 | Judging self-review | non-tech | 2 | Tue 10-20 and Fri 10-23 | dry run 10-10; scored review 1 on 10-22 (27 of 40, two days late); review 2 Fri 10-23 |
 | A1 | Contracts | tech | 2 | Fri 10-09 | done 10-06 |
 | A2 | Secrets into forks | tech | 2 | Sat 10-10 | done 10-06 |
 | A3 | LLM demo target | tech | 6 | shortlist Fri 10-09, done Sat 10-17 | live 10-10 on the local backend, recorded (PR #1); Sandboxes recording after V1 |
