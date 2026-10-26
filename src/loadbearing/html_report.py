@@ -302,6 +302,8 @@ def _model_text(verdict: dict[str, Any]) -> str:
         blocks.append(f'<div class="who">ACROSS ALL FORKS · NEMOTRON SUPER</div>{_prose(verdict["reconciliation"])}')
     if verdict.get("explanation"):
         blocks.append(f'<div class="who">WHY · NEMOTRON ULTRA</div>{_prose(verdict["explanation"])}')
+    for note in verdict.get("citations") or []:
+        blocks.append(f'<div class="who">LINE CHECK · AGAINST THE SOURCE</div><p>{escape(note)}</p>')
     return f'<div class="model">{"".join(blocks)}</div>' if blocks else ""
 
 

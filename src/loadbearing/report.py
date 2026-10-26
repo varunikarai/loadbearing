@@ -9,6 +9,8 @@ did not run, so a schema-2 reader handles a plain probe unchanged:
 
     verdicts[].reconciliation  str or null   Super's statement for the field (V2)
     verdicts[].explanation     str or null   Ultra's account of the code path (V2)
+    verdicts[].citations       [str] or null file:line citations in the explanation that the
+                                             source does not bear out; [] when all hold
     verdicts[].intent_source   "declared" | "inferred" | "undeclared"     (V4)
     verdicts[].evidence        {"intent", "quote", "url"} or null           (V4)
     baseline_runs              int, how often the baseline ran              (V3)
@@ -101,6 +103,7 @@ def _probe_dict(report: Report) -> dict[str, Any]:
                 "evidence": asdict(v.evidence) if v.evidence else None,
                 "reconciliation": v.reconciliation,
                 "explanation": v.explanation,
+                "citations": v.citations,
             }
             for v in report.verdicts
         ],

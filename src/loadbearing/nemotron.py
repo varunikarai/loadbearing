@@ -53,7 +53,8 @@ RECONCILE_SYSTEM = (
 EXPLAIN_SYSTEM = (
     "You are given a pipeline's source code and a defect found by running it. Find the "
     "exact code path responsible and explain why it does or does not read the field. "
-    "Quote the line. Propose the smallest fix."
+    "Quote the line. Propose the smallest fix. Each source line starts with its number and "
+    "a bar; cite a line as path:number using that number, and quote it without the prefix."
 )
 
 FIX_SYSTEM = (

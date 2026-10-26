@@ -272,6 +272,8 @@ def _why(v) -> list[str]:
         lines += _plain(v.reconciliation, "  Super:  ")
     if v.explanation:
         lines += _plain(v.explanation, "  Ultra:  ")
+    for note in v.citations or []:
+        lines += _plain(note, "  check:  ")
     return ["", f"why {v.field}:", *lines] if lines else []
 
 
