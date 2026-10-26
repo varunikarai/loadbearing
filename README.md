@@ -242,7 +242,7 @@ flowchart LR
 | Token Factory Sandboxes | The setup run with `disposable=False` is the checkpoint. Every fork is a run from that snapshot with one mutated input, so the only thing that differs between forks is the input. |
 | Nemotron Nano | One call per moved fork: is the change meaningful, or noise? |
 | Nemotron Super | Reconciles every fork on a field into one defect statement |
-| Nemotron Ultra | Reads the pipeline source and explains why a path does or does not read the field |
+| Nemotron Ultra | Reads the pipeline source, line-numbered, and explains why a path does or does not read the field. Every `file:line` it cites is checked against the file |
 | Tavily | Fetches upstream docs that establish what a pipeline is supposed to read |
 
 ## Quickstart
@@ -506,6 +506,8 @@ Built and tested offline unless it says live. Nemotron, Tavily and the Sandboxes
 - [x] Live: the Sandboxes backend. The toy target finds the same two defects on Nebius (checkpoint 4.4 s, then 17 runs in 5.3 s, 7.6x parallel), and the support answerer's whole loop, intent, fix and proof, ran there and is the recorded run
 - [x] Hosted demo at [loadbearing-demo.vercel.app](https://loadbearing-demo.vercel.app): free targets run on request, paid runs are shown as recorded
 - [x] Real bugs: three public issues in Haystack and pydantic-ai, each flagged on the release with the bug and cleared on the release with the fix ([realworld/](realworld/)), and one regression in the current DSPy release that Loadbearing found itself ([found/](found/))
+- [x] Ultra reads line-numbered source, and every `file:line` it cites is checked against the file; a citation that does not hold is reported beside the explanation, in the terminal and in the HTML report
+- [x] `loadbearing mcp`: the probe as a Model Context Protocol tool, so a coding agent can check the pipeline it just wrote
 - [x] [Demo video](https://www.youtube.com/watch?v=ajrTn_mIN-8), 3 minutes
 
 ## Prior art
