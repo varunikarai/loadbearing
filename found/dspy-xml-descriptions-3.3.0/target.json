@@ -1,0 +1,24 @@
+{
+  "name": "dspy-xml-descriptions-3.3.0",
+  "image": "python:3.12-slim",
+  "setup": "pip install --quiet --disable-pip-version-check --target deps dspy==3.3.0",
+  "needs_sandbox": true,
+  "files": [
+    "pipeline.py"
+  ],
+  "command": "python3 pipeline.py input.json",
+  "record": "request.json",
+  "timeout": 120,
+  "expects": {
+    "relevant": [
+      "question",
+      "passages",
+      "policy_description",
+      "days_description",
+      "refundable_description"
+    ],
+    "irrelevant": [
+      "request_id"
+    ]
+  }
+}
