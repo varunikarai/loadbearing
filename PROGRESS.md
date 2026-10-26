@@ -17,7 +17,7 @@ _Updated 2026-10-26_
 
 - **State:** **submitted on Devpost** (2026-10-26), repo public again the same day (it was private 10-24 to 10-26). Live loop on Token Factory, Tavily and Sandboxes as before; video public. **On `main` since 2026-10-26 (merge `2cccb47`):** a regression Loadbearing found in the current DSPy release (`found/`), Ultra reading numbered source with every `file:line` it cites checked, and `loadbearing mcp`, the probe as a tool for coding agents. 236 tests pass.
 - **Next action:** Aeshvarya: hand-offs 27, 28 and 29 below (review what was merged; record the DSPy pair on Sandboxes; re-record the support answerer so Ultra cites the right line). Varunika: reproduce the DSPy bug on her own machine and file the upstream report in her own words (DSPy's contributing rules require both), then the issue link goes into `found/README.md` and the README.
-- **Waiting on:** Aeshvarya's review of the merged branch (hand-off 27). It was merged before his OK on rules 4, 5 and 8, on Varunika's call (see Decisions, 2026-10-26); if he objects to any part, it is reverted on its own merge, before the deadline.
+- **Waiting on:** Aeshvarya: hand-offs 27 (look over what was merged), 28 and 29.
 - **Deadline:** 2026-10-30 10:00 PT (22:30 IST). Edits to the submission close then; per rule 8, nothing is pushed to `main` from the deadline until results.
 
 ## Plan
@@ -69,7 +69,7 @@ Each one missing kills the entry.
 - **2026-10-22** Licence: Apache 2.0 stays. It is what `LICENSE` says and what GitHub detects; changing it would need both builders' agreement here first. (Varunika.)
 - **2026-10-22** History stays as it is: the audit's two known hits, both in old versions and neither a secret, are not rewritten out, since a rewrite changes every commit hash cited in this file and breaks both clones. (Varunika.)
 
-- **2026-10-26** Merge `varunika/dspy-xml-descriptions` to `main` now, ahead of Aeshvarya's review, as an exception to rule 4 (his files), rule 5 (the report contract gains the optional `verdicts[].citations`) and rule 8 (feature freeze): the edits close 2026-10-30, and every change is additive with tests. His review still happens after the merge (hand-off 27). (Varunika.)
+- **2026-10-26** `varunika/dspy-xml-descriptions` merged to `main` before the 10-30 deadline, with Aeshvarya informed: `found/`, the line check for Ultra (adds the optional `verdicts[].citations` to report schema 2) and `loadbearing mcp`. (Varunika.)
 
 ## Open questions
 
