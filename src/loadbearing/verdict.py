@@ -41,6 +41,7 @@ class FieldVerdict:
     evidence: Optional[Evidence] = None  # set when the intent was inferred
     reconciliation: Optional[str] = None  # Super's statement for the field
     explanation: Optional[str] = None  # Ultra's account of the code path
+    citations: Optional[list[str]] = None  # file:line citations in it that the source does not bear out
 
     @property
     def defect(self) -> bool:

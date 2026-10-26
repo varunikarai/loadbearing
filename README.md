@@ -4,7 +4,7 @@
 
 **Find out which inputs a pipeline is actually load-bearing on, by running it.**
 
-<a href="https://github.com/varunikarai/loadbearing/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/varunikarai/loadbearing/actions/workflows/ci.yml/badge.svg"></a> <a href="LICENSE"><img alt="Apache 2.0" src="https://img.shields.io/badge/license-Apache%202.0-0b0b0c"></a> <img alt="Python 3.10+" src="https://img.shields.io/badge/python-3.10%2B-0b0b0c?logo=python&logoColor=white"> <img alt="NVIDIA Nemotron 3" src="https://img.shields.io/badge/NVIDIA-Nemotron%203%20Nano%20%C2%B7%20Super%20%C2%B7%20Ultra-76B900?logo=nvidia&logoColor=white"> <img alt="Nebius Token Factory" src="https://img.shields.io/badge/Nebius-Token%20Factory-c8ff3d?labelColor=0b0b0c"> <a href="https://loadbearing-demo.vercel.app"><img alt="Live demo" src="https://img.shields.io/badge/live%20demo-loadbearing--demo.vercel.app-ff4d4d?labelColor=0b0b0c"></a>
+<a href="https://github.com/varunikarai/loadbearing/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/varunikarai/loadbearing/actions/workflows/ci.yml/badge.svg"></a> <a href="LICENSE"><img alt="Apache 2.0" src="https://img.shields.io/badge/license-Apache%202.0-0b0b0c"></a> <img alt="Python 3.10+" src="https://img.shields.io/badge/python-3.10%2B-0b0b0c?logo=python&logoColor=white"> <img alt="NVIDIA Nemotron 3" src="https://img.shields.io/badge/NVIDIA-Nemotron%203%20Nano%20%C2%B7%20Super%20%C2%B7%20Ultra-76B900?logo=nvidia&logoColor=white"> <img alt="Nebius Token Factory" src="https://img.shields.io/badge/Nebius-Token%20Factory-c8ff3d?labelColor=0b0b0c"> <a href="https://loadbearing-demo.vercel.app"><img alt="Live demo" src="https://img.shields.io/badge/live%20demo-loadbearing--demo.vercel.app-ff4d4d?labelColor=0b0b0c"></a> <a href="https://www.youtube.com/watch?v=ajrTn_mIN-8"><img alt="Demo video, 3 minutes" src="https://img.shields.io/badge/video-3%20min-ff4d4d?logo=youtube&logoColor=white&labelColor=0b0b0c"></a>
 
 <br><br>
 
@@ -24,6 +24,10 @@ Loadbearing checkpoints a pipeline once, in a Nebius Token Factory Sandbox or on
 - **Silent passthrough**: an input that should matter was destroyed, and the output did not move.
 - **Phantom sensitivity**: an input that should not matter was nudged, and the output moved.
 
+On real libraries it flags three public bugs from Haystack and pydantic-ai on the release that
+shipped each one, clears the release that fixed it, and found a fourth on its own: a regression
+in the current release of DSPy ([Caught in the wild](#caught-in-the-wild)).
+
 The problem statement is in [SPEC.md](SPEC.md).
 
 <p align="center">
@@ -33,6 +37,7 @@ The problem statement is in [SPEC.md](SPEC.md).
   <a href="#how-it-works">How it works</a> ·
   <a href="#quickstart">Quickstart</a> ·
   <a href="#in-ci">In CI</a> ·
+  <a href="#from-a-coding-agent">From a coding agent</a> ·
   <a href="#benchmark">Benchmark</a> ·
   <a href="#the-demo-server">Demo server</a> ·
   <a href="#prior-art">Prior art</a>
@@ -179,6 +184,20 @@ Each release is its own target in [`realworld/`](realworld/): the setup pins the
 checkpoint freezes it, and every fork runs against it. The calling code is a few lines that pass
 the request's fields to the library, as a pipeline would.
 
+### Found, not replayed
+
+Those three were known before Loadbearing ran. This one was not. Probing the current release
+of **DSPy** (3.4.1), Loadbearing flagged every field description of a nested structured output
+as a silent passthrough when the `XMLAdapter` is used: the model is told the output's shape as
+bare tags, and never the descriptions or allowed values the pipeline wrote for it. dspy 3.3.0,
+on the same pipeline and input, is clean, so it is a regression that shipped in 3.3.1 and is
+still on `main`. No upstream issue for it existed when we searched. The pair, the root cause
+and both runs are in [`found/`](found/).
+
+| Library | What goes wrong | Release with the bug | Last release without it |
+|---|---|---|---|
+| DSPy | `XMLAdapter` sends a nested output's structure as bare tags: the descriptions of its fields, and constraints such as a `Literal`'s values, never reach the model | `dspy` 3.4.1: **SILENT PASSTHROUGH** `policy_description`, `days_description`, `refundable_description` | 3.3.0: no defect |
+
 ```
 $ loadbearing probe realworld/haystack-split-overlap-2.30.2/target.json --backend sandbox
 haystack-split-overlap-2.30.2: 15 forks from one checkpoint (sandbox)
@@ -324,6 +343,20 @@ On Nebius, with Nemotron judging each diff, pass the keys from repository secret
     NEMOTRON_NANO_MODEL: ${{ vars.NEMOTRON_NANO_MODEL }}
 ```
 
+## From a coding agent
+
+An agent that has just written or changed a pipeline can probe it before it calls the work
+done. `loadbearing mcp` serves the probe as a Model Context Protocol tool on stdio; add it to
+any MCP client:
+
+```json
+{"mcpServers": {"loadbearing": {"command": "loadbearing", "args": ["mcp"]}}}
+```
+
+The `probe` tool takes a target path and the same options as the command line (backend,
+baseline runs, explain, intent, fix, prove, nano), runs the same code, and returns what the
+terminal shows plus what the exit code means, so the agent reads the verdicts a person would.
+
 ## The report
 
 ```bash
@@ -425,6 +458,7 @@ src/loadbearing/
   nemotron.py        Token Factory client, Nano / Super / Ultra routing
   tavily.py          Tavily search and extract client
   intent.py          what undeclared fields should do, quoted from the pipeline's docs
+  citations.py       numbered source for Ultra, and a check of every file:line it cites
   net.py             one JSON request, retried on a rate limit, a 5xx or a dropped connection
   fix.py             a fix, and the checks it passes before any fork applies it
   prove.py           re-probe a fix from the same checkpoint; the whole loop
@@ -432,7 +466,8 @@ src/loadbearing/
   html_report.py     the self-contained HTML report and fork tree
   markdown_report.py the Markdown summary for CI job summaries
   serve.py           the demo server
-  cli.py             loadbearing probe | report | serve | models
+  mcp.py             the probe as a tool for coding agents (Model Context Protocol)
+  cli.py             loadbearing probe | report | serve | mcp | models
 examples/ticket_triage/     toy pipeline with two planted bugs
 examples/support_answerer/  LLM pipeline on Nemotron that ignores what it retrieved
 ```
@@ -470,7 +505,8 @@ Built and tested offline unless it says live. Nemotron, Tavily and the Sandboxes
 - [x] Live: Tavily inferring which fields should matter. On the support answerer it finds a RAG source saying answers come from the retrieved passages, which makes the unread `passages` field a defect; Ultra's one-line fix is proven, and the answer goes from "30 days, refund" to "14 days, warranty"
 - [x] Live: the Sandboxes backend. The toy target finds the same two defects on Nebius (checkpoint 4.4 s, then 17 runs in 5.3 s, 7.6x parallel), and the support answerer's whole loop, intent, fix and proof, ran there and is the recorded run
 - [x] Hosted demo at [loadbearing-demo.vercel.app](https://loadbearing-demo.vercel.app): free targets run on request, paid runs are shown as recorded
-- [ ] Demo video
+- [x] Real bugs: three public issues in Haystack and pydantic-ai, each flagged on the release with the bug and cleared on the release with the fix ([realworld/](realworld/)), and one regression in the current DSPy release that Loadbearing found itself ([found/](found/))
+- [x] [Demo video](https://www.youtube.com/watch?v=ajrTn_mIN-8), 3 minutes
 
 ## Prior art
 

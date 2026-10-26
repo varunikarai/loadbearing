@@ -1,0 +1,8 @@
+{
+  "request_id": "req_7731",
+  "question": "I bought headphones 20 days ago. Can I still return them for a refund?",
+  "passages": "Returns are accepted within 14 days of delivery. After that, items are covered by the one-year warranty for repair or replacement only.",
+  "policy_description": "The return terms that apply to this customer, taken from the passages.",
+  "days_description": "The return window in days, exactly as the passages state it. Never assume a common default such as 30.",
+  "refundable_description": "Whether this customer can still get a refund, given how long ago they bought the item."
+}

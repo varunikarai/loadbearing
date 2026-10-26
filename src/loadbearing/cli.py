@@ -74,6 +74,8 @@ def main(argv: Optional[list[str]] = None) -> int:
     # Hosting platforms say which port to bind through $PORT.
     s.add_argument("--port", type=int, default=int(os.environ.get("PORT", 8000)))
 
+    sub.add_parser("mcp", help="serve the probe as a tool for coding agents (Model Context Protocol, stdio)")
+
     m = sub.add_parser("models", help="list the Nemotron model IDs your Token Factory key can call")
     m.add_argument("--all", action="store_true", help="list every model, not only Nemotron")
 
@@ -85,6 +87,10 @@ def main(argv: Optional[list[str]] = None) -> int:
             return _report(args.report, args.output)
         if args.command == "serve":
             return _serve(args)
+        if args.command == "mcp":
+            from loadbearing.mcp import serve as serve_mcp
+
+            return serve_mcp()
         return _probe(args)
     except RuntimeError as exc:
         print(f"loadbearing: {exc}", file=sys.stderr)
@@ -272,6 +278,8 @@ def _why(v) -> list[str]:
         lines += _plain(v.reconciliation, "  Super:  ")
     if v.explanation:
         lines += _plain(v.explanation, "  Ultra:  ")
+    for note in v.citations or []:
+        lines += _plain(note, "  check:  ")
     return ["", f"why {v.field}:", *lines] if lines else []
 
 

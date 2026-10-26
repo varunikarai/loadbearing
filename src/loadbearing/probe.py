@@ -8,7 +8,7 @@ from dataclasses import dataclass, field
 from typing import Any, Callable, Optional
 
 from loadbearing.backends.base import Backend, RunResult
-from loadbearing import noise
+from loadbearing import citations, noise
 from loadbearing.compare import Diff, compare
 from loadbearing.fix import read_sources
 from loadbearing.mutations import Mutation, plan
@@ -171,7 +171,9 @@ def explain_defects(verdicts: list[FieldVerdict], target: Target, router: Any) -
     defects = [v for v in verdicts if v.defect]
     if not defects:
         return
-    source = "\n\n".join(f"--- {rel}\n{text}" for rel, text in read_sources(target).items())
+    sources = read_sources(target)
+    source = citations.numbered(sources)
     for verdict in defects:
         verdict.reconciliation = router.reconcile(verdict)
         verdict.explanation = router.explain(verdict, source)
+        verdict.citations = citations.check(verdict.explanation, sources)
