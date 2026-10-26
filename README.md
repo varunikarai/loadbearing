@@ -37,6 +37,7 @@ The problem statement is in [SPEC.md](SPEC.md).
   <a href="#how-it-works">How it works</a> ·
   <a href="#quickstart">Quickstart</a> ·
   <a href="#in-ci">In CI</a> ·
+  <a href="#from-a-coding-agent">From a coding agent</a> ·
   <a href="#benchmark">Benchmark</a> ·
   <a href="#the-demo-server">Demo server</a> ·
   <a href="#prior-art">Prior art</a>
@@ -342,6 +343,20 @@ On Nebius, with Nemotron judging each diff, pass the keys from repository secret
     NEMOTRON_NANO_MODEL: ${{ vars.NEMOTRON_NANO_MODEL }}
 ```
 
+## From a coding agent
+
+An agent that has just written or changed a pipeline can probe it before it calls the work
+done. `loadbearing mcp` serves the probe as a Model Context Protocol tool on stdio; add it to
+any MCP client:
+
+```json
+{"mcpServers": {"loadbearing": {"command": "loadbearing", "args": ["mcp"]}}}
+```
+
+The `probe` tool takes a target path and the same options as the command line (backend,
+baseline runs, explain, intent, fix, prove, nano), runs the same code, and returns what the
+terminal shows plus what the exit code means, so the agent reads the verdicts a person would.
+
 ## The report
 
 ```bash
@@ -443,6 +458,7 @@ src/loadbearing/
   nemotron.py        Token Factory client, Nano / Super / Ultra routing
   tavily.py          Tavily search and extract client
   intent.py          what undeclared fields should do, quoted from the pipeline's docs
+  citations.py       numbered source for Ultra, and a check of every file:line it cites
   net.py             one JSON request, retried on a rate limit, a 5xx or a dropped connection
   fix.py             a fix, and the checks it passes before any fork applies it
   prove.py           re-probe a fix from the same checkpoint; the whole loop
@@ -450,7 +466,8 @@ src/loadbearing/
   html_report.py     the self-contained HTML report and fork tree
   markdown_report.py the Markdown summary for CI job summaries
   serve.py           the demo server
-  cli.py             loadbearing probe | report | serve | models
+  mcp.py             the probe as a tool for coding agents (Model Context Protocol)
+  cli.py             loadbearing probe | report | serve | mcp | models
 examples/ticket_triage/     toy pipeline with two planted bugs
 examples/support_answerer/  LLM pipeline on Nemotron that ignores what it retrieved
 ```
