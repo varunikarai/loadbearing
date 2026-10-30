@@ -4,7 +4,7 @@
 
 **Find out which inputs a pipeline is actually load-bearing on, by running it.**
 
-<a href="https://github.com/varunikarai/loadbearing/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/varunikarai/loadbearing/actions/workflows/ci.yml/badge.svg"></a> <a href="LICENSE"><img alt="Apache 2.0" src="https://img.shields.io/badge/license-Apache%202.0-0b0b0c"></a> <img alt="Python 3.10+" src="https://img.shields.io/badge/python-3.10%2B-0b0b0c?logo=python&logoColor=white"> <img alt="NVIDIA Nemotron 3" src="https://img.shields.io/badge/NVIDIA-Nemotron%203%20Nano%20%C2%B7%20Super%20%C2%B7%20Ultra-76B900?logo=nvidia&logoColor=white"> <img alt="Nebius Token Factory" src="https://img.shields.io/badge/Nebius-Token%20Factory-c8ff3d?labelColor=0b0b0c"> <a href="https://loadbearing-demo.vercel.app"><img alt="Live demo" src="https://img.shields.io/badge/live%20demo-loadbearing--demo.vercel.app-ff4d4d?labelColor=0b0b0c"></a> <a href="https://www.youtube.com/watch?v=ajrTn_mIN-8"><img alt="Demo video, 3 minutes" src="https://img.shields.io/badge/video-3%20min-ff4d4d?logo=youtube&logoColor=white&labelColor=0b0b0c"></a>
+<a href="https://github.com/varunikarai/loadbearing/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/varunikarai/loadbearing/actions/workflows/ci.yml/badge.svg"></a> <a href="LICENSE"><img alt="Apache 2.0" src="https://img.shields.io/badge/license-Apache%202.0-0b0b0c"></a> <img alt="Python 3.10+" src="https://img.shields.io/badge/python-3.10%2B-0b0b0c?logo=python&logoColor=white"> <img alt="NVIDIA Nemotron 3" src="https://img.shields.io/badge/NVIDIA-Nemotron%203%20Nano%20%C2%B7%20Super%20%C2%B7%20Ultra-76B900?logo=nvidia&logoColor=white"> <img alt="Nebius Token Factory" src="https://img.shields.io/badge/Nebius-Token%20Factory-c8ff3d?labelColor=0b0b0c"> <a href="https://loadbearing-demo.vercel.app"><img alt="Live demo" src="https://img.shields.io/badge/live%20demo-loadbearing--demo.vercel.app-ff4d4d?labelColor=0b0b0c"></a> <a href="https://www.youtube.com/watch?v=EyMuK2FBvmU"><img alt="Demo video, 3 minutes" src="https://img.shields.io/badge/video-3%20min-ff4d4d?logo=youtube&logoColor=white&labelColor=0b0b0c"></a>
 
 <br><br>
 
@@ -508,7 +508,7 @@ Built and tested offline unless it says live. Nemotron, Tavily and the Sandboxes
 - [x] Real bugs: three public issues in Haystack and pydantic-ai, each flagged on the release with the bug and cleared on the release with the fix ([realworld/](realworld/)), and one regression in the current DSPy release that Loadbearing found itself ([found/](found/))
 - [x] Ultra reads line-numbered source, and every `file:line` it cites is checked against the file; a citation that does not hold is reported beside the explanation, in the terminal and in the HTML report
 - [x] `loadbearing mcp`: the probe as a Model Context Protocol tool, so a coding agent can check the pipeline it just wrote
-- [x] [Demo video](https://www.youtube.com/watch?v=ajrTn_mIN-8), 3 minutes
+- [x] [Demo video](https://www.youtube.com/watch?v=EyMuK2FBvmU), 3 minutes
 
 ## Prior art
 
