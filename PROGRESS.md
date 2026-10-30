@@ -13,9 +13,9 @@ Where Loadbearing is, what happens next, and what has already happened. **Now**,
 
 ## Now
 
-_Updated 2026-10-26_
+_Updated 2026-10-30_
 
-- **State:** **submitted on Devpost** (2026-10-26), repo public again the same day (it was private 10-24 to 10-26). Live loop on Token Factory, Tavily and Sandboxes as before; video v2 live (2026-10-30, https://www.youtube.com/watch?v=EyMuK2FBvmU), README points at it, Devpost video field still to swap before the 2026-10-30 22:30 IST close. **On `main` since 2026-10-26 (merge `2cccb47`):** a regression Loadbearing found in the current DSPy release (`found/`), Ultra reading numbered source with every `file:line` it cites checked, and `loadbearing mcp`, the probe as a tool for coding agents. 236 tests pass.
+- **State:** **submitted on Devpost** (2026-10-26), repo public again the same day (it was private 10-24 to 10-26). Live loop on Token Factory, Tavily and Sandboxes as before; video v2 live (2026-10-30, https://www.youtube.com/watch?v=EyMuK2FBvmU), README points at it, and the Devpost page (video, text, gallery) was updated to match on 2026-10-30. **On `main` since 2026-10-26 (merge `2cccb47`):** a regression Loadbearing found in the current DSPy release (`found/`), Ultra reading numbered source with every `file:line` it cites checked, and `loadbearing mcp`, the probe as a tool for coding agents. 236 tests pass.
 - **Next action:** Aeshvarya: hand-offs 27, 28 and 29 below (review what was merged; record the DSPy pair on Sandboxes; re-record the support answerer so Ultra cites the right line). Varunika: reproduce the DSPy bug on her own machine and file the upstream report in her own words (DSPy's contributing rules require both), then the issue link goes into `found/README.md` and the README.
 - **Waiting on:** Aeshvarya: hand-offs 27 (look over what was merged), 28 and 29.
 - **Deadline:** 2026-10-30 10:00 PT (22:30 IST). Edits to the submission close then; per rule 8, nothing is pushed to `main` from the deadline until results.
@@ -103,6 +103,7 @@ Newest first.
 ### 2026-10-30
 
 - **Video v2 is up**: https://www.youtube.com/watch?v=EyMuK2FBvmU, 2:53, plays logged out. The README badge and the deliverables checklist now link it (`86d8039`). The Devpost video URL still points at v1 and has to be swapped before the close, 2026-10-30 22:30 IST.
+- **Devpost page refreshed before the close** (Varunika): video URL swapped to v2; new tagline; the About now opens with the three Haystack and pydantic-ai bugs (6 of 6 releases) and the DSPy find, says 236 tests, and states the `pipeline.py:18` citation miss as the reason for the line check (the old "traces the bug to `pipeline.py:18`", "216 tests" and "3,000 random records" lines are gone); the models and Nebius capability answers updated; a new gallery image of the recorded Sandboxes runs of haystack-ai 2.30.2 (flagged) and 2.31.0 (cleared). Nothing in the repo changed for it. Still open: hand-off 28, the DSPy pair is not recorded on Sandboxes.
 
 ### 2026-10-26
 - **Submitted** on Devpost; the repo was private from 10-24 and was made public again after submission, as the rules require until judging ends on 2026-12-15 (Varunika).
