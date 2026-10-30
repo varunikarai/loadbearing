@@ -102,7 +102,7 @@ Newest first.
 
 ### 2026-10-30
 
-- **Video v2 is up** (Aeshvarya's edit, Varunika's narration): https://www.youtube.com/watch?v=EyMuK2FBvmU, 2:53, plays logged out. The README badge and the deliverables checklist now link it (`86d8039`). The Devpost video URL still points at v1 and has to be swapped before the close, 2026-10-30 22:30 IST.
+- **Video v2 is up**: https://www.youtube.com/watch?v=EyMuK2FBvmU, 2:53, plays logged out. The README badge and the deliverables checklist now link it (`86d8039`). The Devpost video URL still points at v1 and has to be swapped before the close, 2026-10-30 22:30 IST.
 
 ### 2026-10-26
 - **Submitted** on Devpost; the repo was private from 10-24 and was made public again after submission, as the rules require until judging ends on 2026-12-15 (Varunika).
