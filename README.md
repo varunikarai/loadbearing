@@ -138,7 +138,10 @@ they are the ones a chance answer could turn into a false defect.
 
 **The evidence.** `passages` was never declared as an input that matters. Tavily read the guide
 the target names, NVIDIA's own page on retrieval-augmented generation; Super quoted it, and that
-turned "the output never moved" into a cited defect. Ultra then named the line.
+turned "the output never moved" into a cited defect. Ultra then named the line, and gave it the
+wrong number: `pipeline.py:18`. Every `file:line` Ultra cites is now checked against the source,
+and the check flags this one: line 18 is `import re`, and the line Ultra quotes is line 37. The
+report shows that note under Ultra's account.
 
 <p align="center">
 <picture>

@@ -315,7 +315,8 @@
       "intent_source": "declared",
       "evidence": null,
       "reconciliation": null,
-      "explanation": null
+      "explanation": null,
+      "citations": null
     },
     {
       "field": "user_id",
@@ -330,7 +331,8 @@
       "intent_source": "declared",
       "evidence": null,
       "reconciliation": null,
-      "explanation": null
+      "explanation": null,
+      "citations": null
     },
     {
       "field": "received_at",
@@ -345,7 +347,8 @@
       "intent_source": "declared",
       "evidence": null,
       "reconciliation": null,
-      "explanation": null
+      "explanation": null,
+      "citations": null
     },
     {
       "field": "question",
@@ -360,7 +363,8 @@
       "intent_source": "declared",
       "evidence": null,
       "reconciliation": null,
-      "explanation": null
+      "explanation": null,
+      "citations": null
     },
     {
       "field": "passages",
@@ -378,7 +382,10 @@
         "url": "https://blogs.nvidia.com/blog/what-is-retrieval-augmented-generation/"
       },
       "reconciliation": "This is a silent passthrough: the field\u202f*passages* is marked as relevant (supposed to matter), yet neither destroying nor dropping it caused any change in the pipeline\u2019s output (both\u202fdestroy\u202fand\u202fdrop\u202fare\u202ffalse). The lack of output movement despite the field\u2019s relevance indicates that the pipeline is ignoring the field rather than using it.",
-      "explanation": "**Code path responsible:**  \nThe `build_prompt` function reads the retrieved policy text from `request[\"context\"]`, but the retriever now stores that text in `request[\"passages\"]`. Because the key mismatch is silent (`.get` returns `\"\"`), the policy passages never reach the prompt, and the LLM answers from generic knowledge.\n\n**Line that reads the wrong field (pipeline.py:18):**\n```python\n    context = request.get(\"context\", \"\")\n```\n\n**Why it fails:**  \nThe retriever was changed to write its output under the key `\"passages\"`. This line still asks for `\"context\"`, so `context` becomes an empty string. The prompt sent to the model then contains only the customer\u2019s question, and the model hallucinates a return policy (e.g., 30\u2011day refund) instead of using the actual policy (14 days, no refund).\n\n**Smallest fix:**  \nChange the key from `\"context\"` to `\"passages\"` (the variable name can stay `context` for minimal diff).\n\n```python\n    context = request.get(\"passages\", \"\")\n```\n\nIf the retriever returns a list of passages, a slightly more robust fix would be:\n```python\n    passages = request.get(\"passages\", \"\")\n    context = \"\\n\".join(passages) if isinstance(passages, list)"
+      "explanation": "**Code path responsible:**  \nThe `build_prompt` function reads the retrieved policy text from `request[\"context\"]`, but the retriever now stores that text in `request[\"passages\"]`. Because the key mismatch is silent (`.get` returns `\"\"`), the policy passages never reach the prompt, and the LLM answers from generic knowledge.\n\n**Line that reads the wrong field (pipeline.py:18):**\n```python\n    context = request.get(\"context\", \"\")\n```\n\n**Why it fails:**  \nThe retriever was changed to write its output under the key `\"passages\"`. This line still asks for `\"context\"`, so `context` becomes an empty string. The prompt sent to the model then contains only the customer\u2019s question, and the model hallucinates a return policy (e.g., 30\u2011day refund) instead of using the actual policy (14 days, no refund).\n\n**Smallest fix:**  \nChange the key from `\"context\"` to `\"passages\"` (the variable name can stay `context` for minimal diff).\n\n```python\n    context = request.get(\"passages\", \"\")\n```\n\nIf the retriever returns a list of passages, a slightly more robust fix would be:\n```python\n    passages = request.get(\"passages\", \"\")\n    context = \"\\n\".join(passages) if isinstance(passages, list)",
+      "citations": [
+        "pipeline.py:18 is `import re`, which the explanation does not quote; the line it quotes from that file is at pipeline.py:37"
+      ]
     }
   ],
   "defects": [
